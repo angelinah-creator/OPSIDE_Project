@@ -17,26 +17,26 @@ OPSIDE est une marketplace B2B qui met en relation des développeurs freelance (
 
 ### Stack technique
 
-| Couche | Technologie |
-|---|---|
-| Backend | Node.js + NestJS |
-| Frontend | React + Next.js + TypeScript |
-| Base de données | PostgreSQL |
-| ORM | Prisma |
-| Auth | JWT (access 15min / refresh 7j) |
-| IA | API Claude (Anthropic) — `claude-sonnet-4-20250514` |
-| Stockage fichiers | AWS S3 |
-| Emails | NodeMailer / SendGrid |
-| Paiements (Drop 3) | Stripe |
-| Signature (Drop 2) | SignFlow |
+| Couche             | Technologie                                         |
+| ------------------ | --------------------------------------------------- |
+| Backend            | Node.js + NestJS                                    |
+| Frontend           | React + Next.js + TypeScript                        |
+| Base de données    | PostgreSQL                                          |
+| ORM                | Prisma                                              |
+| Auth               | JWT (access 15min / refresh 7j)                     |
+| IA                 | API Claude (Anthropic) — `claude-sonnet-4-20250514` |
+| Stockage fichiers  | AWS S3                                              |
+| Emails             | NodeMailer / SendGrid                               |
+| Paiements (Drop 3) | Stripe                                              |
+| Signature (Drop 2) | SignFlow                                            |
 
 ### Rôles utilisateurs
 
-| Rôle | Label | Création |
-|---|---|---|
-| A | Candidat (développeur) | Inscription publique |
-| B | Client (entreprise) | Inscription publique |
-| C | Admin OPSIDE | Manuel en BDD / seed |
+| Rôle | Label                  | Création             |
+| ---- | ---------------------- | -------------------- |
+| A    | Candidat (développeur) | Inscription publique |
+| B    | Client (entreprise)    | Inscription publique |
+| C    | Admin OPSIDE           | Manuel en BDD / seed |
 
 ---
 
@@ -92,15 +92,14 @@ module/
 
 ### Middlewares & Guards
 
-| Middleware / Guard | Rôle |
-|---|---|
-| `JwtAuthGuard` | Vérifie le token JWT sur toutes les routes protégées |
-| `RolesGuard` | Restreint l'accès selon le rôle (A / B / C) |
-| `ThrottlerGuard` | Rate limiting global |
-| `LoggingInterceptor` | Log de chaque requête entrante |
-| `TransformInterceptor` | Standardise le format de réponse `{ data, meta }` |
-| `HttpExceptionFilter` | Gestion uniforme des erreurs HTTP |
-
+| Middleware / Guard     | Rôle                                                 |
+| ---------------------- | ---------------------------------------------------- |
+| `JwtAuthGuard`         | Vérifie le token JWT sur toutes les routes protégées |
+| `RolesGuard`           | Restreint l'accès selon le rôle (A / B / C)          |
+| `ThrottlerGuard`       | Rate limiting global                                 |
+| `LoggingInterceptor`   | Log de chaque requête entrante                       |
+| `TransformInterceptor` | Standardise le format de réponse `{ data, meta }`    |
+| `HttpExceptionFilter`  | Gestion uniforme des erreurs HTTP                    |
 
 ---
 
@@ -110,45 +109,45 @@ module/
 
 #### Candidat (A)
 
-| Route | Page | Drop |
-|---|---|---|
-| `/register` | Inscription | 1 |
-| `/login` | Connexion | 1 |
-| `/profile/edit` | Compléter son profil | 1 |
-| `/test` | Passer le test technique IA | 1 |
-| `/jobs` | Voir les offres anonymes | 1 |
-| `/applications` | Mes candidatures | 1 |
-| `/matches` | Mes matchs | 1 |
-| `/workspace` | Dashboard post-placement | 1 |
-| `/workspace/timesheets` | Logger ses heures | 1 |
-| `/workspace/contracts` | Voir ses contrats | 2 |
-| `/workspace/invoices` | Voir ses factures | 3 |
+| Route                   | Page                        | Drop |
+| ----------------------- | --------------------------- | ---- |
+| `/register`             | Inscription                 | 1    |
+| `/login`                | Connexion                   | 1    |
+| `/profile/edit`         | Compléter son profil        | 1    |
+| `/test`                 | Passer le test technique IA | 1    |
+| `/jobs`                 | Voir les offres anonymes    | 1    |
+| `/applications`         | Mes candidatures            | 1    |
+| `/matches`              | Mes matchs                  | 1    |
+| `/workspace`            | Dashboard post-placement    | 1    |
+| `/workspace/timesheets` | Logger ses heures           | 1    |
+| `/workspace/contracts`  | Voir ses contrats           | 2    |
+| `/workspace/invoices`   | Voir ses factures           | 3    |
 
 #### Client (B)
 
-| Route | Page | Drop |
-|---|---|---|
-| `/register` | Inscription | 1 |
-| `/login` | Connexion | 1 |
-| `/profile/edit` | Profil entreprise | 1 |
-| `/candidates` | Parcourir les profils anonymisés | 1 |
-| `/jobs/new` | Poster une offre | 1 |
-| `/jobs/:id/applications` | Voir les candidatures | 1 |
-| `/matches` | Mes matchs | 1 |
-| `/workspace` | Dashboard collaborateurs | 1 |
-| `/workspace/timesheets` | Approuver les timesheets | 1 |
-| `/workspace/contracts` | Voir les contrats | 2 |
-| `/workspace/invoices` | Factures & paiement | 3 |
+| Route                    | Page                             | Drop |
+| ------------------------ | -------------------------------- | ---- |
+| `/register`              | Inscription                      | 1    |
+| `/login`                 | Connexion                        | 1    |
+| `/profile/edit`          | Profil entreprise                | 1    |
+| `/candidates`            | Parcourir les profils anonymisés | 1    |
+| `/jobs/new`              | Poster une offre                 | 1    |
+| `/jobs/:id/applications` | Voir les candidatures            | 1    |
+| `/matches`               | Mes matchs                       | 1    |
+| `/workspace`             | Dashboard collaborateurs         | 1    |
+| `/workspace/timesheets`  | Approuver les timesheets         | 1    |
+| `/workspace/contracts`   | Voir les contrats                | 2    |
+| `/workspace/invoices`    | Factures & paiement              | 3    |
 
 #### Admin (C)
 
-| Route | Page | Drop |
-|---|---|---|
-| `/admin/dashboard` | Stats globales | 1 |
-| `/admin/users` | Gestion utilisateurs | 1 |
-| `/admin/matches` | Supervision matchs | 1 |
-| `/admin/contracts` | Générer les contrats | 2 |
-| `/admin/invoices` | Lancer la facturation (cron) | 3 |
+| Route              | Page                         | Drop |
+| ------------------ | ---------------------------- | ---- |
+| `/admin/dashboard` | Stats globales               | 1    |
+| `/admin/users`     | Gestion utilisateurs         | 1    |
+| `/admin/matches`   | Supervision matchs           | 1    |
+| `/admin/contracts` | Générer les contrats         | 2    |
+| `/admin/invoices`  | Lancer la facturation (cron) | 3    |
 
 ### Services API (frontend)
 
@@ -166,6 +165,7 @@ services/
 ```
 
 Tous les services utilisent une instance Axios centralisée avec :
+
 - Injection automatique du header `Authorization: Bearer <token>`
 - Intercepteur de refresh token automatique (401 → refresh → retry)
 - Gestion centralisée des erreurs
@@ -645,16 +645,16 @@ frontend/
 
 ### Général
 
-| Contexte | Convention | Exemple |
-|---|---|---|
-| Variables & fonctions | `camelCase` | `getUserById`, `isProfileComplete` |
-| Classes & types TS | `PascalCase` | `CandidateProfile`, `CreateJobDto` |
-| Fichiers backend | `kebab-case` | `candidate-profile.service.ts` |
-| Fichiers frontend | `PascalCase` pour composants | `CandidateCard.tsx` |
-| Tables BDD | `snake_case` (pluriel) | `candidate_profiles`, `job_offers` |
-| Colonnes BDD | `snake_case` | `user_id`, `created_at` |
-| Variables d'env | `SCREAMING_SNAKE_CASE` | `ANTHROPIC_API_KEY` |
-| Constantes globales | `SCREAMING_SNAKE_CASE` | `MAX_SKILLS_PER_TEST = 3` |
+| Contexte              | Convention                   | Exemple                            |
+| --------------------- | ---------------------------- | ---------------------------------- |
+| Variables & fonctions | `camelCase`                  | `getUserById`, `isProfileComplete` |
+| Classes & types TS    | `PascalCase`                 | `CandidateProfile`, `CreateJobDto` |
+| Fichiers backend      | `kebab-case`                 | `candidate-profile.service.ts`     |
+| Fichiers frontend     | `PascalCase` pour composants | `CandidateCard.tsx`                |
+| Tables BDD            | `snake_case` (pluriel)       | `candidate_profiles`, `job_offers` |
+| Colonnes BDD          | `snake_case`                 | `user_id`, `created_at`            |
+| Variables d'env       | `SCREAMING_SNAKE_CASE`       | `ANTHROPIC_API_KEY`                |
+| Constantes globales   | `SCREAMING_SNAKE_CASE`       | `MAX_SKILLS_PER_TEST = 3`          |
 
 ### API REST
 
@@ -691,25 +691,8 @@ frontend/
 
 - Toutes les PKs sont des `UUID` générés par PostgreSQL (`gen_random_uuid()`)
 - Toutes les tables ont `created_at` (et `updated_at` si la table est mutable)
-- Les colonnes `status` utilisent des `CHECK` constraints (pas d'ENUM PostgreSQL natif pour faciliter les migrations)
-- Les FK ont `ON DELETE CASCADE` uniquement si la suppression en cascade est explicitement souhaitée
-
-### Git
-
-Commits au format **Conventional Commits** :
-
-```
-feat(tests): generate questions via Claude API
-fix(auth): handle expired refresh token correctly
-docs(readme): add database schema section
-chore(deps): upgrade NestJS to v11
-```
-
-Types utilisés : `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 
 ### Sécurité
 
-- Les `correct_answer` des questions de test ne sont **jamais** renvoyés au frontend
-- Les profils candidats sont **anonymisés** pour les clients (prénom + initiale du nom) avant le match
-- Les `API keys` ne sont **jamais** hardcodées — uniquement via variables d'environnement
+- Les profils candidats sont **anonymisés** pour les clients avant le match
 - Les passwords sont hashés avec **bcrypt** (salt rounds : 12)
