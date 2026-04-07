@@ -1,8 +1,5 @@
 # OPSIDE — Documentation Technique
 
-> Plateforme de mise en relation entre développeurs africains et clients internationaux.  
-> Version 1.0 — Avril 2026
-
 ---
 
 ## Table des matières
