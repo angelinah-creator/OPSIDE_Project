@@ -1,7 +1,5 @@
 # OPSIDE — Documentation Technique
 
----
-
 ## Table des matières
 
 1. [Vue d'ensemble](#1-vue-densemble)
