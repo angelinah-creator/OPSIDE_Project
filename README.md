@@ -8,7 +8,6 @@
 4. [Schéma base de données PostgreSQL](#4-schéma-base-de-données-postgresql)
 5. [Structure des dossiers](#5-structure-des-dossiers)
 6. [Conventions de nommage & coding style](#6-conventions-de-nommage--coding-style)
-7. [Roadmap par Drop](#7-roadmap-par-drop)
 
 ---
 
@@ -102,25 +101,6 @@ module/
 | `TransformInterceptor` | Standardise le format de réponse `{ data, meta }` |
 | `HttpExceptionFilter` | Gestion uniforme des erreurs HTTP |
 
-### Service IA (`ai.service.ts`)
-
-Le service IA encapsule tous les appels à l'API Claude :
-
-- `generateTest(params)` — génère 10 questions en JSON à partir des technos et du niveau
-- `evaluateAnswers(params)` — score les réponses du candidat
-- Variables d'environnement requises :
-
-```env
-ANTHROPIC_API_KEY=sk-ant-...
-AI_MODEL=claude-sonnet-4-20250514
-AI_MAX_TOKENS_GENERATION=4096
-AI_MAX_TOKENS_EVALUATION=2048
-AI_TEMPERATURE_GENERATION=0.7
-AI_TEMPERATURE_EVALUATION=0.2
-TEST_RETRY_LIMIT=3
-```
-
-> **Règle de sécurité :** Les réponses correctes aux questions ne sont JAMAIS renvoyées au frontend.
 
 ---
 
@@ -734,69 +714,3 @@ Types utilisés : `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
 - Les profils candidats sont **anonymisés** pour les clients (prénom + initiale du nom) avant le match
 - Les `API keys` ne sont **jamais** hardcodées — uniquement via variables d'environnement
 - Les passwords sont hashés avec **bcrypt** (salt rounds : 12)
-
----
-
-## 7. Roadmap par Drop
-
-| Drop | Période | Fonctionnalités |
-|---|---|---|
-| **Drop 1 — MVP** | Juin 2026 | Auth, profils A/B, test IA plateforme, offres, matching, workspace basique, timesheets |
-| **Drop 2** | Août 2026 | OAuth LinkedIn, test custom client, contrats + signature SignFlow, Calendly, workspace enrichi |
-| **Drop 3** | Octobre 2026 | Facturation automatique, Stripe, payroll mensuel, cron jobs financiers |
-
-### Endpoints par Drop
-
-#### Drop 1 — MVP
-
-| Méthode | Endpoint | Rôles |
-|---|---|---|
-| POST | `/auth/register` | A, B |
-| POST | `/auth/login` | A, B, C |
-| POST | `/auth/refresh` | — |
-| POST | `/auth/logout` | — |
-| GET | `/profiles/me` | A, B |
-| PUT | `/profiles/me` | A, B |
-| GET | `/profiles/candidates` | B, C |
-| GET | `/profiles/candidates/:id` | B |
-| POST | `/tests/start` | A |
-| POST | `/tests/submit` | A |
-| GET | `/tests/results/:id` | A, B, C |
-| POST | `/jobs` | B |
-| GET | `/jobs` | A |
-| POST | `/jobs/:id/apply` | A |
-| GET | `/jobs/:id/applications` | B |
-| POST | `/matches/:id/accept` | A, B |
-| POST | `/matches/:id/reject` | A, B |
-| POST | `/timesheets` | A |
-| GET | `/timesheets` | A, B |
-| GET | `/notifications` | A, B, C |
-| GET | `/admin/dashboard` | C |
-
-#### Drop 2
-
-| Méthode | Endpoint | Rôles |
-|---|---|---|
-| POST | `/auth/linkedin` | A |
-| POST | `/tests/custom` | B |
-| POST | `/contracts/generate` | C |
-| POST | `/contracts/:id/sign` | A, B |
-| GET | `/contracts` | A, B, C |
-| POST | `/workspace/collaborators` | B |
-| GET | `/workspace/collaborators` | B |
-| POST | `/workspace/notes` | B |
-
-#### Drop 3
-
-| Méthode | Endpoint | Rôles |
-|---|---|---|
-| POST | `/invoices/generate` | C (cron) |
-| GET | `/invoices` | A, B, C |
-| POST | `/invoices/:id/pay` | B |
-| POST | `/payroll/process` | C (cron) |
-| PUT | `/timesheets/:id/approve` | B |
-| DELETE | `/workspace/collaborators/:id` | B |
-
----
-
-*Documentation maintenue dans ce repository. Toute modification de l'architecture ou du schéma BDD doit être reflétée ici avant merge sur `main`.*
