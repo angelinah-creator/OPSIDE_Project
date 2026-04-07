@@ -655,7 +655,6 @@ frontend/
 | Colonnes BDD | `snake_case` | `user_id`, `created_at` |
 | Variables d'env | `SCREAMING_SNAKE_CASE` | `ANTHROPIC_API_KEY` |
 | Constantes globales | `SCREAMING_SNAKE_CASE` | `MAX_SKILLS_PER_TEST = 3` |
-| Branches Git | `type/description-courte` | `feat/test-ia`, `fix/auth-refresh` |
 
 ### API REST
 
