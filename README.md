@@ -24,7 +24,7 @@ OPSIDE est une marketplace B2B qui met en relation des développeurs freelance (
 | Base de données    | PostgreSQL                                          |
 | ORM                | Prisma                                              |
 | Auth               | JWT (access 15min / refresh 7j)                     |
-| IA                 | API Claude (Anthropic) — `claude-sonnet-4-20250514` |
+| IA                 | API Claude                                          |
 | Stockage fichiers  | AWS S3                                              |
 | Emails             | NodeMailer / SendGrid                               |
 | Paiements (Drop 3) | Stripe                                              |
@@ -651,7 +651,7 @@ frontend/
 | Classes & types TS    | `PascalCase`                 | `CandidateProfile`, `CreateJobDto` |
 | Fichiers backend      | `kebab-case`                 | `candidate-profile.service.ts`     |
 | Fichiers frontend     | `PascalCase` pour composants | `CandidateCard.tsx`                |
-| Tables BDD            | `snake_case` (pluriel)       | `candidate_profiles`, `job_offers` |
+| Tables BDD            | `PascalCase` (pluriel)       | `CandidateProfiles`, `JobOffers` |
 | Colonnes BDD          | `snake_case`                 | `user_id`, `created_at`            |
 | Variables d'env       | `SCREAMING_SNAKE_CASE`       | `ANTHROPIC_API_KEY`                |
 | Constantes globales   | `SCREAMING_SNAKE_CASE`       | `MAX_SKILLS_PER_TEST = 3`          |

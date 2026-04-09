@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -10,4 +5,250 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Role {
+  candidate
+  client
+  admin
+}
+
+enum UserStatus {
+  active
+  suspended
+  deleted
+}
+
+enum CandidateStatus {
+  open_to_work
+  in_mission
+  part_time
+}
+
+enum Availability {
+  immediate
+  one_week
+  two_weeks
+  one_month
+  unavailable
+}
+
+enum Currency {
+  MGA
+  XOF
+  XAF
+  MAD
+  TND
+  EUR
+  USD
+}
+
+enum Speciality {
+  frontend
+  backend
+  fullstack
+  mobile
+  devops
+  data
+  design
+}
+
+enum SkillCategory {
+  frontend
+  backend
+  mobile
+  devops
+  data
+  design
+}
+
+enum EmploymentType {
+  full_time
+  part_time
+  freelance
+  independent
+  internship
+  apprenticeship
+}
+
+model User {
+  id               String           @id @default(uuid())
+  email            String           @unique
+  password         String
+  role             Role
+  status           UserStatus       @default(active)
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  candidateProfile CandidateProfile?
+  clientProfile    ClientProfile?
+  refreshTokens    RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("refresh_tokens")
+}
+
+model CandidateProfile {
+  id               String           @id @default(uuid())
+  userId           String           @unique @map("user_id")
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName        String           @map("first_name")
+  lastName         String           @map("last_name")
+  phone            String?
+  country          String
+  city             String?
+  bio              String?          @db.VarChar(500)
+  speciality       Speciality
+  experienceYears  Int              @map("experience_years")
+  dailyRate        Decimal          @map("daily_rate") @db.Decimal(10,2)
+  currency         Currency
+  availability     Availability
+  status           CandidateStatus  @default(open_to_work)
+  linkedinUrl      String?          @map("linkedin_url")
+  portfolioUrl     String?          @map("portfolio_url")
+  photoUrl         String?          @map("photo_url")
+  profileCompleted Boolean          @default(false) @map("profile_completed")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  skills           CandidateSkill[]
+  experiences      Experience[]
+  educations       Education[]
+
+  @@map("candidate_profiles")
+}
+
+model CandidateSkill {
+  candidateId String          @map("candidate_id")
+  skillId     String          @map("skill_id")
+  candidate   CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  skill       Skill           @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([candidateId, skillId])
+  @@map("candidate_skills")
+}
+
+model Skill {
+  id         String          @id @default(uuid())
+  name       String          @unique
+  category   SkillCategory
+  candidates CandidateSkill[]
+  experiences ExperienceSkill[]
+  educations  EducationSkill[]
+
+  @@map("skills")
+}
+
+model Experience {
+  id              String           @id @default(uuid())
+  candidateId     String           @map("candidate_id")
+  candidate       CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  title           String
+  employmentType  EmploymentType   @map("employment_type")
+  company         String
+  startDate       DateTime         @map("start_date") @db.Date
+  endDate         DateTime?        @map("end_date") @db.Date
+  location        String?
+  description     String?          @db.VarChar(1000)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  skills          ExperienceSkill[]
+  media           ExperienceMedia[]
+
+  @@map("experiences")
+}
+
+model ExperienceSkill {
+  experienceId String     @map("experience_id")
+  skillId      String     @map("skill_id")
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  skill        Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([experienceId, skillId])
+  @@map("experience_skills")
+}
+
+model ExperienceMedia {
+  id           String     @id @default(uuid())
+  experienceId String     @map("experience_id")
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  url          String
+  type         String     // "image" or "link"
+  createdAt    DateTime   @default(now()) @map("created_at")
+
+  @@map("experience_media")
+}
+
+model Education {
+  id           String           @id @default(uuid())
+  candidateId  String           @map("candidate_id")
+  candidate    CandidateProfile @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  school       String
+  degree       String?
+  fieldOfStudy String?          @map("field_of_study")
+  startDate    DateTime         @map("start_date") @db.Date
+  endDate      DateTime?        @map("end_date") @db.Date
+  level        String?
+  description  String?          @db.VarChar(1000)
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  skills       EducationSkill[]
+  media        EducationMedia[]
+
+  @@map("educations")
+}
+
+model EducationSkill {
+  educationId String   @map("education_id")
+  skillId     String   @map("skill_id")
+  education   Education @relation(fields: [educationId], references: [id], onDelete: Cascade)
+  skill       Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([educationId, skillId])
+  @@map("education_skills")
+}
+
+model EducationMedia {
+  id          String   @id @default(uuid())
+  educationId String   @map("education_id")
+  education   Education @relation(fields: [educationId], references: [id], onDelete: Cascade)
+  url         String
+  type        String   // "image" or "link"
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("education_media")
+}
+
+model ClientProfile {
+  id                    String   @id @default(uuid())
+  userId                String   @unique @map("user_id")
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName           String   @map("company_name")
+  companySize           String?  @map("company_size")
+  industry              String?
+  country               String
+  city                  String?
+  contactName           String   @map("contact_name")
+  contactEmail          String   @map("contact_email")
+  contactPhone          String?  @map("contact_phone")
+  website               String?
+  logoUrl               String?  @map("logo_url")
+  interviewAvailability String?  @map("interview_availability")
+  ndaTemplateUrl        String?  @map("nda_template_url")
+  contractTemplateUrl   String?  @map("contract_template_url")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("client_profiles")
 }
