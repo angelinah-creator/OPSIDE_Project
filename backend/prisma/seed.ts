@@ -1,30 +1,40 @@
-import { PrismaClient, Role, SkillCategory, Speciality, Currency } from '../generated/prisma';
+import { PrismaClient, Role, UserStatus, SkillCategory } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 
-const prisma = new PrismaClient();
+const connectionString = process.env.DATABASE_URL;
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log('Starting seed...');
 
-  // 1. Create admin user
-  const adminEmail = 'admin@gmail.com';
-  const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } });
+  // ─── Admin User
+  const existingAdmin = await prisma.user.findUnique({
+    where: { email: 'admin@gmail.com' },
+  });
+
   if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash('Admin@123456', 10);
     await prisma.user.create({
       data: {
-        email: adminEmail,
-        password: await bcrypt.hash('Admin123!', 10),
+        email: 'admin@gmail.com',
+        password: hashedPassword,
         role: Role.admin,
-        status: 'active',
+        first_name: 'Super',
+        last_name: 'Admin',
+        status: UserStatus.active,
       },
     });
-    console.log('Admin user created');
+    console.log('Admin user created: admin@gmail.com / Admin@123456');
   } else {
-    console.log('Admin user already exists');
+    console.log('Admin already exists, skipping.');
   }
 
-  // 2. Seed skills
-  const skillsData: { name: string; category: SkillCategory }[] = [
+  // ─── Skills
+  const skillsData = [
     // Frontend
     { name: 'React', category: SkillCategory.frontend },
     { name: 'Vue.js', category: SkillCategory.frontend },
@@ -75,9 +85,9 @@ async function main() {
       create: skill,
     });
   }
-  console.log(`✅ ${skillsData.length} skills seeded`);
 
-  console.log('🌱 Seeding completed.');
+  console.log(`${skillsData.length} skills seeded.`);
+  console.log('Seed completed!');
 }
 
 main()
