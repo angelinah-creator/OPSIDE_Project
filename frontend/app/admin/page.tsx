@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { adminApi } from '@/lib/api'
+import { adminApi  } from '@/lib/admin-service'
 import { Users, UserCheck, Building2, UserX } from 'lucide-react'
 
 export default function AdminDashboard() {

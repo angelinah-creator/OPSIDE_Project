@@ -10,10 +10,10 @@ import Textarea from '@/components/ui/Textarea'
 import Select from '@/components/ui/Select'
 import SkillSelector from '@/components/ui/SkillSelector'
 import FileUpload from '@/components/ui/FileUpload'
-import { candidateApi } from '@/lib/api'
-import { clearTokens } from '@/lib/auth'
+import { candidateApi  } from '@/lib/candidate-service'
+import { clearTokens } from '@/lib/auth-service'
 import { ArrowLeft, Plus, Trash2, Check, LogOut, Save, Pencil, X } from 'lucide-react'
-import { CandidateProfile, Experience, Education } from '@/types'
+import { CandidateProfile, Experience, Education } from '@/lib/candidate-service'
 
 const SPECIALITIES = [
   { value: 'frontend', label: 'Frontend' }, { value: 'backend', label: 'Backend' },
@@ -77,7 +77,7 @@ export default function CandidatProfilePage() {
       candidateApi.getExperiences(),
       candidateApi.getEducations(),
     ]).then(([p, e, ed]) => {
-      const prof = p.data
+      const prof = p
       setProfileData(prof)
       setPf({
         country: prof.country || '', city: prof.city || '',
@@ -87,8 +87,8 @@ export default function CandidatProfilePage() {
         phone: prof.phone || '', linkedin_url: prof.linkedin_url || '', portfolio_url: prof.portfolio_url || '',
       })
       setSkillIds(prof.skills?.map((s: any) => s.id) || [])
-      setExperiences(e.data || [])
-      setEducations(ed.data || [])
+      setExperiences(e || [])
+      setEducations(ed || [])
     }).catch(() => router.push('/auth/login')).finally(() => setLoading(false))
   }, [router])
 
@@ -109,7 +109,7 @@ export default function CandidatProfilePage() {
     try {
       await candidateApi.updateExperience(id, { ...f, start_month: Number(f.start_month), start_year: Number(f.start_year), end_month: f.end_month ? Number(f.end_month) : undefined, end_year: f.end_year ? Number(f.end_year) : undefined })
       if (expMediaFiles[id]) await candidateApi.uploadExperienceMedia(id, expMediaFiles[id]).catch(() => {})
-      const { data } = await candidateApi.getExperiences()
+      const data = await candidateApi.getExperiences()
       setExperiences(data); setEditingExpId(null); showSuccess('Expérience mise à jour !')
     } catch { setError('Erreur.') } finally { setSaving(false) }
   }
@@ -122,7 +122,7 @@ export default function CandidatProfilePage() {
   const deleteExpMedia = async (expId: string, mediaId: string) => {
     try {
       await candidateApi.deleteExperienceMedia(expId, mediaId)
-      const { data } = await candidateApi.getExperiences()
+      const data = await candidateApi.getExperiences()
       setExperiences(data)
     } catch {}
   }
@@ -133,7 +133,7 @@ export default function CandidatProfilePage() {
     try {
       await candidateApi.updateEducation(id, { ...f, start_month: Number(f.start_month), start_year: Number(f.start_year), end_month: f.end_month ? Number(f.end_month) : undefined, end_year: f.end_year ? Number(f.end_year) : undefined })
       if (eduMediaFiles[id]) await candidateApi.uploadEducationMedia(id, eduMediaFiles[id]).catch(() => {})
-      const { data } = await candidateApi.getEducations()
+      const data = await candidateApi.getEducations()
       setEducations(data); setEditingEduId(null); showSuccess('Formation mise à jour !')
     } catch { setError('Erreur.') } finally { setSaving(false) }
   }
@@ -147,9 +147,9 @@ export default function CandidatProfilePage() {
     if (!newExp?.title || !newExp?.company || !newExp?.start_year) return
     setSaving(true)
     try {
-      const { data } = await candidateApi.createExperience({ ...newExp, start_month: Number(newExp.start_month), start_year: Number(newExp.start_year), end_month: newExp.end_month ? Number(newExp.end_month) : undefined, end_year: newExp.end_year ? Number(newExp.end_year) : undefined })
+      const data = await candidateApi.createExperience({ ...newExp, start_month: Number(newExp.start_month), start_year: Number(newExp.start_year), end_month: newExp.end_month ? Number(newExp.end_month) : undefined, end_year: newExp.end_year ? Number(newExp.end_year) : undefined })
       if (newExp.mediaFile && data.experience?.id) await candidateApi.uploadExperienceMedia(data.experience.id, newExp.mediaFile).catch(() => {})
-      const { data: exps } = await candidateApi.getExperiences()
+      const exps = await candidateApi.getExperiences()
       setExperiences(exps); setNewExp(null); showSuccess('Expérience ajoutée !')
     } catch { setError('Erreur.') } finally { setSaving(false) }
   }
@@ -158,15 +158,15 @@ export default function CandidatProfilePage() {
     if (!newEdu?.school || !newEdu?.degree || !newEdu?.start_year) return
     setSaving(true)
     try {
-      const { data } = await candidateApi.createEducation({ ...newEdu, start_month: Number(newEdu.start_month), start_year: Number(newEdu.start_year), end_month: newEdu.end_month ? Number(newEdu.end_month) : undefined, end_year: newEdu.end_year ? Number(newEdu.end_year) : undefined })
+      const data = await candidateApi.createEducation({ ...newEdu, start_month: Number(newEdu.start_month), start_year: Number(newEdu.start_year), end_month: newEdu.end_month ? Number(newEdu.end_month) : undefined, end_year: newEdu.end_year ? Number(newEdu.end_year) : undefined })
       if (newEdu.mediaFile && data.education?.id) await candidateApi.uploadEducationMedia(data.education.id, newEdu.mediaFile).catch(() => {})
-      const { data: edus } = await candidateApi.getEducations()
+      const edus = await candidateApi.getEducations()
       setEducations(edus); setNewEdu(null); showSuccess('Formation ajoutée !')
     } catch { setError('Erreur.') } finally { setSaving(false) }
   }
 
   const handleLogout = async () => {
-    try { const Cookies = (await import('js-cookie')).default; await import('@/lib/api').then(m => m.authApi.logout(Cookies.get('refresh_token') || '')) } catch {}
+    try { const Cookies = (await import('js-cookie')).default; await import('@/lib/auth-service').then(m => m.authApi.logout(Cookies.get('refresh_token') || '')) } catch {}
     clearTokens(); router.push('/')
   }
 
@@ -205,7 +205,7 @@ export default function CandidatProfilePage() {
         {/* Profile Info */}
         <div className="bg-white rounded-2xl border border-border p-6 space-y-4">
           <h2 className="font-semibold text-foreground">Informations principales</h2>
-          <FileUpload label="Photo de profil" accept="image/*" onFile={setPhotoFile} preview={profileData?.photo_url} />
+          <FileUpload label="Photo de profil" accept="image/*" onUpload={async (f) => { setPhotoFile(f); }} currentUrl={profileData?.photo_url} />
           <div className="grid grid-cols-2 gap-4">
             <Input label="Pays *" value={pf.country} onChange={e => setPf((p: any) => ({ ...p, country: e.target.value }))} />
             <Input label="Ville" value={pf.city} onChange={e => setPf((p: any) => ({ ...p, city: e.target.value }))} />
@@ -223,7 +223,7 @@ export default function CandidatProfilePage() {
           <Input label="Téléphone" value={pf.phone} onChange={e => setPf((p: any) => ({ ...p, phone: e.target.value }))} />
           <Input label="LinkedIn" value={pf.linkedin_url} onChange={e => setPf((p: any) => ({ ...p, linkedin_url: e.target.value }))} />
           <Input label="Portfolio / GitHub" value={pf.portfolio_url} onChange={e => setPf((p: any) => ({ ...p, portfolio_url: e.target.value }))} />
-          <SkillSelector selected={skillIds} onChange={setSkillIds} />
+          <SkillSelector selectedIds={skillIds} onChange={setSkillIds} />
           <Button className="w-full" onClick={saveProfile} loading={saving}>
             <Save className="w-4 h-4" /> Sauvegarder le profil
           </Button>
@@ -257,12 +257,12 @@ export default function CandidatProfilePage() {
                     </div>
                   )}
                   <Textarea label="Description" value={expForms[exp.id]?.description || ''} onChange={e => setExpForms(p => ({ ...p, [exp.id]: { ...p[exp.id], description: e.target.value } }))} />
-                  <SkillSelector label="Compétences" selected={expForms[exp.id]?.skill_ids || []} onChange={ids => setExpForms(p => ({ ...p, [exp.id]: { ...p[exp.id], skill_ids: ids } }))} />
+                  <SkillSelector label="Compétences" selectedIds={expForms[exp.id]?.skill_ids || []} onChange={ids => setExpForms(p => ({ ...p, [exp.id]: { ...p[exp.id], skill_ids: ids } }))} />
                   {/* Existing medias */}
-                  {exp.medias?.length > 0 && (
+                  {(exp.medias?.length ?? 0) > 0 && (
                     <div className="space-y-2">
                       <p className="text-sm font-medium text-foreground">Fichiers existants</p>
-                      {exp.medias.map(m => (
+                      {exp.medias && exp.medias.map(m => (
                         <div key={m.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-background border border-border text-sm">
                           <a href={m.url} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline truncate">{m.name || 'Fichier'}</a>
                           <button onClick={() => deleteExpMedia(exp.id, m.id)} className="text-muted hover:text-red-500 ml-2"><X className="w-3.5 h-3.5" /></button>
@@ -270,7 +270,7 @@ export default function CandidatProfilePage() {
                       ))}
                     </div>
                   )}
-                  <FileUpload label="Ajouter un fichier" accept="image/*,application/pdf" onFile={f => setExpMediaFiles(p => ({ ...p, [exp.id]: f }))} />
+                  <FileUpload label="Ajouter un fichier" accept="image/*,application/pdf" onUpload={async (f) => { setExpMediaFiles(p => ({ ...p, [exp.id]: f })); }} />
                   <div className="flex gap-3">
                     <Button variant="secondary" size="sm" onClick={() => setEditingExpId(null)}>Annuler</Button>
                     <Button size="sm" onClick={() => saveExp(exp.id)} loading={saving}><Save className="w-3.5 h-3.5" /> Sauvegarder</Button>
@@ -284,7 +284,7 @@ export default function CandidatProfilePage() {
                     <p className="text-xs text-muted mt-0.5">
                       {exp.start_month}/{exp.start_year} — {exp.is_current ? 'Présent' : `${exp.end_month || '?'}/${exp.end_year || '?'}`}
                     </p>
-                    {exp.medias?.length > 0 && <p className="text-xs text-accent mt-1">{exp.medias.length} fichier(s) joint(s)</p>}
+                    {(exp.medias?.length ?? 0) > 0 && <p className="text-xs text-accent mt-1">{exp.medias?.length} fichier(s) joint(s)</p>}
                   </div>
                   <div className="flex items-center gap-2 ml-4">
                     <button onClick={() => { setEditingExpId(exp.id); setExpForms(p => ({ ...p, [exp.id]: { title: exp.title, company: exp.company, employment_type: exp.employment_type, start_month: String(exp.start_month), start_year: String(exp.start_year), end_month: exp.end_month ? String(exp.end_month) : '', end_year: exp.end_year ? String(exp.end_year) : '', is_current: exp.is_current, location: exp.location || '', description: exp.description || '', skill_ids: exp.skills?.map((s: any) => s.id) || [] } })) }} className="text-muted hover:text-accent transition-colors"><Pencil className="w-4 h-4" /></button>
@@ -320,8 +320,8 @@ export default function CandidatProfilePage() {
                 </div>
               )}
               <Textarea label="Description" value={newExp.description || ''} onChange={e => setNewExp((p: any) => ({ ...p, description: e.target.value }))} />
-              <SkillSelector label="Compétences" selected={newExp.skill_ids || []} onChange={ids => setNewExp((p: any) => ({ ...p, skill_ids: ids }))} />
-              <FileUpload label="Pièce jointe" accept="image/*,application/pdf" onFile={f => setNewExp((p: any) => ({ ...p, mediaFile: f }))} />
+              <SkillSelector label="Compétences" selectedIds={newExp.skill_ids || []} onChange={ids => setNewExp((p: any) => ({ ...p, skill_ids: ids }))} />
+              <FileUpload label="Pièce jointe" accept="image/*,application/pdf" onUpload={async (f) => { setNewExp((p: any) => ({ ...p, mediaFile: f })); }} />
               <div className="flex gap-3">
                 <Button variant="secondary" size="sm" onClick={() => setNewExp(null)}>Annuler</Button>
                 <Button size="sm" onClick={addExp} loading={saving}><Plus className="w-3.5 h-3.5" /> Ajouter</Button>
@@ -362,18 +362,18 @@ export default function CandidatProfilePage() {
                     </div>
                   )}
                   <Textarea label="Description" value={eduForms[edu.id]?.description || ''} onChange={e => setEduForms(p => ({ ...p, [edu.id]: { ...p[edu.id], description: e.target.value } }))} />
-                  <SkillSelector label="Compétences" selected={eduForms[edu.id]?.skill_ids || []} onChange={ids => setEduForms(p => ({ ...p, [edu.id]: { ...p[edu.id], skill_ids: ids } }))} />
-                  {edu.medias?.length > 0 && (
+                  <SkillSelector label="Compétences" selectedIds={eduForms[edu.id]?.skill_ids || []} onChange={ids => setEduForms(p => ({ ...p, [edu.id]: { ...p[edu.id], skill_ids: ids } }))} />
+                  {(edu.medias?.length ?? 0) > 0 && (
                     <div className="space-y-2">
                       <p className="text-sm font-medium">Fichiers existants</p>
-                      {edu.medias.map(m => (
+                      {edu.medias && edu.medias.map(m => (
                         <div key={m.id} className="flex items-center justify-between px-3 py-2 rounded-lg bg-background border border-border text-sm">
                           <a href={m.url} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline truncate">{m.name || 'Fichier'}</a>
                         </div>
                       ))}
                     </div>
                   )}
-                  <FileUpload label="Ajouter un fichier" accept="image/*,application/pdf" onFile={f => setEduMediaFiles(p => ({ ...p, [edu.id]: f }))} />
+                  <FileUpload label="Ajouter un fichier" accept="image/*,application/pdf" onUpload={async (f) => { setEduMediaFiles(p => ({ ...p, [edu.id]: f })); }} />
                   <div className="flex gap-3">
                     <Button variant="secondary" size="sm" onClick={() => setEditingEduId(null)}>Annuler</Button>
                     <Button size="sm" onClick={() => saveEdu(edu.id)} loading={saving}><Save className="w-3.5 h-3.5" /> Sauvegarder</Button>
@@ -421,8 +421,8 @@ export default function CandidatProfilePage() {
                 </div>
               )}
               <Textarea label="Description" value={newEdu.description || ''} onChange={e => setNewEdu((p: any) => ({ ...p, description: e.target.value }))} />
-              <SkillSelector label="Compétences" selected={newEdu.skill_ids || []} onChange={ids => setNewEdu((p: any) => ({ ...p, skill_ids: ids }))} />
-              <FileUpload label="Justificatif" accept="image/*,application/pdf" onFile={f => setNewEdu((p: any) => ({ ...p, mediaFile: f }))} />
+              <SkillSelector label="Compétences" selectedIds={newEdu.skill_ids || []} onChange={ids => setNewEdu((p: any) => ({ ...p, skill_ids: ids }))} />
+              <FileUpload label="Justificatif" accept="image/*,application/pdf" onUpload={async (f) => { setNewEdu((p: any) => ({ ...p, mediaFile: f })); }} />
               <div className="flex gap-3">
                 <Button variant="secondary" size="sm" onClick={() => setNewEdu(null)}>Annuler</Button>
                 <Button size="sm" onClick={addEdu} loading={saving}><Plus className="w-3.5 h-3.5" /> Ajouter</Button>

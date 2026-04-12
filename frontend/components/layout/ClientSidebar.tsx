@@ -1,8 +1,10 @@
 'use client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { clearTokens, authApi } from '@/lib/auth-service';
 import { usePathname } from 'next/navigation';
 import Logo from '@/components/ui/Logo';
-import { useAuth } from '@/hooks/useAuth';
+
 
 const navItems = [
   { href: '/client/dashboard', label: 'Poster offre', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg> },
@@ -11,7 +13,13 @@ const navItems = [
 
 export default function ClientSidebar() {
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const router = useRouter();
+  const logout = async () => {
+    try { const Cookies = (await import('js-cookie')).default; await authApi.logout(Cookies.get('refresh_token') || '') } catch {}
+    clearTokens(); router.push('/')
+  };
+
+  
   return (
     <aside className="w-64 bg-white border-r border-[#F0F0F0] flex flex-col min-h-screen">
       <div className="p-6 border-b border-[#F0F0F0]"><Logo /></div>

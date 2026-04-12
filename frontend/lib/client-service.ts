@@ -1,0 +1,45 @@
+import api from './api';
+
+export type CompanySize = 'size_1_10' | 'size_11_50' | 'size_51_200' | 'size_201_500' | 'size_500_plus';
+
+export interface ClientProfile {
+  id: string;
+  user_id: string;
+  company_name: string;
+  company_size?: CompanySize;
+  industry?: string;
+  country: string;
+  city?: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone?: string;
+  website?: string;
+  interview_availability?: string;
+  logo_url?: string;
+}
+
+export const clientApi = {
+  getProfile: async (): Promise<ClientProfile> => {
+    const res = await api.get('/client/profile/me');
+    return res.data;
+  },
+
+  createProfile: async (data: Record<string, unknown>) => {
+    const res = await api.post('/client/profile', data);
+    return res.data;
+  },
+
+  updateProfile: async (data: Record<string, unknown>) => {
+    const res = await api.patch('/client/profile', data);
+    return res.data;
+  },
+
+  uploadLogo: async (file: File) => {
+    const form = new FormData();
+    form.append('logo', file);
+    const res = await api.post('/client/profile/logo', form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data;
+  },
+};

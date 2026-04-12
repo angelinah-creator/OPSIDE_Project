@@ -8,8 +8,8 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import FileUpload from '@/components/ui/FileUpload'
-import { clientApi, authApi } from '@/lib/api'
-import { clearTokens } from '@/lib/auth'
+import { authApi, clearTokens } from '@/lib/auth-service'
+import { clientApi } from '@/lib/client-service'
 import { ArrowLeft, Save, Check, LogOut } from 'lucide-react'
 
 const SIZES = [
@@ -35,8 +35,8 @@ export default function ClientProfilePage() {
 
   useEffect(() => {
     clientApi.getProfile()
-      .then(r => {
-        const p = r.data
+      .then((r: any) => {
+        const p = r;
         setLogoUrl(p.logo_url || '')
         setForm({
           company_name: p.company_name || '', company_size: p.company_size || '',
@@ -103,7 +103,7 @@ export default function ClientProfilePage() {
         {/* Company */}
         <div className="bg-white rounded-2xl border border-border p-6 space-y-4">
           <h2 className="font-semibold text-foreground">Informations entreprise</h2>
-          <FileUpload label="Logo de l'entreprise" accept="image/*" onFile={setLogoFile} preview={logoUrl} />
+          <FileUpload label="Logo de l'entreprise" accept="image/*" onUpload={async (f) => { setLogoFile(f); }} currentUrl={logoUrl} />
           <Input label="Nom de l'entreprise *" value={form.company_name} onChange={set('company_name')} />
           <Select label="Taille de l'entreprise" options={SIZES} placeholder="Sélectionner..." value={form.company_size} onChange={set('company_size')} />
           <Input label="Secteur d'activité" placeholder="Technologies de l'information" value={form.industry} onChange={set('industry')} />

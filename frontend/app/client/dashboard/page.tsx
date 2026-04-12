@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
 import Button from '@/components/ui/Button'
-import { getUser, clearTokens } from '@/lib/auth'
-import { authApi } from '@/lib/api'
+import { getUser, clearTokens } from '@/lib/auth-service'
+import { authApi  } from '@/lib/auth-service'
 import { LogOut, Settings, Briefcase, PlusCircle } from 'lucide-react'
 
 export default function ClientDashboard() {

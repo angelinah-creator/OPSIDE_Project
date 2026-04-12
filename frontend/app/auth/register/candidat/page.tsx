@@ -6,8 +6,8 @@ import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { authApi } from '@/lib/api'
-import { setTokens, setUser } from '@/lib/auth'
+import { authApi  } from '@/lib/auth-service'
+import { setTokens, setUser } from '@/lib/auth-service'
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react'
 
 export default function CandidatRegisterPage() {

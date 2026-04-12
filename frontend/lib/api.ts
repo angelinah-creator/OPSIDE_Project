@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import { getToken, getRefreshToken, setTokens, clearAuth } from './auth';
+import { getToken, getRefreshToken, setTokens, clearAuth } from './auth-service';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 

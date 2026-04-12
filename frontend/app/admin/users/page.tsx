@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { adminApi } from '@/lib/api'
+import { adminApi  } from '@/lib/admin-service'
 import Button from '@/components/ui/Button'
-import { User } from '@/types'
+import { User } from '@/lib/auth-service'
 import { Search, ChevronDown, ShieldOff, ShieldCheck, RefreshCw, Filter } from 'lucide-react'
 import clsx from 'clsx'
 

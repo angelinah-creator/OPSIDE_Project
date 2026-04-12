@@ -6,8 +6,8 @@ import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { authApi } from '@/lib/api'
-import { setTokens, setUser, getDashboardByRole } from '@/lib/auth'
+import { authApi  } from '@/lib/auth-service'
+import { setTokens, setUser, getDashboardByRole } from '@/lib/auth-service'
 import { Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {

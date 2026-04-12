@@ -8,6 +8,7 @@ interface FileUploadProps {
   currentUrl?: string;
   type?: 'image' | 'document';
   hint?: string;
+  preview?: string;
 }
 
 export default function FileUpload({

@@ -1,4 +1,24 @@
-import { User } from '@/types';
+import api from './api';
+import Cookies from 'js-cookie';
+
+export type UserRole = 'candidat' | 'client' | 'admin';
+export type UserStatus = 'active' | 'suspended' | 'pending';
+
+export interface User {
+  id: string;
+  email: string;
+  role: UserRole;
+  first_name: string;
+  last_name: string;
+  status: UserStatus;
+  created_at: string;
+}
+
+export interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+  user: User;
+}
 
 export const TOKEN_KEY = 'opside_access_token';
 export const REFRESH_KEY = 'opside_refresh_token';
@@ -17,6 +37,7 @@ export function getRefreshToken(): string | null {
 export function setTokens(access: string, refresh: string): void {
   localStorage.setItem(TOKEN_KEY, access);
   localStorage.setItem(REFRESH_KEY, refresh);
+  Cookies.set('refresh_token', refresh, { path: '/' });
 }
 
 export function setUser(user: User): void {
@@ -34,8 +55,24 @@ export function clearAuth(): void {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_KEY);
   localStorage.removeItem(USER_KEY);
+  Cookies.remove('refresh_token', { path: '/' });
 }
+
+export const clearTokens = clearAuth;
 
 export function isAuthenticated(): boolean {
   return !!getToken();
 }
+
+export function getDashboardByRole(role: UserRole): string {
+  if (role === 'admin') return '/admin';
+  if (role === 'candidat') return '/candidat/dashboard';
+  return '/client/dashboard';
+}
+
+export const authApi = {
+  register: (data: any) => api.post<AuthResponse>('/auth/register', data),
+  login: (email: string, password: string) => api.post<AuthResponse>('/auth/login', { email, password }),
+  logout: (refresh_token: string) => api.post('/auth/logout', { refresh_token }),
+  me: () => api.get<User>('/auth/me'),
+};

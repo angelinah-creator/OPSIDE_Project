@@ -8,8 +8,9 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import FileUpload from '@/components/ui/FileUpload'
-import { authApi, clientApi } from '@/lib/api'
-import { setTokens, setUser } from '@/lib/auth'
+import { authApi } from '@/lib/auth-service'
+import { clientApi } from '@/lib/client-service'
+import { setTokens, setUser } from '@/lib/auth-service'
 import { Eye, EyeOff, ArrowLeft, ArrowRight, Check } from 'lucide-react'
 
 const STEPS = ['Compte', 'Entreprise', 'Contact']
@@ -151,7 +152,7 @@ export default function ClientRegisterPage() {
                 <Input label="Ville" placeholder="Paris" value={company.city} onChange={setC('city')} />
               </div>
               <Input label="Site web" type="url" placeholder="https://entreprise.com" value={company.website} onChange={setC('website')} />
-              <FileUpload label="Logo de l'entreprise (optionnel)" accept="image/*" onFile={setLogoFile} />
+              <FileUpload label="Logo de l'entreprise (optionnel)" accept="image/*" onUpload={async (f) => { setLogoFile(f); }} />
               <div className="flex gap-3 mt-2">
                 <Button variant="secondary" className="flex-1" onClick={() => setStep(0)}>Retour</Button>
                 <Button className="flex-1" onClick={nextStep} disabled={!company.company_name || !company.country}>

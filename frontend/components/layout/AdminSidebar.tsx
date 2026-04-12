@@ -1,8 +1,10 @@
 'use client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { clearTokens, authApi } from '@/lib/auth-service';
 import { usePathname } from 'next/navigation';
 import Logo from '@/components/ui/Logo';
-import { useAuth } from '@/hooks/useAuth';
+
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg> },
@@ -11,7 +13,13 @@ const navItems = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const router = useRouter();
+  const logout = async () => {
+    try { const Cookies = (await import('js-cookie')).default; await authApi.logout(Cookies.get('refresh_token') || '') } catch {}
+    clearTokens(); router.push('/')
+  };
+
+  
   return (
     <aside className="w-64 bg-white border-r border-[#F0F0F0] flex flex-col min-h-screen">
       <div className="p-6 border-b border-[#F0F0F0]"><Logo /></div>

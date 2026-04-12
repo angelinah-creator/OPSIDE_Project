@@ -1,8 +1,10 @@
 'use client';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { clearTokens, authApi } from '@/lib/auth-service';
 import { usePathname } from 'next/navigation';
 import Logo from '@/components/ui/Logo';
-import { useAuth } from '@/hooks/useAuth';
+
 
 const navItems = [
   { href: '/candidat/dashboard', label: 'Test technique', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg> },
@@ -11,7 +13,13 @@ const navItems = [
 
 export default function CandidatSidebar() {
   const pathname = usePathname();
-  const { logout } = useAuth();
+  const router = useRouter();
+  const logout = async () => {
+    try { const Cookies = (await import('js-cookie')).default; await authApi.logout(Cookies.get('refresh_token') || '') } catch {}
+    clearTokens(); router.push('/')
+  };
+
+  
   return (
     <aside className="w-64 bg-white border-r border-[#F0F0F0] flex flex-col min-h-screen">
       <div className="p-6 border-b border-[#F0F0F0]"><Logo /></div>

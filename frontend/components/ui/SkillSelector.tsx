@@ -1,8 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Skill } from '@/types';
-import { useSkills } from '@/hooks/useProfile';
+import { Skill } from '@/lib/skill-service';
+
 import Badge from './Badge';
+import { skillApi } from '@/lib/skill-service';
 
 interface SkillSelectorProps {
   selectedIds: string[];
@@ -16,7 +17,7 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
   const [skills, setSkills] = useState<Skill[]>([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [search, setSearch] = useState('');
-  const { getSkills } = useSkills();
+  const getSkills = skillApi.getSkills;
 
   useEffect(() => {
     getSkills(activeCategory === 'all' ? undefined : activeCategory)

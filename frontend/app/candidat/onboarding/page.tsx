@@ -9,7 +9,7 @@ import Textarea from '@/components/ui/Textarea'
 import Select from '@/components/ui/Select'
 import SkillSelector from '@/components/ui/SkillSelector'
 import FileUpload from '@/components/ui/FileUpload'
-import { candidateApi } from '@/lib/api'
+import { candidateApi  } from '@/lib/candidate-service'
 import {
   Check, ArrowRight, ArrowLeft, Plus, Trash2, Upload, X, Paperclip
 } from 'lucide-react'
@@ -160,7 +160,7 @@ export default function CandidatOnboarding() {
     try {
       for (const exp of experiences) {
         if (!exp.title || !exp.company || !exp.start_year) continue
-        const { data } = await candidateApi.createExperience({
+        const data = await candidateApi.createExperience({
           title: exp.title, employment_type: exp.employment_type, company: exp.company,
           start_month: Number(exp.start_month), start_year: Number(exp.start_year),
           end_month: exp.is_current ? undefined : (exp.end_month ? Number(exp.end_month) : undefined),
@@ -185,7 +185,7 @@ export default function CandidatOnboarding() {
     try {
       for (const edu of educations) {
         if (!edu.school || !edu.degree || !edu.start_year) continue
-        const { data } = await candidateApi.createEducation({
+        const data = await candidateApi.createEducation({
           school: edu.school, degree: edu.degree, field: edu.field, level: edu.level,
           start_month: Number(edu.start_month), start_year: Number(edu.start_year),
           end_month: edu.is_current ? undefined : (edu.end_month ? Number(edu.end_month) : undefined),
@@ -244,7 +244,7 @@ export default function CandidatOnboarding() {
             {/* Photo */}
             <div className="bg-white rounded-2xl border border-border p-6 space-y-4">
               <h2 className="font-semibold text-foreground">Photo de profil</h2>
-              <FileUpload label="Photo (optionnel)" accept="image/*" onFile={setPhotoFile} />
+              <FileUpload label="Photo (optionnel)" accept="image/*" onUpload={async (f) => { setPhotoFile(f); }} />
             </div>
 
             {/* Infos principales */}
@@ -277,7 +277,7 @@ export default function CandidatOnboarding() {
             {/* Skills */}
             <div className="bg-white rounded-2xl border border-border p-6">
               <h2 className="font-semibold text-foreground mb-4">Compétences</h2>
-              <SkillSelector selected={profile.skill_ids} onChange={(ids) => setProfile(p => ({ ...p, skill_ids: ids }))} />
+              <SkillSelector selectedIds={profile.skill_ids} onChange={(ids) => setProfile(p => ({ ...p, skill_ids: ids }))} />
             </div>
 
             <Button
@@ -331,8 +331,8 @@ export default function CandidatOnboarding() {
                   </div>
                 )}
                 <Textarea label="Description" placeholder="Décrivez vos responsabilités..." value={exp.description} onChange={e => setExp(i, 'description', e.target.value)} />
-                <SkillSelector label="Compétences utilisées" selected={exp.skill_ids} onChange={ids => setExp(i, 'skill_ids', ids)} />
-                <FileUpload label="Pièce jointe (optionnel)" accept="image/*,application/pdf" onFile={f => setExp(i, 'mediaFile', f)} />
+                <SkillSelector label="Compétences utilisées" selectedIds={exp.skill_ids} onChange={ids => setExp(i, 'skill_ids', ids)} />
+                <FileUpload label="Pièce jointe (optionnel)" accept="image/*,application/pdf" onUpload={async (f) => setExp(i, 'mediaFile', f)} />
               </div>
             ))}
 
@@ -397,8 +397,8 @@ export default function CandidatOnboarding() {
                   </div>
                 )}
                 <Textarea label="Description" placeholder="Matières, projets, distinctions..." value={edu.description} onChange={e => setEdu(i, 'description', e.target.value)} />
-                <SkillSelector label="Compétences acquises" selected={edu.skill_ids} onChange={ids => setEdu(i, 'skill_ids', ids)} />
-                <FileUpload label="Justificatif (optionnel)" accept="image/*,application/pdf" onFile={f => setEdu(i, 'mediaFile', f)} />
+                <SkillSelector label="Compétences acquises" selectedIds={edu.skill_ids} onChange={ids => setEdu(i, 'skill_ids', ids)} />
+                <FileUpload label="Justificatif (optionnel)" accept="image/*,application/pdf" onUpload={async (f) => setEdu(i, 'mediaFile', f)} />
               </div>
             ))}
 
