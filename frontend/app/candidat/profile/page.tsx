@@ -89,7 +89,15 @@ export default function CandidatProfilePage() {
       setSkillIds(prof.skills?.map((s: any) => s.id) || [])
       setExperiences(e || [])
       setEducations(ed || [])
-    }).catch(() => router.push('/auth/login')).finally(() => setLoading(false))
+    }).catch((err) => {
+      if (err.response?.status === 401) {
+        router.push('/auth/login')
+      } else if (err.response?.status === 404) {
+        console.warn('Profil non trouvé (404), prêt pour création.')
+      } else {
+        setError('Erreur lors du chargement des données. Veuillez réessayer.')
+      }
+    }).finally(() => setLoading(false))
   }, [router])
 
   const showSuccess = (msg: string) => { setSuccess(msg); setTimeout(() => setSuccess(''), 3000) }
