@@ -1,0 +1,82 @@
+app/admin/layout.tsx(7,19): error TS2305: Module '"@/lib/auth"' has no exported member 'clearTokens'.
+app/admin/layout.tsx(8,10): error TS2614: Module '"@/lib/api"' has no exported member 'authApi'. Did you mean to use 'import authApi from "@/lib/api"' instead?
+app/admin/layout.tsx(26,28): error TS7006: Parameter 'r' implicitly has an 'any' type.
+app/admin/layout.tsx(33,41): error TS7016: Could not find a declaration file for module 'js-cookie'. 'D:/Kevinfal Code_talent/PROJET/OPSIDE_project/OPSIDE_project/frontend/node_modules/.pnpm/js-cookie@3.0.5/node_modules/js-cookie/dist/js.cookie.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/js-cookie` if it exists or add a new declaration (.d.ts) file containing `declare module 'js-cookie';`
+app/admin/page.tsx(5,10): error TS2614: Module '"@/lib/api"' has no exported member 'adminApi'. Did you mean to use 'import adminApi from "@/lib/api"' instead?
+app/admin/users/page.tsx(5,10): error TS2614: Module '"@/lib/api"' has no exported member 'adminApi'. Did you mean to use 'import adminApi from "@/lib/api"' instead?
+app/auth/login/page.tsx(9,10): error TS2614: Module '"@/lib/api"' has no exported member 'authApi'. Did you mean to use 'import authApi from "@/lib/api"' instead?
+app/auth/login/page.tsx(10,30): error TS2305: Module '"@/lib/auth"' has no exported member 'getDashboardByRole'.
+app/auth/register/candidat/page.tsx(9,10): error TS2614: Module '"@/lib/api"' has no exported member 'authApi'. Did you mean to use 'import authApi from "@/lib/api"' instead?
+app/auth/register/client/page.tsx(11,10): error TS2614: Module '"@/lib/api"' has no exported member 'authApi'. Did you mean to use 'import authApi from "@/lib/api"' instead?
+app/auth/register/client/page.tsx(11,19): error TS2614: Module '"@/lib/api"' has no exported member 'clientApi'. Did you mean to use 'import clientApi from "@/lib/api"' instead?
+app/auth/register/client/page.tsx(154,85): error TS2322: Type '{ label: string; accept: string; onFile: Dispatch<SetStateAction<File | null>>; }' is not assignable to type 'IntrinsicAttributes & FileUploadProps'.
+  Property 'onFile' does not exist on type 'IntrinsicAttributes & FileUploadProps'.
+app/candidat/dashboard/page.tsx(8,19): error TS2305: Module '"@/lib/auth"' has no exported member 'clearTokens'.
+app/candidat/dashboard/page.tsx(9,10): error TS2614: Module '"@/lib/api"' has no exported member 'authApi'. Did you mean to use 'import authApi from "@/lib/api"' instead?
+app/candidat/dashboard/page.tsx(19,28): error TS7006: Parameter 'r' implicitly has an 'any' type.
+app/candidat/dashboard/page.tsx(24,37): error TS7016: Could not find a declaration file for module 'js-cookie'. 'D:/Kevinfal Code_talent/PROJET/OPSIDE_project/OPSIDE_project/frontend/node_modules/.pnpm/js-cookie@3.0.5/node_modules/js-cookie/dist/js.cookie.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/js-cookie` if it exists or add a new declaration (.d.ts) file containing `declare module 'js-cookie';`
+app/candidat/onboarding/page.tsx(12,10): error TS2614: Module '"@/lib/api"' has no exported member 'candidateApi'. Did you mean to use 'import candidateApi from "@/lib/api"' instead?
+app/candidat/onboarding/page.tsx(247,70): error TS2322: Type '{ label: string; accept: string; onFile: Dispatch<SetStateAction<File | null>>; }' is not assignable to type 'IntrinsicAttributes & FileUploadProps'.
+  Property 'onFile' does not exist on type 'IntrinsicAttributes & FileUploadProps'.
+app/candidat/onboarding/page.tsx(280,30): error TS2322: Type '{ selected: string[]; onChange: (ids: string[]) => void; }' is not assignable to type 'IntrinsicAttributes & SkillSelectorProps'.
+  Property 'selected' does not exist on type 'IntrinsicAttributes & SkillSelectorProps'.
+app/candidat/onboarding/page.tsx(334,62): error TS2322: Type '{ label: string; selected: string[]; onChange: (ids: string[]) => void; }' is not assignable to type 'IntrinsicAttributes & SkillSelectorProps'.
+  Property 'selected' does not exist on type 'IntrinsicAttributes & SkillSelectorProps'.
+app/candidat/onboarding/page.tsx(335,95): error TS2322: Type '{ label: string; accept: string; onFile: (f: any) => void; }' is not assignable to type 'IntrinsicAttributes & FileUploadProps'.
+  Property 'onFile' does not exist on type 'IntrinsicAttributes & FileUploadProps'.
+app/candidat/onboarding/page.tsx(335,103): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/candidat/onboarding/page.tsx(400,61): error TS2322: Type '{ label: string; selected: string[]; onChange: (ids: string[]) => void; }' is not assignable to type 'IntrinsicAttributes & SkillSelectorProps'.
+  Property 'selected' does not exist on type 'IntrinsicAttributes & SkillSelectorProps'.
+app/candidat/onboarding/page.tsx(401,95): error TS2322: Type '{ label: string; accept: string; onFile: (f: any) => void; }' is not assignable to type 'IntrinsicAttributes & FileUploadProps'.
+  Property 'onFile' does not exist on type 'IntrinsicAttributes & FileUploadProps'.
+app/candidat/onboarding/page.tsx(401,103): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/candidat/profile/page.tsx(13,10): error TS2614: Module '"@/lib/api"' has no exported member 'candidateApi'. Did you mean to use 'import candidateApi from "@/lib/api"' instead?
+app/candidat/profile/page.tsx(14,10): error TS2305: Module '"@/lib/auth"' has no exported member 'clearTokens'.
+app/candidat/profile/page.tsx(169,41): error TS7016: Could not find a declaration file for module 'js-cookie'. 'D:/Kevinfal Code_talent/PROJET/OPSIDE_project/OPSIDE_project/frontend/node_modules/.pnpm/js-cookie@3.0.5/node_modules/js-cookie/dist/js.cookie.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/js-cookie` if it exists or add a new declaration (.d.ts) file containing `declare module 'js-cookie';`
+app/candidat/profile/page.tsx(169,102): error TS2339: Property 'authApi' does not exist on type 'typeof import("D:/Kevinfal Code_talent/PROJET/OPSIDE_project/OPSIDE_project/frontend/lib/api")'.
+app/candidat/profile/page.tsx(208,64): error TS2322: Type '{ label: string; accept: string; onFile: Dispatch<SetStateAction<File | null>>; preview: string | undefined; }' is not assignable to type 'IntrinsicAttributes & FileUploadProps'.
+  Property 'onFile' does not exist on type 'IntrinsicAttributes & FileUploadProps'.
+app/candidat/profile/page.tsx(226,26): error TS2322: Type '{ selected: string[]; onChange: Dispatch<SetStateAction<string[]>>; }' is not assignable to type 'IntrinsicAttributes & SkillSelectorProps'.
+  Property 'selected' does not exist on type 'IntrinsicAttributes & SkillSelectorProps'.
+app/candidat/profile/page.tsx(260,54): error TS2322: Type '{ label: string; selected: any; onChange: (ids: string[]) => void; }' is not assignable to type 'IntrinsicAttributes & SkillSelectorProps'.
+  Property 'selected' does not exist on type 'IntrinsicAttributes & SkillSelectorProps'.
+app/candidat/profile/page.tsx(262,20): error TS18048: 'exp.medias.length' is possibly 'undefined'.
+app/candidat/profile/page.tsx(265,24): error TS18048: 'exp.medias' is possibly 'undefined'.
+app/candidat/profile/page.tsx(273,91): error TS2322: Type '{ label: string; accept: string; onFile: (f: any) => void; }' is not assignable to type 'IntrinsicAttributes & FileUploadProps'.
+  Property 'onFile' does not exist on type 'IntrinsicAttributes & FileUploadProps'.
+app/candidat/profile/page.tsx(273,99): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/candidat/profile/page.tsx(287,22): error TS18048: 'exp.medias.length' is possibly 'undefined'.
+app/candidat/profile/page.tsx(287,89): error TS18048: 'exp.medias' is possibly 'undefined'.
+app/candidat/profile/page.tsx(323,50): error TS2322: Type '{ label: string; selected: any; onChange: (ids: string[]) => void; }' is not assignable to type 'IntrinsicAttributes & SkillSelectorProps'.
+  Property 'selected' does not exist on type 'IntrinsicAttributes & SkillSelectorProps'.
+app/candidat/profile/page.tsx(324,81): error TS2322: Type '{ label: string; accept: string; onFile: (f: any) => void; }' is not assignable to type 'IntrinsicAttributes & FileUploadProps'.
+  Property 'onFile' does not exist on type 'IntrinsicAttributes & FileUploadProps'.
+app/candidat/profile/page.tsx(324,89): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/candidat/profile/page.tsx(365,54): error TS2322: Type '{ label: string; selected: any; onChange: (ids: string[]) => void; }' is not assignable to type 'IntrinsicAttributes & SkillSelectorProps'.
+  Property 'selected' does not exist on type 'IntrinsicAttributes & SkillSelectorProps'.
+app/candidat/profile/page.tsx(366,20): error TS18048: 'edu.medias.length' is possibly 'undefined'.
+app/candidat/profile/page.tsx(369,24): error TS18048: 'edu.medias' is possibly 'undefined'.
+app/candidat/profile/page.tsx(376,91): error TS2322: Type '{ label: string; accept: string; onFile: (f: any) => void; }' is not assignable to type 'IntrinsicAttributes & FileUploadProps'.
+  Property 'onFile' does not exist on type 'IntrinsicAttributes & FileUploadProps'.
+app/candidat/profile/page.tsx(376,99): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/candidat/profile/page.tsx(424,50): error TS2322: Type '{ label: string; selected: any; onChange: (ids: string[]) => void; }' is not assignable to type 'IntrinsicAttributes & SkillSelectorProps'.
+  Property 'selected' does not exist on type 'IntrinsicAttributes & SkillSelectorProps'.
+app/candidat/profile/page.tsx(425,81): error TS2322: Type '{ label: string; accept: string; onFile: (f: any) => void; }' is not assignable to type 'IntrinsicAttributes & FileUploadProps'.
+  Property 'onFile' does not exist on type 'IntrinsicAttributes & FileUploadProps'.
+app/candidat/profile/page.tsx(425,89): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/client/dashboard/page.tsx(8,19): error TS2305: Module '"@/lib/auth"' has no exported member 'clearTokens'.
+app/client/dashboard/page.tsx(9,10): error TS2614: Module '"@/lib/api"' has no exported member 'authApi'. Did you mean to use 'import authApi from "@/lib/api"' instead?
+app/client/dashboard/page.tsx(19,28): error TS7006: Parameter 'r' implicitly has an 'any' type.
+app/client/dashboard/page.tsx(24,37): error TS7016: Could not find a declaration file for module 'js-cookie'. 'D:/Kevinfal Code_talent/PROJET/OPSIDE_project/OPSIDE_project/frontend/node_modules/.pnpm/js-cookie@3.0.5/node_modules/js-cookie/dist/js.cookie.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/js-cookie` if it exists or add a new declaration (.d.ts) file containing `declare module 'js-cookie';`
+app/client/profile/page.tsx(11,10): error TS2614: Module '"@/lib/api"' has no exported member 'clientApi'. Did you mean to use 'import clientApi from "@/lib/api"' instead?
+app/client/profile/page.tsx(11,21): error TS2614: Module '"@/lib/api"' has no exported member 'authApi'. Did you mean to use 'import authApi from "@/lib/api"' instead?
+app/client/profile/page.tsx(12,10): error TS2305: Module '"@/lib/auth"' has no exported member 'clearTokens'.
+app/client/profile/page.tsx(38,13): error TS7006: Parameter 'r' implicitly has an 'any' type.
+app/client/profile/page.tsx(67,41): error TS7016: Could not find a declaration file for module 'js-cookie'. 'D:/Kevinfal Code_talent/PROJET/OPSIDE_project/OPSIDE_project/frontend/node_modules/.pnpm/js-cookie@3.0.5/node_modules/js-cookie/dist/js.cookie.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/js-cookie` if it exists or add a new declaration (.d.ts) file containing `declare module 'js-cookie';`
+app/client/profile/page.tsx(106,69): error TS2322: Type '{ label: string; accept: string; onFile: Dispatch<SetStateAction<File | null>>; preview: string; }' is not assignable to type 'IntrinsicAttributes & FileUploadProps'.
+  Property 'onFile' does not exist on type 'IntrinsicAttributes & FileUploadProps'.
