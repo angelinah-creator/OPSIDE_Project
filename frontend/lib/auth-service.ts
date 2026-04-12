@@ -37,11 +37,13 @@ export function getRefreshToken(): string | null {
 export function setTokens(access: string, refresh: string): void {
   localStorage.setItem(TOKEN_KEY, access);
   localStorage.setItem(REFRESH_KEY, refresh);
-  Cookies.set('refresh_token', refresh, { path: '/' });
+  Cookies.set('access_token', access, { path: '/', expires: 7 });
+  Cookies.set('refresh_token', refresh, { path: '/', expires: 7 });
 }
 
 export function setUser(user: User): void {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
+  Cookies.set('user', JSON.stringify(user), { path: '/', expires: 7 });
 }
 
 export function getUser(): User | null {
@@ -55,7 +57,9 @@ export function clearAuth(): void {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(REFRESH_KEY);
   localStorage.removeItem(USER_KEY);
+  Cookies.remove('access_token', { path: '/' });
   Cookies.remove('refresh_token', { path: '/' });
+  Cookies.remove('user', { path: '/' });
 }
 
 export const clearTokens = clearAuth;
