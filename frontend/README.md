@@ -1,7 +1,7 @@
 opside/
 ├── .env.local.example
 ├── README.md
-├── middleware.ts                          # Protection des routes par rôle
+├── proxy.ts                               # Protection des routes par rôle
 ├── next.config.js
 ├── package.json
 ├── postcss.config.js
