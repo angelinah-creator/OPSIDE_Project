@@ -46,7 +46,16 @@ export default function ClientProfilePage() {
           interview_availability: p.interview_availability || '',
         })
       })
-      .catch(() => router.push('/auth/login'))
+      .catch((err) => {
+        // Only redirect to login if it's an authentication error
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          router.push('/auth/login')
+        } else if (err.response?.status === 404) {
+          console.warn('Profile not found, user might need to create it.')
+        } else {
+          setError('Impossible de charger le profil.')
+        }
+      })
       .finally(() => setLoading(false))
   }, [router])
 
@@ -54,13 +63,22 @@ export default function ClientProfilePage() {
     setForm(p => ({ ...p, [k]: e.target.value }))
 
   const handleSave = async () => {
-    setSaving(true); setError('')
+    setSaving(true); setError(''); setSuccess('')
     try {
-      await clientApi.updateProfile(form)
+      // Clean empty strings to avoid backend validation errors
+      const cleanedData = Object.fromEntries(
+        Object.entries(form).filter(([_, v]) => v !== '')
+      )
+      
+      await clientApi.updateProfile(cleanedData)
       if (logoFile) await clientApi.uploadLogo(logoFile).catch(() => {})
       setSuccess('Profil mis à jour !')
       setTimeout(() => setSuccess(''), 3000)
-    } catch { setError('Erreur lors de la mise à jour.') } finally { setSaving(false) }
+    } catch { 
+      setError('Erreur lors de la mise à jour.') 
+    } finally { 
+      setSaving(false) 
+    }
   }
 
   const handleLogout = async () => {

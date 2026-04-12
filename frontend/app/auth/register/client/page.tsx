@@ -61,11 +61,18 @@ export default function ClientRegisterPage() {
       setUser(data.user)
 
       // 2. Create profile
-      await clientApi.createProfile({
+      const profileData = {
         ...company, ...contact,
         contact_name: contact.contact_name || `${account.first_name} ${account.last_name}`,
         contact_email: contact.contact_email || account.email,
-      })
+      }
+      
+      // Clean empty strings to avoid backend validation errors on optional fields
+      const cleanedData = Object.fromEntries(
+        Object.entries(profileData).filter(([_, v]) => v !== '')
+      )
+
+      await clientApi.createProfile(cleanedData)
 
       // 3. Upload logo if any
       if (logoFile) await clientApi.uploadLogo(logoFile).catch(() => {})
