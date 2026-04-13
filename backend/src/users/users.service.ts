@@ -60,6 +60,19 @@ export class UsersService {
     return user;
   }
 
+  async updateMe(userId: string, data: { first_name?: string; last_name?: string }) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new NotFoundException('Utilisateur non trouvé');
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data,
+      select: { id: true, email: true, role: true, first_name: true, last_name: true, status: true },
+    });
+
+    return { message: 'Profil mis à jour', user: updated };
+  }
+
   async updateStatus(id: string, status: UserStatus) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('Utilisateur non trouvé');
