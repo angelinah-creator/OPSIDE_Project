@@ -69,7 +69,7 @@ export function isAuthenticated(): boolean {
 }
 
 export function getDashboardByRole(role: UserRole): string {
-  if (role === 'admin') return '/admin';
+  if (role === 'admin') return '/admin/users';
   if (role === 'candidat') return '/candidat/dashboard';
   return '/client/dashboard';
 }
