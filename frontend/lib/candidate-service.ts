@@ -152,4 +152,20 @@ export const candidateApi = {
     });
     return res.data;
   },
+
+  deleteEducationMedia: async (educationId: string, mediaId: string) => {
+    const res = await api.delete(`/candidate/educations/${educationId}/media/${mediaId}`);
+    return res.data;
+  },
+
+  updateUserNames: async (data: { first_name?: string; last_name?: string }) => {
+    const res = await api.patch('/users/me', data);
+    return res.data;
+  },
+
+  deletePhoto: async () => {
+    const res = await api.delete('/candidate/profile/photo');
+    return res.data;
+  },
 };
+
