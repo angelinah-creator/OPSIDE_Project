@@ -59,27 +59,8 @@ export default function CandidatDashboard() {
 
           <h1 className="text-3xl font-bold text-foreground mb-3">Test technique</h1>
           <p className="text-muted text-base leading-relaxed mb-8">
-            Bonjour {user?.first_name} 👋 Votre profil a été créé avec succès. La prochaine étape est le test technique pour valider vos compétences.
+            Bonjour {user?.first_name} Votre profil a été créé avec succès. La prochaine étape est le test technique pour valider vos compétences.
           </p>
-
-          {/* Status card */}
-          <div className="bg-white rounded-2xl border border-border p-6 text-left mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
-              <span className="text-sm font-medium text-foreground">En attente du test</span>
-            </div>
-            <div className="flex items-start gap-3 text-sm text-muted">
-              <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <p>Le test technique sera disponible très prochainement. Vous recevrez une notification par email.</p>
-            </div>
-          </div>
-
-          <Link href="/candidat/profile">
-            <Button variant="secondary" size="lg">
-              <User className="w-4 h-4" />
-              Modifier mon profil
-            </Button>
-          </Link>
         </div>
       </main>
     </div>

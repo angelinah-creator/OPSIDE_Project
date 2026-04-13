@@ -54,25 +54,12 @@ export default function ClientDashboard() {
             <Briefcase className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-3">Poster une offre</h1>
-          <p className="text-muted text-base leading-relaxed mb-8">
-            Bienvenue {user?.first_name} 👋 Votre entreprise est prête. Créez votre première offre pour commencer à trouver les meilleurs talents.
-          </p>
-          <div className="bg-white rounded-2xl border border-border p-6 text-left mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-2 h-2 rounded-full bg-green-400" />
-              <span className="text-sm font-medium text-foreground">Profil entreprise créé</span>
-            </div>
-            <p className="text-sm text-muted">La fonctionnalité de publication d'offres sera disponible très prochainement.</p>
-          </div>
           <div className="flex gap-3 justify-center">
             <Link href="/client/profile">
               <Button variant="secondary">
                 <Settings className="w-4 h-4" /> Modifier mon profil
               </Button>
             </Link>
-            <Button disabled>
-              <PlusCircle className="w-4 h-4" /> Poster une offre
-            </Button>
           </div>
         </div>
       </main>
