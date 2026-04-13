@@ -7,6 +7,7 @@ import Logo from '@/components/ui/Logo'
 import Button from '@/components/ui/Button'
 import { getUser, clearTokens } from '@/lib/auth-service'
 import { authApi  } from '@/lib/auth-service'
+import { candidateApi } from '@/lib/candidate-service'
 import { User, LogOut, Settings, Code2, Clock } from 'lucide-react'
 
 export default function CandidatDashboard() {
@@ -17,6 +18,12 @@ export default function CandidatDashboard() {
     const u = getUser()
     if (u) setUser(u)
     else authApi.me().then(r => setUser(r.data)).catch(() => router.push('/auth/login'))
+
+    candidateApi.getProfile().catch((err: any) => {
+      if (err.response?.status === 404) {
+        router.replace('/candidat/onboarding')
+      }
+    })
   }, [router])
 
   const handleLogout = async () => {

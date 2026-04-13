@@ -93,7 +93,7 @@ export default function CandidatProfilePage() {
       if (err.response?.status === 401) {
         router.push('/auth/login')
       } else if (err.response?.status === 404) {
-        console.warn('Profil non trouvé (404), prêt pour création.')
+        router.replace('/candidat/onboarding')
       } else {
         setError('Erreur lors du chargement des données. Veuillez réessayer.')
       }
