@@ -14,6 +14,7 @@ import { clearTokens } from '@/lib/auth-service'
 import {
   ArrowLeft, LogOut, Pencil, Save, X, Plus, Trash2,
   Camera, User, ExternalLink, Check, ImagePlus, ChevronDown,
+  ChevronLeft, ChevronRight,
 } from 'lucide-react'
 
 // ─── Constants ───────────────────────────────────────────────────
@@ -58,20 +59,32 @@ const SPEC_LABEL: Record<string, string> = {
 // ─── Media helpers ────────────────────────────────────────────────
 interface MediaPreview { file: File; previewUrl: string }
 
-function MediaGallery({ medias, onDelete, editMode }: {
+function MediaGallery({ medias, onDelete, editMode, onOpen }: {
   medias: any[]
   onDelete?: (id: string) => void
   editMode?: boolean
+  onOpen?: (index: number) => void
 }) {
   const visible = medias.filter(m => m.media_type === 'image' || m.media_type === 'video')
   if (!visible.length) return null
   return (
     <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
-      {visible.map((m: any) => (
-        <div key={m.id} className="relative flex-shrink-0 w-44 h-32 rounded-xl overflow-hidden bg-background border border-border group">
+      {visible.map((m: any, idx: number) => (
+        <div
+          key={m.id}
+          className="relative flex-shrink-0 w-44 h-32 rounded-xl overflow-hidden bg-background border border-border group cursor-pointer"
+          onClick={() => onOpen?.(idx)}
+        >
           {m.media_type === 'image'
             ? <img src={m.url} alt="" className="w-full h-full object-cover" />
-            : <video src={m.url} className="w-full h-full object-cover" controls />
+            : <div className="w-full h-full relative">
+              <video src={m.url} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1" />
+                </div>
+              </div>
+            </div>
           }
           {editMode && onDelete && (
             <button
@@ -149,7 +162,7 @@ export default function CandidatProfilePage() {
   const [editHero, setEditHero] = useState(false)
   const [heroForm, setHeroForm] = useState({ first_name: '', last_name: '', bio: '', title: '' })
   const [photoDropdown, setPhotoDropdown] = useState(false)
-  const [lightbox, setLightbox] = useState<string | null>(null)
+  const [gallery, setGallery] = useState<{ items: { url: string, type: string }[], index: number } | null>(null)
 
   // Main info section
   const [editMain, setEditMain] = useState(false)
@@ -439,16 +452,68 @@ export default function CandidatProfilePage() {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* ── Lightbox ── */}
-      {lightbox && (
+      {/* ── Lightbox Gallery ── */}
+      {gallery && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-          onClick={() => setLightbox(null)}
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={() => setGallery(null)}
         >
-          <img src={lightbox} alt="Photo" className="max-w-full max-h-full rounded-2xl object-contain shadow-2xl" onClick={e => e.stopPropagation()} />
-          <button onClick={() => setLightbox(null)} className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors">
-            <X className="w-5 h-5" />
+          {/* Close button */}
+          <button
+            onClick={() => setGallery(null)}
+            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all z-[60]"
+          >
+            <X className="w-6 h-6" />
           </button>
+
+          {/* Navigation Arrows */}
+          {gallery.items.length > 1 && (
+            <>
+              <button
+                className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all z-[60]"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setGallery(prev => prev ? { ...prev, index: (prev.index - 1 + prev.items.length) % prev.items.length } : null)
+                }}
+              >
+                <ChevronLeft className="w-8 h-8" />
+              </button>
+              <button
+                className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all z-[60]"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setGallery(prev => prev ? { ...prev, index: (prev.index + 1) % prev.items.length } : null)
+                }}
+              >
+                <ChevronRight className="w-8 h-8" />
+              </button>
+            </>
+          )}
+
+          {/* Media Content */}
+          <div className="w-full h-full flex items-center justify-center p-4 sm:p-12" onClick={e => e.stopPropagation()}>
+            {gallery.items[gallery.index].type === 'image' || gallery.items[gallery.index].type === 'photo' ? (
+              <img
+                src={gallery.items[gallery.index].url}
+                alt=""
+                className="max-w-full max-h-full rounded-2xl object-contain shadow-2xl animate-in zoom-in-95 duration-300"
+              />
+            ) : (
+              <video
+                src={gallery.items[gallery.index].url}
+                controls
+                autoPlay
+                className="max-w-full max-h-full rounded-2xl shadow-2xl animate-in zoom-in-95 duration-300"
+              />
+            )}
+          </div>
+
+          {/* Counter */}
+          {gallery.items.length > 1 && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium backdrop-blur-md">
+              {gallery.index + 1} / {gallery.items.length}
+            </div>
+          )}
         </div>
       )}
 
@@ -485,7 +550,7 @@ export default function CandidatProfilePage() {
           {/* Photo */}
           <div className="relative mb-5">
             <div
-              onClick={() => photoUrl && setLightbox(photoUrl)}
+              onClick={() => photoUrl && setGallery({ items: [{ url: photoUrl, type: 'photo' }], index: 0 })}
               className={`w-36 h-36 rounded-full overflow-hidden bg-background border-4 border-white shadow-lg flex items-center justify-center ${photoUrl ? 'cursor-pointer' : ''}`}
             >
               {photoUrl
@@ -761,7 +826,17 @@ export default function CandidatProfilePage() {
                   {exp.experience_medias?.filter((m: any) => m.media_type === 'image' || m.media_type === 'video').length > 0 && (
                     <div>
                       <p className="text-sm font-medium text-foreground mb-2">Médias actuels</p>
-                      <MediaGallery medias={exp.experience_medias} onDelete={(mid) => deleteExpMedia(exp.id, mid)} editMode />
+                      <MediaGallery
+                        medias={exp.experience_medias}
+                        onDelete={(mid) => deleteExpMedia(exp.id, mid)}
+                        editMode
+                        onOpen={(idx) => {
+                          const items = exp.experience_medias
+                            .filter((mx: any) => mx.media_type === 'image' || mx.media_type === 'video')
+                            .map((mx: any) => ({ url: mx.url, type: mx.media_type }))
+                          setGallery({ items, index: idx })
+                        }}
+                      />
                     </div>
                   )}
 
@@ -807,7 +882,15 @@ export default function CandidatProfilePage() {
                   {/* Media gallery */}
                   {exp.experience_medias?.filter((m: any) => m.media_type === 'image' || m.media_type === 'video').length > 0 && (
                     <div className="mt-3">
-                      <MediaGallery medias={exp.experience_medias} />
+                      <MediaGallery
+                        medias={exp.experience_medias}
+                        onOpen={(idx) => {
+                          const items = exp.experience_medias
+                            .filter((mx: any) => mx.media_type === 'image' || mx.media_type === 'video')
+                            .map((mx: any) => ({ url: mx.url, type: mx.media_type }))
+                          setGallery({ items, index: idx })
+                        }}
+                      />
                     </div>
                   )}
                 </div>
@@ -898,7 +981,17 @@ export default function CandidatProfilePage() {
                   {edu.education_medias?.filter((m: any) => m.media_type === 'image' || m.media_type === 'video').length > 0 && (
                     <div>
                       <p className="text-sm font-medium text-foreground mb-2">Médias actuels</p>
-                      <MediaGallery medias={edu.education_medias} onDelete={(mid) => deleteEduMedia(edu.id, mid)} editMode />
+                      <MediaGallery
+                        medias={edu.education_medias}
+                        onDelete={(mid) => deleteEduMedia(edu.id, mid)}
+                        editMode
+                        onOpen={(idx) => {
+                          const items = edu.education_medias
+                            .filter((mx: any) => mx.media_type === 'image' || mx.media_type === 'video')
+                            .map((mx: any) => ({ url: mx.url, type: mx.media_type }))
+                          setGallery({ items, index: idx })
+                        }}
+                      />
                     </div>
                   )}
                   <div>
@@ -939,7 +1032,15 @@ export default function CandidatProfilePage() {
                   )}
                   {edu.education_medias?.filter((m: any) => m.media_type === 'image' || m.media_type === 'video').length > 0 && (
                     <div className="mt-3">
-                      <MediaGallery medias={edu.education_medias} />
+                      <MediaGallery
+                        medias={edu.education_medias}
+                        onOpen={(idx) => {
+                          const items = edu.education_medias
+                            .filter((mx: any) => mx.media_type === 'image' || mx.media_type === 'video')
+                            .map((mx: any) => ({ url: mx.url, type: mx.media_type }))
+                          setGallery({ items, index: idx })
+                        }}
+                      />
                     </div>
                   )}
                 </div>
