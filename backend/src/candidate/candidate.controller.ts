@@ -70,6 +70,13 @@ export class CandidateController {
     return this.candidateService.uploadPhoto(userId, file);
   }
 
+  @Delete('profile/photo')
+  @Roles(Role.candidat)
+  @HttpCode(HttpStatus.OK)
+  deletePhoto(@CurrentUser('id') userId: string) {
+    return this.candidateService.deletePhoto(userId);
+  }
+
   // ─── Experiences ──────────────────────────────────────────────────
 
   @Post('experiences')

@@ -179,6 +179,18 @@ export class CandidateService {
     return { message: 'Photo uploadée avec succès', photo_url: updated.photo_url };
   }
 
+  async deletePhoto(userId: string) {
+    const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
+    if (!profile) throw new NotFoundException('Profil candidat non trouvé');
+
+    await this.prisma.candidateProfile.update({
+      where: { user_id: userId },
+      data: { photo_url: null },
+    });
+
+    return { message: 'Photo supprimée avec succès' };
+  }
+
   // ─── Experiences ────
 
   async createExperience(userId: string, dto: CreateExperienceDto) {
