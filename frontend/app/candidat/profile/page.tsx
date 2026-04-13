@@ -41,7 +41,7 @@ const LEVELS = [
 ]
 const MONTHS = Array.from({ length: 12 }, (_, i) => ({
   value: String(i + 1),
-  label: ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'][i],
+  label: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][i],
 }))
 const years = () => {
   const now = new Date().getFullYear()
@@ -197,7 +197,7 @@ export default function CandidatProfilePage() {
   }, [router])
 
   const flash = (msg: string) => { setSuccess(msg); setTimeout(() => setSuccess(''), 3000) }
-  const refresh = () => candidateApi.getProfile().then((p: any) => setProfile(p)).catch(() => {})
+  const refresh = () => candidateApi.getProfile().then((p: any) => setProfile(p)).catch(() => { })
 
   // ── Photo handlers ──
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -272,7 +272,7 @@ export default function CandidatProfilePage() {
         end_year: expForm.end_year ? Number(expForm.end_year) : undefined,
       })
       for (const m of expNewMedia) {
-        await candidateApi.uploadExperienceMedia(id, m.file).catch(() => {})
+        await candidateApi.uploadExperienceMedia(id, m.file).catch(() => { })
       }
       await refresh()
       setEditingExpId(null); setExpNewMedia([])
@@ -282,11 +282,11 @@ export default function CandidatProfilePage() {
 
   const deleteExp = async (id: string) => {
     if (!confirm('Supprimer cette expérience ?')) return
-    try { await candidateApi.deleteExperience(id); await refresh() } catch {}
+    try { await candidateApi.deleteExperience(id); await refresh() } catch { }
   }
 
   const deleteExpMedia = async (expId: string, mediaId: string) => {
-    try { await candidateApi.deleteExperienceMedia(expId, mediaId); await refresh() } catch {}
+    try { await candidateApi.deleteExperienceMedia(expId, mediaId); await refresh() } catch { }
   }
 
   const addExpMediaFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -310,7 +310,7 @@ export default function CandidatProfilePage() {
       const expId = res?.experience?.id
       if (expId) {
         for (const m of newExpMedia) {
-          await candidateApi.uploadExperienceMedia(expId, m.file).catch(() => {})
+          await candidateApi.uploadExperienceMedia(expId, m.file).catch(() => { })
         }
       }
       await refresh()
@@ -351,7 +351,7 @@ export default function CandidatProfilePage() {
         end_year: eduForm.end_year ? Number(eduForm.end_year) : undefined,
       })
       for (const m of eduNewMedia) {
-        await candidateApi.uploadEducationMedia(id, m.file).catch(() => {})
+        await candidateApi.uploadEducationMedia(id, m.file).catch(() => { })
       }
       await refresh()
       setEditingEduId(null); setEduNewMedia([])
@@ -361,11 +361,11 @@ export default function CandidatProfilePage() {
 
   const deleteEdu = async (id: string) => {
     if (!confirm('Supprimer cette formation ?')) return
-    try { await candidateApi.deleteEducation(id); await refresh() } catch {}
+    try { await candidateApi.deleteEducation(id); await refresh() } catch { }
   }
 
   const deleteEduMedia = async (eduId: string, mediaId: string) => {
-    try { await candidateApi.deleteEducationMedia(eduId, mediaId); await refresh() } catch {}
+    try { await candidateApi.deleteEducationMedia(eduId, mediaId); await refresh() } catch { }
   }
 
   const addEduMediaFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -389,7 +389,7 @@ export default function CandidatProfilePage() {
       const eduId = res?.education?.id
       if (eduId) {
         for (const m of newEduMedia) {
-          await candidateApi.uploadEducationMedia(eduId, m.file).catch(() => {})
+          await candidateApi.uploadEducationMedia(eduId, m.file).catch(() => { })
         }
       }
       await refresh()
@@ -406,7 +406,7 @@ export default function CandidatProfilePage() {
   }
 
   const handleLogout = async () => {
-    try { const Cookies = (await import('js-cookie')).default; await import('@/lib/auth-service').then(m => m.authApi.logout(Cookies.get('refresh_token') || '')) } catch {}
+    try { const Cookies = (await import('js-cookie')).default; await import('@/lib/auth-service').then(m => m.authApi.logout(Cookies.get('refresh_token') || '')) } catch { }
     clearTokens(); router.push('/')
   }
 
@@ -441,7 +441,7 @@ export default function CandidatProfilePage() {
 
       {/* ── Header ── */}
       <header className="bg-white border-b border-border px-6 py-4 sticky top-0 z-40">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/candidat/dashboard" className="text-muted hover:text-foreground transition-colors">
               <ArrowLeft className="w-5 h-5" />
@@ -455,7 +455,7 @@ export default function CandidatProfilePage() {
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-6 py-10 space-y-6">
+      <div className="max-w-5xl mx-auto px-6 py-10 space-y-6">
 
         {/* Flash messages */}
         {success && (

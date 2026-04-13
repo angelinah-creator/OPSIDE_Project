@@ -237,7 +237,7 @@ export default function CandidatOnboarding() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-10 space-y-8">
+      <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground mb-1">Mon profil candidat</h1>
           <p className="text-muted text-sm">Remplissez votre profil. Les expériences et formations sont facultatives.</p>

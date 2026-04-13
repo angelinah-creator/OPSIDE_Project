@@ -109,7 +109,7 @@ export default function ClientProfilePage() {
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-6 py-10 space-y-6">
+      <div className="max-w-5xl mx-auto px-6 py-10 space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground mb-1">Profil entreprise</h1>
           <p className="text-muted text-sm">Ces informations sont visibles par les candidats.</p>
