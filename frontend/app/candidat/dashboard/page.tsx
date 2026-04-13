@@ -41,11 +41,13 @@ export default function CandidatDashboard() {
       {/* Top nav */}
       <header className="bg-white border-b border-border px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Logo size={28} />
+          <div>
+            <img src="/logo.png" alt="OPSIDE" className='w-28'/>
+          </div>
           <div className="flex items-center gap-3">
             <Link href="/candidat/profile">
-              <Button variant="ghost" size="sm">
-                <Settings className="w-4 h-4" /> Mon profil
+              <Button variant="ghost" size="sm" className='gap-2'>
+                <User className="w-4 h-4" /> Mon profil
               </Button>
             </Link>
             <button onClick={handleLogout} className="btn-ghost text-sm flex items-center gap-1.5 px-3 py-2 rounded-xl text-muted hover:text-foreground">

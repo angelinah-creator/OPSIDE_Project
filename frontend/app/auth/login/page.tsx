@@ -41,8 +41,9 @@ export default function LoginPage() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-3xl border border-border shadow-card p-8">
-          <div className="flex justify-center mb-6"><Logo size={36} /></div>
-          <h1 className="text-xl font-bold text-foreground text-center mb-1">Bon retour 👋</h1>
+          <div className="flex justify-center mb-2">
+            <img src="/logo.png" alt="OPSIDE" className='w-40' />
+          </div>
           <p className="text-sm text-muted text-center mb-8">Connectez-vous à votre compte OPSIDE</p>
 
           {error && (
@@ -53,7 +54,7 @@ export default function LoginPage() {
             <Input label="Email" type="email" placeholder="votre@email.com" value={form.email} onChange={set('email')} required />
             <div className="relative">
               <Input label="Mot de passe" type={showPw ? 'text' : 'password'} placeholder="Votre mot de passe" value={form.password} onChange={set('password')} required />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-8 text-muted hover:text-foreground">
+              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-8 text-muted hover:text-foreground mt-2">
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>

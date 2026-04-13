@@ -96,7 +96,11 @@ export default function ClientRegisterPage() {
         </Link>
 
         <div className="bg-white rounded-3xl border border-border shadow-card p-8">
-          <div className="flex justify-center mb-6"><Logo size={36} /></div>
+          <div className="flex justify-center mb-6">
+            <div>
+              <img src="/logo.png" alt="OPSIDE" className='w-28'/>
+            </div>
+          </div>
           <h1 className="text-xl font-bold text-foreground text-center mb-1">Créer mon compte entreprise</h1>
           <p className="text-sm text-muted text-center mb-8">Trouvez les meilleurs talents tech</p>
 

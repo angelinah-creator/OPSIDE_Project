@@ -10,7 +10,9 @@ export default function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#F0F0F0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Logo />
+          <div>
+            <img src="/logo.png" alt="OPSIDE" className='w-28'/>
+          </div>
           <div className="hidden md:flex items-center gap-3">
             <Link href="/auth/login"><Button variant="ghost" size="sm">Se connecter</Button></Link>
             <Link href="/auth/register"><Button size="sm">S'inscrire</Button></Link>

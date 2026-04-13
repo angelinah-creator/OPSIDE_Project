@@ -520,11 +520,13 @@ export default function CandidatProfilePage() {
       {/* ── Header ── */}
       <header className="bg-white border-b border-border px-6 py-4 sticky top-0 z-40">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-8">
             <Link href="/candidat/dashboard" className="text-muted hover:text-foreground transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <Logo size={26} />
+            <div>
+              <img src="/logo.png" alt="OPSIDE" className='w-28'/>
+            </div>
           </div>
           <button onClick={handleLogout} className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors">
             <LogOut className="w-4 h-4" />
@@ -659,7 +661,7 @@ export default function CandidatProfilePage() {
         {/* ── Informations principales ── */}
         <div className="bg-white rounded-2xl border border-border p-6">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-semibold text-foreground text-lg">Informations principales</h2>
+            <h2 className="font-semibold text-foreground text-lg">Infos</h2>
             {!editMain && (
               <button onClick={() => setEditMain(true)} className="text-muted hover:text-accent transition-colors">
                 <Pencil className="w-4 h-4" />
