@@ -135,6 +135,7 @@ model CandidateProfile {
   country            String
   city               String?
   bio                String?
+  title              String?
   speciality         Speciality
   experience_years   Int
   daily_rate         Decimal

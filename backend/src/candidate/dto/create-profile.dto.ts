@@ -30,6 +30,10 @@ export class CreateCandidateProfileDto {
   @IsString()
   bio?: string;
 
+  @IsOptional()
+  @IsString()
+  title?: string;
+
   @IsEnum(Speciality)
   speciality: Speciality;
 

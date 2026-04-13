@@ -147,7 +147,7 @@ export default function CandidatProfilePage() {
 
   // Hero section
   const [editHero, setEditHero] = useState(false)
-  const [heroForm, setHeroForm] = useState({ first_name: '', last_name: '', bio: '' })
+  const [heroForm, setHeroForm] = useState({ first_name: '', last_name: '', bio: '', title: '' })
   const [photoDropdown, setPhotoDropdown] = useState(false)
   const [lightbox, setLightbox] = useState<string | null>(null)
 
@@ -155,6 +155,7 @@ export default function CandidatProfilePage() {
   const [editMain, setEditMain] = useState(false)
   const [pf, setPf] = useState<any>({})
   const [skillIds, setSkillIds] = useState<string[]>([])
+  const [editSkills, setEditSkills] = useState(false)
 
   // Experience editing
   const [editingExpId, setEditingExpId] = useState<string | null>(null)
@@ -182,12 +183,14 @@ export default function CandidatProfilePage() {
         currency: p.currency || 'EUR', availability: p.availability || 'immediate',
         bio: p.bio || '', phone: p.phone || '',
         linkedin_url: p.linkedin_url || '', portfolio_url: p.portfolio_url || '',
+        title: p.title || '',
       })
       setSkillIds(p.candidate_skills?.map((cs: any) => cs.skill.id) || [])
       setHeroForm({
         first_name: p.user?.first_name || '',
         last_name: p.user?.last_name || '',
         bio: p.bio || '',
+        title: p.title || '',
       })
     }).catch((err: any) => {
       if (err.response?.status === 401) router.push('/auth/login')
@@ -224,7 +227,7 @@ export default function CandidatProfilePage() {
     setSaving(true); setError('')
     try {
       await candidateApi.updateUserNames({ first_name: heroForm.first_name, last_name: heroForm.last_name })
-      await candidateApi.updateProfile({ bio: heroForm.bio })
+      await candidateApi.updateProfile({ bio: heroForm.bio, title: heroForm.title })
       await refresh()
       setEditHero(false)
       flash('Informations mises à jour !')
@@ -239,12 +242,22 @@ export default function CandidatProfilePage() {
         ...pf,
         experience_years: Number(pf.experience_years),
         daily_rate: Number(pf.daily_rate),
-        skill_ids: skillIds,
       })
       await refresh()
       setEditMain(false)
       flash('Profil mis à jour !')
     } catch { setError('Erreur lors de la mise à jour.') } finally { setSaving(false) }
+  }
+
+  // ── Skills save ──
+  const saveSkills = async () => {
+    setSaving(true); setError('')
+    try {
+      await candidateApi.updateProfile({ skill_ids: skillIds })
+      await refresh()
+      setEditSkills(false)
+      flash('Compétences mises à jour !')
+    } catch { setError('Erreur.') } finally { setSaving(false) }
   }
 
   // ── Experience handlers ──
@@ -526,14 +539,24 @@ export default function CandidatProfilePage() {
                   onChange={e => setHeroForm(f => ({ ...f, last_name: e.target.value }))}
                 />
               </div>
-              <div className="text-left">
-                <label className="block text-xs font-medium text-muted mb-1">Bio</label>
-                <AutoTextarea
-                  value={heroForm.bio}
-                  onChange={v => setHeroForm(f => ({ ...f, bio: v }))}
-                  placeholder="Décrivez-vous en quelques lignes..."
-                  className="border border-border rounded-xl px-3 py-2 text-sm min-h-[60px]"
-                />
+              <div className="text-left space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-muted mb-1">Titre professionnel</label>
+                  <Input
+                    placeholder="ex: Développeur React.js | Next.js | Vue.js..."
+                    value={heroForm.title}
+                    onChange={e => setHeroForm(f => ({ ...f, title: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted mb-1">Bio</label>
+                  <AutoTextarea
+                    value={heroForm.bio}
+                    onChange={v => setHeroForm(f => ({ ...f, bio: v }))}
+                    placeholder="Décrivez-vous en quelques lignes..."
+                    className="border border-border rounded-xl px-3 py-2 text-sm min-h-[60px]"
+                  />
+                </div>
               </div>
               <div className="flex gap-2 justify-center pt-1">
                 <Button size="sm" variant="secondary" onClick={() => setEditHero(false)}>Annuler</Button>
@@ -542,11 +565,20 @@ export default function CandidatProfilePage() {
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-2 mb-2">
-                <h1 className="text-2xl font-bold text-foreground">{userName || 'Votre nom'}</h1>
-                <button onClick={() => setEditHero(true)} className="text-muted hover:text-accent transition-colors">
-                  <Pencil className="w-4 h-4" />
-                </button>
+              <div className="flex flex-col items-center gap-1 mb-4">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-bold text-foreground">{userName || 'Votre nom'}</h1>
+                  <button onClick={() => setEditHero(true)} className="text-muted hover:text-accent transition-colors">
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                </div>
+                {profile?.title ? (
+                  <p className="text-accent font-medium">{profile.title}</p>
+                ) : (
+                  <button onClick={() => setEditHero(true)} className="text-xs text-muted hover:text-accent transition-colors italic">
+                    + Ajouter un titre (ex: Développeur Fullstack)
+                  </button>
+                )}
               </div>
               {profile?.bio ? (
                 <p className="text-muted text-sm leading-relaxed max-w-md">{profile.bio}</p>
@@ -588,10 +620,6 @@ export default function CandidatProfilePage() {
               <Input label="Téléphone" value={pf.phone} onChange={e => setPf((p: any) => ({ ...p, phone: e.target.value }))} />
               <Input label="LinkedIn" type="url" value={pf.linkedin_url} onChange={e => setPf((p: any) => ({ ...p, linkedin_url: e.target.value }))} />
               <Input label="Portfolio / GitHub" type="url" value={pf.portfolio_url} onChange={e => setPf((p: any) => ({ ...p, portfolio_url: e.target.value }))} />
-              <div>
-                <p className="text-sm font-medium text-foreground mb-2">Compétences</p>
-                <SkillSelector selectedIds={skillIds} onChange={setSkillIds} />
-              </div>
               <div className="flex gap-3 pt-2">
                 <Button variant="secondary" className="flex-1" onClick={() => setEditMain(false)}>Annuler</Button>
                 <Button className="flex-1" onClick={saveMain} loading={saving}><Save className="w-4 h-4" /> Sauvegarder</Button>
@@ -637,17 +665,64 @@ export default function CandidatProfilePage() {
                 </div>
               )}
 
-              {profileSkills.length > 0 && (
-                <div className="flex items-start gap-2 pt-1">
-                  <dt className="text-muted w-36 flex-shrink-0">Compétences</dt>
-                  <dd className="flex flex-wrap gap-1.5">
-                    {profileSkills.map((s: any) => (
-                      <span key={s.id} className="px-2 py-0.5 rounded-md bg-accent-soft text-accent text-xs font-medium">{s.name}</span>
-                    ))}
-                  </dd>
-                </div>
-              )}
             </dl>
+          )}
+        </div>
+
+        {/* ── Compétences ── */}
+        <div className="bg-white rounded-2xl border border-border p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-semibold text-foreground text-lg">Compétences</h2>
+            {!editSkills && (
+              <button onClick={() => setEditSkills(true)} className="text-muted hover:text-accent transition-colors">
+                <Pencil className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {editSkills ? (
+            <div className="space-y-4">
+              <SkillSelector selectedIds={skillIds} onChange={setSkillIds} />
+              <div className="flex gap-3 pt-2">
+                <Button variant="secondary" className="flex-1" onClick={() => setEditSkills(false)}>Annuler</Button>
+                <Button className="flex-1" onClick={saveSkills} loading={saving}><Save className="w-4 h-4" /> Sauvegarder</Button>
+              </div>
+            </div>
+          ) : profileSkills.length > 0 ? (
+            <div className="space-y-6">
+              {Object.entries(
+                profileSkills.reduce((acc: any, skill: any) => {
+                  const cat = skill.category || 'other';
+                  if (!acc[cat]) acc[cat] = [];
+                  acc[cat].push(skill);
+                  return acc;
+                }, {})
+              ).map(([category, skills]: [string, any]) => (
+                <div key={category}>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    {category}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {skills.map((s: any) => (
+                      <span
+                        key={s.id}
+                        className="px-3 py-1.5 rounded-xl bg-background border border-border text-foreground text-sm font-medium hover:border-accent hover:text-accent transition-all cursor-default"
+                      >
+                        {s.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6 border-2 border-dashed border-border rounded-xl">
+              <p className="text-sm text-muted mb-3">Aucune compétence renseignée.</p>
+              <Button size="sm" variant="secondary" onClick={() => setEditSkills(true)}>
+                <Plus className="w-3.5 h-3.5" /> Ajouter des compétences
+              </Button>
+            </div>
           )}
         </div>
 

@@ -55,6 +55,7 @@ export interface CandidateProfile {
   currency: Currency;
   availability: Availability;
   bio?: string;
+  title?: string;
   phone?: string;
   linkedin_url?: string;
   portfolio_url?: string;
