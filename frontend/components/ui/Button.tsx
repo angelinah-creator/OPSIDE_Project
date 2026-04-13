@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'black';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   children: React.ReactNode;
@@ -19,11 +19,12 @@ export default function Button({
   const base = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variants = {
-    primary: 'bg-gradient-to-r from-[#7C3AED] to-[#9333EA] text-white hover:opacity-90 focus:ring-purple-500 shadow-md hover:shadow-lg',
+    primary: 'bg-[#7C3AED] text-white hover:opacity-90 focus:ring-purple-500 shadow-md hover:shadow-lg',
     secondary: 'bg-[#1A1A1A] text-white hover:bg-[#333] focus:ring-gray-500',
     outline: 'border-2 border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white focus:ring-gray-500',
     ghost: 'text-[#6B6B6B] hover:bg-[#F5F5F5] hover:text-[#1A1A1A] focus:ring-gray-300',
     danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500',
+    black: 'bg-black text-white hover:bg-black/80 focus:ring-black',
   };
 
   const sizes = {

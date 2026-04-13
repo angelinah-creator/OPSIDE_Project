@@ -11,13 +11,9 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Logo />
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="#how-it-works" className="text-sm text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors font-medium">Comment ça marche</Link>
-            <Link href="#features" className="text-sm text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors font-medium">Fonctionnalités</Link>
-          </nav>
           <div className="hidden md:flex items-center gap-3">
             <Link href="/auth/login"><Button variant="ghost" size="sm">Se connecter</Button></Link>
-            <Link href="/auth/register"><Button size="sm">Commencer</Button></Link>
+            <Link href="/auth/register"><Button size="sm">S'inscrire</Button></Link>
           </div>
           <button className="md:hidden p-2" onClick={() => setOpen(!open)}>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
