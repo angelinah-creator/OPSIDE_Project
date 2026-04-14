@@ -19,9 +19,6 @@ export default function RegisterChoicePage() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-10">
-          {/* <div className="flex justify-center mb-6">
-          <img src="/logo.png" alt="" className='w-35'/>
-          </div> */}
           <h1 className="text-2xl font-bold text-foreground mb-2">Rejoindre OPSIDE</h1>
           <p className="text-muted text-sm">Choisissez votre profil pour commencer</p>
         </div>

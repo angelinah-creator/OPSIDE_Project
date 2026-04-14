@@ -7,7 +7,7 @@ import Logo from '@/components/ui/Logo'
 import Button from '@/components/ui/Button'
 import { getUser, clearTokens } from '@/lib/auth-service'
 import { authApi  } from '@/lib/auth-service'
-import { LogOut, Settings, Briefcase, PlusCircle } from 'lucide-react'
+import { LogOut, Settings, Briefcase, PlusCircle, User } from 'lucide-react'
 
 export default function ClientDashboard() {
   const router = useRouter()
@@ -33,11 +33,11 @@ export default function ClientDashboard() {
     <div className="min-h-screen bg-background">
       <header className="bg-white border-b border-border px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Logo size={28} />
+          <img src="/logo.png" alt="OPSIDE" className='w-28'/>
           <div className="flex items-center gap-3">
             <Link href="/client/profile">
               <Button variant="ghost" size="sm">
-                <Settings className="w-4 h-4" /> Mon profil
+                <User className="w-4 h-4" /> Mon profil
               </Button>
             </Link>
             <button onClick={handleLogout} className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground px-3 py-2 rounded-xl hover:bg-border/40 transition-all">

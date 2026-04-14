@@ -179,7 +179,7 @@ export default function ClientRegisterPage() {
               <Input label="Nom du contact" placeholder={`${account.first_name} ${account.last_name}`} value={contact.contact_name} onChange={setCt('contact_name')} />
               <Input label="Email de contact" type="email" placeholder={account.email} value={contact.contact_email} onChange={setCt('contact_email')} />
               <Input label="Téléphone" placeholder="+33 6 12 34 56 78" value={contact.contact_phone} onChange={setCt('contact_phone')} />
-              <Input label="Disponibilités pour les entretiens" placeholder="Lundi-Vendredi, 9h-18h" value={contact.interview_availability} onChange={setCt('interview_availability')} />
+              <Input label="Disponibilités" placeholder="Lundi-Vendredi, 9h-18h" value={contact.interview_availability} onChange={setCt('interview_availability')} />
               <div className="flex gap-3 mt-2">
                 <Button variant="secondary" className="flex-1" onClick={() => setStep(1)}>Retour</Button>
                 <Button className="flex-1" onClick={handleFinish} loading={loading}>
