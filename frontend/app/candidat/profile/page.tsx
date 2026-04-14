@@ -25,8 +25,8 @@ const SPECIALITIES = [
   { value: 'data', label: 'Data / IA' }, { value: 'other', label: 'Autre' },
 ]
 const AVAILABILITY = [
-  { value: 'immediate', label: 'Immédiat' }, { value: 'one_week', label: 'Sous 1 semaine' },
-  { value: 'two_weeks', label: 'Sous 2 semaines' }, { value: 'one_month', label: 'Sous 1 mois' },
+  { value: 'immediate', label: 'Immédiat' }, { value: 'two_weeks', label: 'Sous 2 semaines' },
+  { value: 'one_month', label: 'Sous 1 mois' }, { value: 'tree_months', label: 'Sous 3 mois' },
 ]
 const CURRENCIES = [
   { value: 'EUR', label: 'EUR (€)' }, { value: 'USD', label: 'USD ($)' }, { value: 'MGA', label: 'MGA (Ar)' },
@@ -49,7 +49,7 @@ const years = () => {
   return Array.from({ length: 30 }, (_, i) => ({ value: String(now - i), label: String(now - i) }))
 }
 const AVAIL_LABEL: Record<string, string> = {
-  immediate: 'Immédiat', one_week: 'Sous 1 semaine', two_weeks: 'Sous 2 semaines', one_month: 'Sous 1 mois',
+  immediate: 'Immédiat', two_weeks: 'Sous 2 semaines', one_month: 'Sous 1 mois', tree_months: 'Sous 3 mois',
 }
 const SPEC_LABEL: Record<string, string> = {
   frontend: 'Frontend', backend: 'Backend', fullstack: 'Fullstack', mobile: 'Mobile',

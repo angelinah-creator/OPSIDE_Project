@@ -23,9 +23,9 @@ const SPECIALITIES = [
 ]
 const AVAILABILITY = [
   { value: 'immediate', label: 'Immédiat' },
-  { value: 'one_week', label: 'Sous une semaine' },
   { value: 'two_weeks', label: 'Sous deux semaines' },
   { value: 'one_month', label: 'Sous un mois' },
+  { value: 'tree_months', label: 'Sous trois mois' },
 ]
 const CURRENCIES = [
   { value: 'EUR', label: 'EUR (€)' },

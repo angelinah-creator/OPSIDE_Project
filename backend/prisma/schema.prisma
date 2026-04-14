@@ -39,9 +39,9 @@ enum Currency {
 
 enum Availability {
   immediate
-  one_week
   two_weeks
   one_month
+  tree_months
   unavailable
 }
 
