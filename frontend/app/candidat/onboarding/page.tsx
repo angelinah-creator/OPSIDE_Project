@@ -124,7 +124,7 @@ export default function CandidatOnboarding() {
   const [profile, setProfile] = useState({
     country: '', city: '', speciality: '', experience_years: '',
     daily_rate: '', currency: 'EUR', availability: 'immediate',
-    bio: '', phone: '', linkedin_url: '', portfolio_url: '', skill_ids: [] as string[],
+    bio: '', title: '', phone: '', linkedin_url: '', portfolio_url: '', skill_ids: [] as string[],
   })
 
   const [experiences, setExperiences] = useState<ExpForm[]>([])
@@ -198,6 +198,7 @@ export default function CandidatOnboarding() {
         currency: profile.currency,
         availability: profile.availability,
         bio: profile.bio || undefined,
+        title: profile.title || undefined,
         phone: profile.phone || undefined,
         linkedin_url: profile.linkedin_url || undefined,
         portfolio_url: profile.portfolio_url || undefined,
@@ -307,6 +308,7 @@ export default function CandidatOnboarding() {
             <Input label="Pays *" placeholder="Madagascar" value={profile.country} onChange={setP('country')} required />
             <Input label="Ville" placeholder="Antananarivo" value={profile.city} onChange={setP('city')} />
           </div>
+          <Input label="Titre du profil *" placeholder="Ex: Développeur Fullstack Senior" value={profile.title} onChange={setP('title')} required />
           <Select label="Spécialité *" options={SPECIALITIES} placeholder="Choisir..." value={profile.speciality} onChange={setP('speciality') as any} />
           <div className="grid grid-cols-2 gap-4">
             <Input label="Années d'expérience *" type="number" min="0" max="50" placeholder="4" value={profile.experience_years} onChange={setP('experience_years')} />

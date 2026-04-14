@@ -1,6 +1,6 @@
 // npx tsx .\prisma\seed-skills.ts
 
-import { PrismaClient, SkillCategory } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import * as dotenv from 'dotenv';
@@ -13,57 +13,74 @@ const prisma = new PrismaClient({ adapter });
 
 const skillsData = [  
   // Frontend
-  { name: 'React', category: SkillCategory.frontend },
-  { name: 'Vue.js', category: SkillCategory.frontend },
-  { name: 'Angular', category: SkillCategory.frontend },
-  { name: 'Next.js', category: SkillCategory.frontend },
-  { name: 'TypeScript', category: SkillCategory.frontend },
-  { name: 'HTML/CSS', category: SkillCategory.frontend },
-  { name: 'Tailwind', category: SkillCategory.frontend },
+  { name: 'React', category: 'frontend' },
+  { name: 'Vue.js', category: 'frontend' },
+  { name: 'Angular', category: 'frontend' },
+  { name: 'Next.js', category: 'frontend' },
+  { name: 'TypeScript', category: 'frontend' },
+  { name: 'HTML/CSS', category: 'frontend' },
+  { name: 'Tailwind', category: 'frontend' },
   // Backend
-  { name: 'Node.js', category: SkillCategory.backend },
-  { name: 'NestJS', category: SkillCategory.backend },
-  { name: 'Python', category: SkillCategory.backend },
-  { name: 'Django', category: SkillCategory.backend },
-  { name: 'FastAPI', category: SkillCategory.backend },
-  { name: 'PHP', category: SkillCategory.backend },
-  { name: 'Laravel', category: SkillCategory.backend },
-  { name: 'Java', category: SkillCategory.backend },
-  { name: 'Spring Boot', category: SkillCategory.backend },
+  { name: 'Node.js', category: 'backend' },
+  { name: 'NestJS', category: 'backend' },
+  { name: 'Python', category: 'backend' },
+  { name: 'Django', category: 'backend' },
+  { name: 'FastAPI', category: 'backend' },
+  { name: 'PHP', category: 'backend' },
+  { name: 'Laravel', category: 'backend' },
+  { name: 'Java', category: 'backend' },
+  { name: 'Spring Boot', category: 'backend' },
   // Mobile
-  { name: 'React Native', category: SkillCategory.mobile },
-  { name: 'Flutter', category: SkillCategory.mobile },
-  { name: 'Swift', category: SkillCategory.mobile },
-  { name: 'Kotlin', category: SkillCategory.mobile },
+  { name: 'React Native', category: 'mobile' },
+  { name: 'Flutter', category: 'mobile' },
+  { name: 'Swift', category: 'mobile' },
+  { name: 'Kotlin', category: 'mobile' },
   // DevOps
-  { name: 'Docker', category: SkillCategory.devops },
-  { name: 'Kubernetes', category: SkillCategory.devops },
-  { name: 'AWS', category: SkillCategory.devops },
-  { name: 'CI/CD', category: SkillCategory.devops },
-  { name: 'Terraform', category: SkillCategory.devops },
+  { name: 'Docker', category: 'devops' },
+  { name: 'Kubernetes', category: 'devops' },
+  { name: 'AWS', category: 'devops' },
+  { name: 'CI/CD', category: 'devops' },
+  { name: 'Terraform', category: 'devops' },
   // Data
-  { name: 'PostgreSQL', category: SkillCategory.data },
-  { name: 'MongoDB', category: SkillCategory.data },
-  { name: 'Redis', category: SkillCategory.data },
-  { name: 'Elasticsearch', category: SkillCategory.data },
-  { name: 'Python Data', category: SkillCategory.data },
-  { name: 'SQL', category: SkillCategory.data },
+  { name: 'PostgreSQL', category: 'data' },
+  { name: 'MongoDB', category: 'data' },
+  { name: 'Redis', category: 'data' },
+  { name: 'Elasticsearch', category: 'data' },
+  { name: 'Python Data', category: 'data' },
+  { name: 'SQL', category: 'data' },
   // Design
-  { name: 'Figma', category: SkillCategory.design },
-  { name: 'Photoshop', category: SkillCategory.design },
-  { name: 'AdobeXD', category: SkillCategory.design },
-  { name: 'Photopea', category: SkillCategory.design },
+  { name: 'Figma', category: 'design' },
+  { name: 'Photoshop', category: 'design' },
+  { name: 'AdobeXD', category: 'design' },
+  { name: 'Photopea', category: 'design' },
 ];
 
 async function main() {
   console.log('Seeding skills into database...');
   for (const skill of skillsData) {
-    await prisma.skill.upsert({
-      where: { name: skill.name },
-      update: { category: skill.category },
-      create: skill,
+    const existing = await prisma.skill.findFirst({
+      where: {
+        name: skill.name,
+        owner_id: null,
+      },
     });
-    console.log(`- Upserted skill: ${skill.name}`);
+
+    if (existing) {
+      await prisma.skill.update({
+        where: { id: existing.id },
+        data: { category: skill.category },
+      });
+      console.log(`- Updated skill: ${skill.name}`);
+    } else {
+      await prisma.skill.create({
+        data: {
+          ...skill,
+          owner_id: null,
+          is_custom: false,
+        },
+      });
+      console.log(`- Created skill: ${skill.name}`);
+    }
   }
   console.log('All skills seeded successfully!');
 }

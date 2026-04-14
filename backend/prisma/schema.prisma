@@ -51,14 +51,14 @@ enum CandidateStatus {
   part_time
 }
 
-enum SkillCategory {
-  frontend
-  backend
-  mobile
-  devops
-  data
-  design
-}
+// enum SkillCategory {
+//   frontend
+//   backend
+//   mobile
+//   devops
+//   data
+//   design
+// }
 
 enum EmploymentType {
   temps_plein
@@ -99,6 +99,7 @@ model User {
   refresh_tokens RefreshToken[]
   candidate      CandidateProfile?
   client         ClientProfile?
+  skills         Skill[]
 
   @@map("users")
 }
@@ -117,14 +118,19 @@ model RefreshToken {
 }
 
 model Skill {
-  id       String        @id @default(uuid())
-  name     String        @unique
-  category SkillCategory
+  id        String   @id @default(uuid())
+  name      String
+  category  String
+  is_custom Boolean  @default(false)
+  owner_id  String?
 
-  candidate_skills    CandidateSkill[]
-  experience_skills   ExperienceSkill[]
-  education_skills    EducationSkill[]
+  candidate_skills  CandidateSkill[]
+  experience_skills ExperienceSkill[]
+  education_skills  EducationSkill[]
 
+  owner User? @relation(fields: [owner_id], references: [id], onDelete: Cascade)
+
+  @@unique([name, owner_id])
   @@map("skills")
 }
 
