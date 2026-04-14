@@ -1,7 +1,7 @@
 import api from './api';
 import { Skill } from './skill-service';
 
-export type Availability = 'immediate' | 'two_weeks' | 'one_month' | 'tree_months';
+export type Availability = 'immediate' | 'two_weeks' | 'one_month' | 'three_months';
 export type Currency = 'EUR' | 'USD' | 'MGA';
 export type CandidateStatus = 'open_to_work' | 'not_available' | 'in_mission';
 

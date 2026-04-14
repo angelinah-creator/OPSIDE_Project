@@ -41,7 +41,7 @@ enum Availability {
   immediate
   two_weeks
   one_month
-  tree_months
+  three_months
   unavailable
 }
 
