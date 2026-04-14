@@ -59,7 +59,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           ))}
         </nav>
         <div className="p-4 border-t border-border">
-          <div className="flex items-center gap-3 mb-3 px-2">
+          {/* <div className="flex items-center gap-3 mb-3 px-2">
             <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white text-xs font-bold">
               {user?.first_name?.[0]}{user?.last_name?.[0]}
             </div>
@@ -67,7 +67,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <p className="text-xs font-medium text-foreground truncate">{user?.first_name} {user?.last_name}</p>
               <p className="text-xs text-muted">Admin</p>
             </div>
-          </div>
+          </div> */}
           <button onClick={handleLogout} className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-muted hover:text-foreground hover:bg-background transition-all">
             <LogOut className="w-4 h-4" /> Déconnexion
           </button>
