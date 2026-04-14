@@ -12,6 +12,13 @@ export interface User {
   last_name: string;
   status: UserStatus;
   created_at: string;
+  candidate?: {
+    photo_url?: string;
+  };
+  client?: {
+    company_name?: string;
+    logo_url?: string;
+  };
 }
 
 export interface AuthResponse {

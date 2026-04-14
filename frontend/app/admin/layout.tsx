@@ -39,7 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex flex-col w-60 bg-white border-r border-border fixed inset-y-0 left-0">
         <div className="p-6 border-b border-border">
-          <Logo size={28} />
+          <img src="/logo.png" alt="Logo" className="w-28" />
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {NAV.map(({ href, label, icon: Icon }) => (

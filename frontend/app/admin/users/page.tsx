@@ -144,11 +144,23 @@ export default function AdminUsersPage() {
                     <tr key={user.id} className="hover:bg-background/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-accent-soft flex items-center justify-center text-accent text-sm font-semibold flex-shrink-0">
-                            {user.first_name?.[0]}{user.last_name?.[0]}
-                          </div>
+                          {/* Avatar or Initials */}
+                          {user.candidate?.photo_url || user.client?.logo_url ? (
+                            <img 
+                              src={user.candidate?.photo_url || user.client?.logo_url} 
+                              alt="" 
+                              className="w-9 h-9 rounded-full object-cover border border-border flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="w-9 h-9 rounded-full bg-accent-soft flex items-center justify-center text-accent text-sm font-semibold flex-shrink-0 uppercase">
+                              {user.first_name?.[0] || user.client?.company_name?.[0] || user.email[0]}
+                              {(user.last_name?.[0] || (user.client?.company_name && user.client.company_name.length > 1 ? user.client.company_name[1] : ''))}
+                            </div>
+                          )}
                           <div>
-                            <p className="text-sm font-medium text-foreground">{user.first_name} {user.last_name}</p>
+                            <p className="text-sm font-medium text-foreground">
+                              {user.role === 'client' && user.client?.company_name ? user.client.company_name : `${user.first_name} ${user.last_name}`}
+                            </p>
                             <p className="text-xs text-muted">{user.email}</p>
                           </div>
                         </div>
