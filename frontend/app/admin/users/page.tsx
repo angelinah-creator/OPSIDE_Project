@@ -149,10 +149,10 @@ export default function AdminUsersPage() {
                             <img 
                               src={user.candidate?.photo_url || user.client?.logo_url} 
                               alt="" 
-                              className="w-9 h-9 rounded-full object-cover border border-border flex-shrink-0"
+                              className="w-9 h-9 rounded-full object-cover border border-border shrink-0"
                             />
                           ) : (
-                            <div className="w-9 h-9 rounded-full bg-accent-soft flex items-center justify-center text-accent text-sm font-semibold flex-shrink-0 uppercase">
+                            <div className="w-9 h-9 rounded-full bg-accent-soft flex items-center justify-center text-accent text-sm font-semibold shrink-0 uppercase">
                               {user.first_name?.[0] || user.client?.company_name?.[0] || user.email[0]}
                               {(user.last_name?.[0] || (user.client?.company_name && user.client.company_name.length > 1 ? user.client.company_name[1] : ''))}
                             </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Logo from '@/components/ui/Logo'
 import Button from '@/components/ui/Button'
@@ -85,6 +85,32 @@ const emptyEdu = (): EduForm => ({
   start_month: '', start_year: '', end_month: '', end_year: '',
   is_current: false, description: '', skill_ids: [], mediaFiles: [],
 })
+
+// ─── Auto-resize textarea ─────────────────────────────────────────
+function AutoTextarea({ value, onChange, placeholder, className = '', label }: {
+  value: string; onChange?: (v: string) => void; placeholder?: string; className?: string; label?: string
+}) {
+  const ref = useRef<HTMLTextAreaElement>(null)
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.style.height = 'auto'
+      ref.current.style.height = ref.current.scrollHeight + 'px'
+    }
+  }, [value])
+  return (
+    <div className="flex flex-col gap-1.5">
+      {label && <label className="text-sm font-medium text-foreground">{label}</label>}
+      <textarea
+        ref={ref}
+        value={value}
+        placeholder={placeholder}
+        onChange={e => onChange?.(e.target.value)}
+        rows={1}
+        className={`w-full px-4 py-2.5 rounded-xl border border-border bg-white text-foreground placeholder:text-muted text-sm transition-all outline-none resize-none overflow-hidden focus:border-accent focus:ring-2 focus:ring-accent/10 ${className}`}
+      />
+    </div>
+  )
+}
 
 export default function CandidatOnboarding() {
   const router = useRouter()
@@ -231,8 +257,8 @@ export default function CandidatOnboarding() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-white border-b border-border px-6 py-4 sticky top-0 z-40">
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <Logo size={28} />
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <img src="/logo.png" alt="" className="w-24" />
           <span className="text-sm text-muted">Créez votre profil pour continuer</span>
         </div>
       </div>
@@ -253,7 +279,7 @@ export default function CandidatOnboarding() {
           <div className="flex items-center gap-5">
             <div
               onClick={() => photoInputRef.current?.click()}
-              className="w-24 h-24 rounded-full bg-background border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:border-accent transition-colors overflow-hidden flex-shrink-0"
+              className="w-24 h-24 rounded-full bg-background border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:border-accent transition-colors overflow-hidden shrink-0"
             >
               {photoPreview
                 ? <img src={photoPreview} alt="preview" className="w-full h-full object-cover" />
@@ -290,7 +316,7 @@ export default function CandidatOnboarding() {
             <Input label="Taux journalier *" type="number" placeholder="80" value={profile.daily_rate} onChange={setP('daily_rate')} />
             <Select label="Devise" options={CURRENCIES} value={profile.currency} onChange={setP('currency') as any} />
           </div>
-          <Textarea label="Bio" placeholder="Décrivez-vous en quelques lignes..." value={profile.bio} onChange={setP('bio') as any} />
+          <AutoTextarea label="Bio" placeholder="Décrivez-vous en quelques lignes..." value={profile.bio} onChange={v => setProfile(p => ({ ...p, bio: v }))} />
         </div>
 
         {/* ── Liens ── */}
@@ -343,7 +369,7 @@ export default function CandidatOnboarding() {
                     <Select label="Année fin" options={years()} placeholder="Année" value={exp.end_year} onChange={e => setExp(i, 'end_year', e.target.value)} />
                   </div>
                 )}
-                <Textarea label="Description" placeholder="Décrivez vos responsabilités..." value={exp.description} onChange={e => setExp(i, 'description', e.target.value)} />
+                <AutoTextarea label="Description" placeholder="Décrivez vos responsabilités..." value={exp.description} onChange={v => setExp(i, 'description', v)} />
                 <SkillSelector label="Compétences utilisées" selectedIds={exp.skill_ids} onChange={ids => setExp(i, 'skill_ids', ids)} />
 
                 {/* Multi-media upload */}
@@ -352,7 +378,7 @@ export default function CandidatOnboarding() {
                   {exp.mediaFiles.length > 0 && (
                     <div className="flex gap-3 overflow-x-auto pb-2 mb-3">
                       {exp.mediaFiles.map((m, mi) => (
-                        <div key={mi} className="relative flex-shrink-0 w-32 h-24 rounded-xl overflow-hidden bg-background border border-border">
+                        <div key={mi} className="relative shrink-0 w-32 h-24 rounded-xl overflow-hidden bg-background border border-border">
                           {m.file.type.startsWith('image/') ? (
                             <img src={m.previewUrl} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -420,7 +446,7 @@ export default function CandidatOnboarding() {
                   <Select label="Année fin" options={years()} placeholder="Année" value={edu.end_year} onChange={e => setEdu(i, 'end_year', e.target.value)} />
                 </div>
               )}
-              <Textarea label="Description" placeholder="Matières, projets, distinctions..." value={edu.description} onChange={e => setEdu(i, 'description', e.target.value)} />
+              <AutoTextarea label="Description" placeholder="Matières, projets, distinctions..." value={edu.description} onChange={v => setEdu(i, 'description', v)} />
               <SkillSelector label="Compétences acquises" selectedIds={edu.skill_ids} onChange={ids => setEdu(i, 'skill_ids', ids)} />
 
               {/* Multi-media upload */}
@@ -429,7 +455,7 @@ export default function CandidatOnboarding() {
                 {edu.mediaFiles.length > 0 && (
                   <div className="flex gap-3 overflow-x-auto pb-2 mb-3">
                     {edu.mediaFiles.map((m, mi) => (
-                      <div key={mi} className="relative flex-shrink-0 w-32 h-24 rounded-xl overflow-hidden bg-background border border-border">
+                      <div key={mi} className="relative shrink-0 w-32 h-24 rounded-xl overflow-hidden bg-background border border-border">
                         {m.file.type.startsWith('image/') ? (
                           <img src={m.previewUrl} alt="" className="w-full h-full object-cover" />
                         ) : (
