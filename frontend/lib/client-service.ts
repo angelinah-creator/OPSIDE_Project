@@ -16,6 +16,12 @@ export interface ClientProfile {
   website?: string;
   interview_availability?: string;
   logo_url?: string;
+  user?: {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
 }
 
 export const clientApi = {
@@ -40,6 +46,11 @@ export const clientApi = {
     const res = await api.post('/client/profile/logo', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
+    return res.data;
+  },
+
+  updateUserNames: async (data: { first_name?: string; last_name?: string }) => {
+    const res = await api.patch('/users/me', data);
     return res.data;
   },
 };

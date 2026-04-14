@@ -160,6 +160,7 @@ export default function CandidatProfilePage() {
 
   // Hero section
   const [editHero, setEditHero] = useState(false)
+  const [editBio, setEditBio] = useState(false)
   const [heroForm, setHeroForm] = useState({ first_name: '', last_name: '', bio: '', title: '' })
   const [photoDropdown, setPhotoDropdown] = useState(false)
   const [gallery, setGallery] = useState<{ items: { url: string, type: string }[], index: number } | null>(null)
@@ -240,10 +241,20 @@ export default function CandidatProfilePage() {
     setSaving(true); setError('')
     try {
       await candidateApi.updateUserNames({ first_name: heroForm.first_name, last_name: heroForm.last_name })
-      await candidateApi.updateProfile({ bio: heroForm.bio, title: heroForm.title })
+      await candidateApi.updateProfile({ title: heroForm.title })
       await refresh()
       setEditHero(false)
-      flash('Informations mises à jour !')
+      flash('Profil mis à jour !')
+    } catch { setError('Erreur lors de la mise à jour.') } finally { setSaving(false) }
+  }
+
+  const saveBio = async () => {
+    setSaving(true); setError('')
+    try {
+      await candidateApi.updateProfile({ bio: heroForm.bio })
+      await refresh()
+      setEditBio(false)
+      flash('Bio mise à jour !')
     } catch { setError('Erreur lors de la mise à jour.') } finally { setSaving(false) }
   }
 
@@ -547,114 +558,135 @@ export default function CandidatProfilePage() {
           <div className="px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">{error}</div>
         )}
 
-        {/* ── HERO: Photo + Nom + Bio ── */}
-        <div className="bg-white rounded-3xl border border-border p-8 flex flex-col items-center text-center">
-          {/* Photo */}
-          <div className="relative mb-5">
-            <div
-              onClick={() => photoUrl && setGallery({ items: [{ url: photoUrl, type: 'photo' }], index: 0 })}
-              className={`w-36 h-36 rounded-full overflow-hidden bg-background border-4 border-white shadow-lg flex items-center justify-center ${photoUrl ? 'cursor-pointer' : ''}`}
-            >
-              {photoUrl
-                ? <img src={photoUrl} alt={userName} className="w-full h-full object-cover" />
-                : <User className="w-16 h-16 text-muted" />
-              }
+        {/* ── IDENTITY: Photo + Nom + Titre ── */}
+        <div className="bg-white rounded-3xl border border-border p-8">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+            {/* Photo */}
+            <div className="relative flex-shrink-0">
+              <div
+                onClick={() => photoUrl && setGallery({ items: [{ url: photoUrl, type: 'photo' }], index: 0 })}
+                className={`w-36 h-36 rounded-xl overflow-hidden bg-background border-4 border-white shadow-lg flex items-center justify-center ${photoUrl ? 'cursor-pointer' : ''}`}
+              >
+                {photoUrl
+                  ? <img src={photoUrl} alt={userName} className="w-full h-full object-cover" />
+                  : <User className="w-16 h-16 text-muted" />
+                }
+              </div>
+
+              {/* Camera button */}
+              <div className="absolute bottom-1 right-1">
+                <button
+                  onClick={() => setPhotoDropdown(d => !d)}
+                  className="w-9 h-9 rounded-full bg-accent text-white flex items-center justify-center shadow-md hover:bg-accent/90 transition-colors"
+                >
+                  <Camera className="w-4 h-4" />
+                </button>
+                {photoDropdown && (
+                  <div className="absolute bottom-11 right-0 bg-white rounded-xl border border-border shadow-lg overflow-hidden w-44 z-10">
+                    <button
+                      onClick={() => { photoInputRef.current?.click(); setPhotoDropdown(false) }}
+                      className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-background transition-colors flex items-center gap-2"
+                    >
+                      <Camera className="w-4 h-4 text-accent" /> Modifier la photo
+                    </button>
+                    {photoUrl && (
+                      <button
+                        onClick={handleDeletePhoto}
+                        className="w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2 border-t border-border"
+                      >
+                        <Trash2 className="w-4 h-4" /> Supprimer la photo
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+              <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
             </div>
 
-            {/* Camera button */}
-            <div className="absolute bottom-1 right-1">
-              <button
-                onClick={() => setPhotoDropdown(d => !d)}
-                className="w-9 h-9 rounded-full bg-accent text-white flex items-center justify-center shadow-md hover:bg-accent/90 transition-colors"
-              >
-                <Camera className="w-4 h-4" />
-              </button>
-              {photoDropdown && (
-                <div className="absolute bottom-11 right-0 bg-white rounded-xl border border-border shadow-lg overflow-hidden w-44 z-10">
-                  <button
-                    onClick={() => { photoInputRef.current?.click(); setPhotoDropdown(false) }}
-                    className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-background transition-colors flex items-center gap-2"
-                  >
-                    <Camera className="w-4 h-4 text-accent" /> Modifier la photo
-                  </button>
-                  {photoUrl && (
-                    <button
-                      onClick={handleDeletePhoto}
-                      className="w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2 border-t border-border"
-                    >
-                      <Trash2 className="w-4 h-4" /> Supprimer la photo
+            {/* Name + Title */}
+            <div className="flex-1 w-full">
+              {editHero ? (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      label="Prénom"
+                      value={heroForm.first_name}
+                      onChange={e => setHeroForm(f => ({ ...f, first_name: e.target.value }))}
+                    />
+                    <Input
+                      label="Nom"
+                      value={heroForm.last_name}
+                      onChange={e => setHeroForm(f => ({ ...f, last_name: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted mb-1">Titre professionnel</label>
+                    <Input
+                      placeholder="ex: Développeur React.js | Next.js | Vue.js..."
+                      value={heroForm.title}
+                      onChange={e => setHeroForm(f => ({ ...f, title: e.target.value }))}
+                    />
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <Button size="sm" variant="secondary" onClick={() => setEditHero(false)}>Annuler</Button>
+                    <Button size="sm" onClick={saveHero} loading={saving}><Save className="w-3.5 h-3.5" /> Sauvegarder</Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center md:items-start pt-2">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h1 className="text-3xl font-bold text-foreground">{userName || 'Votre nom'}</h1>
+                    <button onClick={() => setEditHero(true)} className="text-muted hover:text-accent transition-colors">
+                      <Pencil className="w-5 h-5" />
+                    </button>
+                  </div>
+                  {profile?.title ? (
+                    <p className="text-xl text-accent font-medium">{profile.title}</p>
+                  ) : (
+                    <button onClick={() => setEditHero(true)} className="text-sm text-muted hover:text-accent transition-colors italic">
+                      + Ajouter un titre professionnel
                     </button>
                   )}
                 </div>
               )}
             </div>
-            <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+          </div>
+        </div>
+
+        {/* ── BIO ── */}
+        <div className="bg-white rounded-2xl border border-border p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-foreground text-lg">À propos</h2>
+            {!editBio && (
+              <button onClick={() => setEditBio(true)} className="text-muted hover:text-accent transition-colors">
+                <Pencil className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
-          {/* Name + Bio */}
-          {editHero ? (
-            <div className="w-full space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <Input
-                  label="Prénom"
-                  value={heroForm.first_name}
-                  onChange={e => setHeroForm(f => ({ ...f, first_name: e.target.value }))}
-                />
-                <Input
-                  label="Nom"
-                  value={heroForm.last_name}
-                  onChange={e => setHeroForm(f => ({ ...f, last_name: e.target.value }))}
-                />
-              </div>
-              <div className="text-left space-y-3">
-                <div>
-                  <label className="block text-xs font-medium text-muted mb-1">Titre professionnel</label>
-                  <Input
-                    placeholder="ex: Développeur React.js | Next.js | Vue.js..."
-                    value={heroForm.title}
-                    onChange={e => setHeroForm(f => ({ ...f, title: e.target.value }))}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted mb-1">Bio</label>
-                  <AutoTextarea
-                    value={heroForm.bio}
-                    onChange={v => setHeroForm(f => ({ ...f, bio: v }))}
-                    placeholder="Décrivez-vous en quelques lignes..."
-                    className="border border-border rounded-xl px-3 py-2 text-sm min-h-[60px]"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2 justify-center pt-1">
-                <Button size="sm" variant="secondary" onClick={() => setEditHero(false)}>Annuler</Button>
-                <Button size="sm" onClick={saveHero} loading={saving}><Save className="w-3.5 h-3.5" /> Sauvegarder</Button>
+          {editBio ? (
+            <div className="space-y-4">
+              <AutoTextarea
+                value={heroForm.bio}
+                onChange={v => setHeroForm(f => ({ ...f, bio: v }))}
+                placeholder="Décrivez votre parcours, vos aspirations..."
+                className="border border-border rounded-xl px-4 py-3 text-sm min-h-[120px] focus:border-accent transition-colors"
+              />
+              <div className="flex gap-2">
+                <Button size="sm" variant="secondary" onClick={() => setEditBio(false)}>Annuler</Button>
+                <Button size="sm" onClick={saveBio} loading={saving}><Save className="w-3.5 h-3.5" /> Sauvegarder</Button>
               </div>
             </div>
           ) : (
-            <>
-              <div className="flex flex-col items-center gap-1 mb-4">
-                <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold text-foreground">{userName || 'Votre nom'}</h1>
-                  <button onClick={() => setEditHero(true)} className="text-muted hover:text-accent transition-colors">
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                </div>
-                {profile?.title ? (
-                  <p className="text-accent font-medium">{profile.title}</p>
-                ) : (
-                  <button onClick={() => setEditHero(true)} className="text-xs text-muted hover:text-accent transition-colors italic">
-                    + Ajouter un titre (ex: Développeur Fullstack)
-                  </button>
-                )}
-              </div>
+            <div className="text-muted text-sm leading-relaxed">
               {profile?.bio ? (
-                <p className="text-muted text-sm leading-relaxed max-w-md">{profile.bio}</p>
+                <p className="whitespace-pre-wrap">{profile.bio}</p>
               ) : (
-                <button onClick={() => setEditHero(true)} className="text-sm text-muted hover:text-accent transition-colors italic">
-                  + Ajouter une bio
+                <button onClick={() => setEditBio(true)} className="italic hover:text-accent transition-colors">
+                  + Ajouter une présentation bio...
                 </button>
               )}
-            </>
+            </div>
           )}
         </div>
 
