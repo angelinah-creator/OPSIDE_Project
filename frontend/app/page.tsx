@@ -12,7 +12,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[#1A1A1A] leading-tight tracking-tight mb-6 ">
             L'infrastructure des {' '}
-            <span className="bg-[#9333EA] bg-clip-text text-transparent">
+            <span className="bg-accent-light bg-clip-text text-transparent">
               meilleurs talents
             </span>
             <br />pour l'Afrique.

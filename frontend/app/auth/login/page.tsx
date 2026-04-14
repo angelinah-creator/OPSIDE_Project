@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { authApi  } from '@/lib/auth-service'
 import { setTokens, setUser, getDashboardByRole } from '@/lib/auth-service'
-import { Eye, EyeOff } from 'lucide-react'
+import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -40,6 +40,10 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-md">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground mb-8 transition-colors self-start">
+          <ArrowLeft className="w-4 h-4" />
+          Retour
+        </Link>
         <div className="bg-white rounded-3xl border border-border shadow-card p-8">
           <div className="flex justify-center mb-2">
             <img src="/logo.png" alt="OPSIDE" className='w-40' />

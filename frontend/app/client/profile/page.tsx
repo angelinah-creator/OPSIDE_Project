@@ -211,7 +211,7 @@ export default function ClientProfilePage() {
         {/* Flash messages */}
         {success && (
           <div className="px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm flex items-center gap-2">
-            <Check className="w-4 h-4 flex-shrink-0" />{success}
+            <Check className="w-4 h-4 shrink-0" />{success}
           </div>
         )}
         {error && (
@@ -328,7 +328,7 @@ export default function ClientProfilePage() {
                 { label: 'Localisation', value: profile?.country && profile?.city ? `${profile.city}, ${profile.country}` : profile?.country || profile?.city, icon: MapPin },
               ].filter(r => r.value).map(row => (
                 <div key={row.label} className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center flex-shrink-0 text-accent border border-border">
+                  <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center shrink-0 text-accent border border-border">
                     <row.icon className="w-5 h-5" />
                   </div>
                   <div>
@@ -340,7 +340,7 @@ export default function ClientProfilePage() {
 
               {profile?.website && (
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center flex-shrink-0 text-accent border border-border">
+                  <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center shrink-0 text-accent border border-border">
                     <Globe className="w-5 h-5" />
                   </div>
                   <div>
@@ -348,7 +348,7 @@ export default function ClientProfilePage() {
                     <dd>
                       <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-700 transition-colors flex items-center gap-1 font-medium break-all text-sm">
                         {profile.website}
-                        <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                        <ExternalLink className="w-3 h-3 shrink-0" />
                       </a>
                     </dd>
                   </div>
@@ -383,7 +383,7 @@ export default function ClientProfilePage() {
           ) : (
             <dl className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center flex-shrink-0 text-accent border border-border">
+                <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center shrink-0 text-accent border border-border">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>
@@ -398,7 +398,7 @@ export default function ClientProfilePage() {
                 { label: 'Disponibilités entretiens', value: profile?.interview_availability, icon: Calendar },
               ].filter(r => r.value).map(row => (
                 <div key={row.label} className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center flex-shrink-0 text-accent border border-border">
+                  <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center shrink-0 text-accent border border-border">
                     <row.icon className="w-5 h-5" />
                   </div>
                   <div>

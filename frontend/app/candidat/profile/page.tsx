@@ -72,7 +72,7 @@ function MediaGallery({ medias, onDelete, editMode, onOpen }: {
       {visible.map((m: any, idx: number) => (
         <div
           key={m.id}
-          className="relative flex-shrink-0 w-44 h-32 rounded-xl overflow-hidden bg-background border border-border group cursor-pointer"
+          className="relative shrink-0 w-44 h-32 rounded-xl overflow-hidden bg-background border border-border group cursor-pointer"
           onClick={() => onOpen?.(idx)}
         >
           {m.media_type === 'image'
@@ -81,7 +81,7 @@ function MediaGallery({ medias, onDelete, editMode, onOpen }: {
               <video src={m.url} className="w-full h-full object-cover" />
               <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                 <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1" />
+                  <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-10 border-l-white border-b-[6px] border-b-transparent ml-1" />
                 </div>
               </div>
             </div>
@@ -105,7 +105,7 @@ function MediaPreviewRow({ previews, onRemove }: { previews: MediaPreview[]; onR
   return (
     <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
       {previews.map((m, i) => (
-        <div key={i} className="relative flex-shrink-0 w-44 h-32 rounded-xl overflow-hidden bg-background border border-border group">
+        <div key={i} className="relative shrink-0 w-44 h-32 rounded-xl overflow-hidden bg-background border border-border group">
           {m.file.type.startsWith('image/')
             ? <img src={m.previewUrl} alt="" className="w-full h-full object-cover" />
             : <video src={m.previewUrl} className="w-full h-full object-cover" />
@@ -472,7 +472,7 @@ export default function CandidatProfilePage() {
           {/* Close button */}
           <button
             onClick={() => setGallery(null)}
-            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all z-[60]"
+            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all z-60"
           >
             <X className="w-6 h-6" />
           </button>
@@ -481,7 +481,7 @@ export default function CandidatProfilePage() {
           {gallery.items.length > 1 && (
             <>
               <button
-                className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all z-[60]"
+                className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all z-60"
                 onClick={(e) => {
                   e.stopPropagation()
                   setGallery(prev => prev ? { ...prev, index: (prev.index - 1 + prev.items.length) % prev.items.length } : null)
@@ -490,7 +490,7 @@ export default function CandidatProfilePage() {
                 <ChevronLeft className="w-8 h-8" />
               </button>
               <button
-                className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all z-[60]"
+                className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all z-60"
                 onClick={(e) => {
                   e.stopPropagation()
                   setGallery(prev => prev ? { ...prev, index: (prev.index + 1) % prev.items.length } : null)
@@ -551,7 +551,7 @@ export default function CandidatProfilePage() {
         {/* Flash messages */}
         {success && (
           <div className="px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm flex items-center gap-2">
-            <Check className="w-4 h-4 flex-shrink-0" />{success}
+            <Check className="w-4 h-4 shrink-0" />{success}
           </div>
         )}
         {error && (
@@ -562,7 +562,7 @@ export default function CandidatProfilePage() {
         <div className="bg-white rounded-3xl border border-border p-8">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
             {/* Photo */}
-            <div className="relative flex-shrink-0">
+            <div className="relative shrink-0">
               <div
                 onClick={() => photoUrl && setGallery({ items: [{ url: photoUrl, type: 'photo' }], index: 0 })}
                 className={`w-36 h-36 rounded-xl overflow-hidden bg-background border-4 border-white shadow-lg flex items-center justify-center ${photoUrl ? 'cursor-pointer' : ''}`}
@@ -736,29 +736,29 @@ export default function CandidatProfilePage() {
                 { label: 'Téléphone', value: profile?.phone },
               ].filter(r => r.value).map(row => (
                 <div key={row.label} className="flex items-start gap-2">
-                  <dt className="text-muted w-36 flex-shrink-0">{row.label}</dt>
+                  <dt className="text-muted w-36 shrink-0">{row.label}</dt>
                   <dd className="text-foreground font-medium">{row.value}</dd>
                 </div>
               ))}
 
               {profile?.linkedin_url && (
                 <div className="flex items-start gap-2">
-                  <dt className="text-muted w-36 flex-shrink-0">LinkedIn</dt>
+                  <dt className="text-muted w-36 shrink-0">LinkedIn</dt>
                   <dd>
                     <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-700 transition-colors flex items-center gap-1 text-sm break-all">
                       {profile.linkedin_url}
-                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                      <ExternalLink className="w-3 h-3 shrink-0" />
                     </a>
                   </dd>
                 </div>
               )}
               {profile?.portfolio_url && (
                 <div className="flex items-start gap-2">
-                  <dt className="text-muted w-36 flex-shrink-0">Portfolio</dt>
+                  <dt className="text-muted w-36 shrink-0">Portfolio</dt>
                   <dd>
                     <a href={profile.portfolio_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-700 transition-colors flex items-center gap-1 text-sm break-all">
                       {profile.portfolio_url}
-                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                      <ExternalLink className="w-3 h-3 shrink-0" />
                     </a>
                   </dd>
                 </div>

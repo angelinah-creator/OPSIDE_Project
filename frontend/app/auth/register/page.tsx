@@ -3,7 +3,8 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import Logo from '@/components/ui/Logo'
-import { User, Building2, ArrowRight } from 'lucide-react'
+import { User, Building2, ArrowRight, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 export default function RegisterChoicePage() {
   const router = useRouter()
@@ -18,6 +19,10 @@ export default function RegisterChoicePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-4xl">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground mb-8 transition-colors self-start">
+        <ArrowLeft className="w-4 h-4" />
+        Retour
+      </Link>
         <div className="text-center mb-10">
           <h1 className="text-2xl font-bold text-foreground mb-2">Rejoindre OPSIDE</h1>
           <p className="text-muted text-sm">Choisissez votre profil pour commencer</p>
@@ -30,7 +35,7 @@ export default function RegisterChoicePage() {
             className="group relative bg-white border-2 border-border rounded-2xl p-6 text-left hover:border-accent hover:shadow-elevated transition-all duration-200"
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-accent-soft flex items-center justify-center flex-shrink-0 group-hover:bg-accent transition-colors duration-200">
+              <div className="w-12 h-12 rounded-xl bg-accent-soft flex items-center justify-center shrink-0 group-hover:bg-accent transition-colors duration-200">
                 <User className="w-6 h-6 text-accent group-hover:text-white transition-colors duration-200" />
               </div>
               <div className="flex-1">
@@ -58,7 +63,7 @@ export default function RegisterChoicePage() {
             className="group relative bg-white border-2 border-border rounded-2xl p-6 text-left hover:border-accent hover:shadow-elevated transition-all duration-200"
           >
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-accent-soft flex items-center justify-center flex-shrink-0 group-hover:bg-accent transition-colors duration-200">
+              <div className="w-12 h-12 rounded-xl bg-accent-soft flex items-center justify-center shrink-0 group-hover:bg-accent transition-colors duration-200">
                 <Building2 className="w-6 h-6 text-accent group-hover:text-white transition-colors duration-200" />
               </div>
               <div className="flex-1">
