@@ -331,7 +331,7 @@ export default function CandidatOnboarding() {
 
         {/* ── Compétences ── */}
         <div className="bg-white rounded-2xl border border-border p-6">
-          <h2 className="font-semibold text-foreground mb-4">Compétences</h2>
+          {/* <h2 className="font-semibold text-foreground mb-4">Compétences</h2> */}
           <SkillSelector selectedIds={profile.skill_ids} onChange={(ids) => setProfile(p => ({ ...p, skill_ids: ids }))} />
         </div>
 

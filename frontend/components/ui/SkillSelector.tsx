@@ -13,7 +13,7 @@ interface SkillSelectorProps {
 
 const SYSTEM_CATEGORIES = ['frontend', 'backend', 'fullstack', 'mobile', 'devops', 'design', 'data'];
 
-export default function SkillSelector({ selectedIds, onChange, label = 'Compétences' }: SkillSelectorProps) {
+export default function SkillSelector({ selectedIds, onChange, label = 'Compétences *' }: SkillSelectorProps) {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [search, setSearch] = useState('');
@@ -108,7 +108,7 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-semibold text-foreground">{label}</label>
+        <label className="font-semibold text-foreground">{label}</label>
         <button
           type="button"
           onClick={() => { setIsAdding(!isAdding); setEditingSkill(null); setForm({ name: '', category: '', customCategory: '' }); }}

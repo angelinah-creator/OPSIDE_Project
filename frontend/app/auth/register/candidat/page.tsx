@@ -74,13 +74,13 @@ export default function CandidatRegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
-              <Input label="Prénom" placeholder="Jean" value={form.first_name} onChange={set('first_name')} required />
-              <Input label="Nom" placeholder="Rakoto" value={form.last_name} onChange={set('last_name')} required />
+              <Input label="Prénom *" placeholder="Jean" value={form.first_name} onChange={set('first_name')} required />
+              <Input label="Nom *" placeholder="Rakoto" value={form.last_name} onChange={set('last_name')} required />
             </div>
-            <Input label="Email" type="email" placeholder="jean@mail.com" value={form.email} onChange={set('email')} required />
+            <Input label="Email *" type="email" placeholder="jean@mail.com" value={form.email} onChange={set('email')} required />
             <div className="relative">
               <Input
-                label="Mot de passe"
+                label="Mot de passe *"
                 type={showPw ? 'text' : 'password'}
                 placeholder="Min. 8 caractères"
                 value={form.password}
@@ -96,7 +96,7 @@ export default function CandidatRegisterPage() {
               </button>
             </div>
             <Input
-              label="Confirmer le mot de passe"
+              label="Confirmer le mot de passe *"
               type="password"
               placeholder="Répétez le mot de passe"
               value={form.confirm}

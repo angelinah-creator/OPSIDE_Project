@@ -129,17 +129,17 @@ export default function ClientRegisterPage() {
           {step === 0 && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <Input label="Prénom" placeholder="Marie" value={account.first_name} onChange={setA('first_name')} required />
-                <Input label="Nom" placeholder="Dupont" value={account.last_name} onChange={setA('last_name')} required />
+                <Input label="Prénom *" placeholder="Marie" value={account.first_name} onChange={setA('first_name')} required />
+                <Input label="Nom *" placeholder="Dupont" value={account.last_name} onChange={setA('last_name')} required />
               </div>
-              <Input label="Email professionnel" type="email" placeholder="marie@entreprise.com" value={account.email} onChange={setA('email')} required />
+              <Input label="Email de l'entreprise *" type="email" placeholder="marie@entreprise.com" value={account.email} onChange={setA('email')} required />
               <div className="relative">
-                <Input label="Mot de passe" type={showPw ? 'text' : 'password'} placeholder="Min. 8 caractères" value={account.password} onChange={setA('password')} required />
+                <Input label="Mot de passe *" type={showPw ? 'text' : 'password'} placeholder="Min. 8 caractères" value={account.password} onChange={setA('password')} required />
                 <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-8 text-muted hover:text-foreground">
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <Input label="Confirmer" type="password" placeholder="Répétez le mot de passe" value={account.confirm} onChange={setA('confirm')} required />
+              <Input label="Confirmer *" type="password" placeholder="Répétez le mot de passe" value={account.confirm} onChange={setA('confirm')} required />
               <Button className="w-full mt-2" onClick={nextStep} disabled={!account.email || !account.password || !account.first_name}>
                 Continuer <ArrowRight className="w-4 h-4" />
               </Button>
@@ -149,7 +149,7 @@ export default function ClientRegisterPage() {
           {/* Step 1 — Company */}
           {step === 1 && (
             <div className="space-y-4">
-              <Input label="Nom de l'entreprise" placeholder="Tech Solutions SAS" value={company.company_name} onChange={setC('company_name')} required />
+              <Input label="Nom de l'entreprise *" placeholder="Tech Solutions SAS" value={company.company_name} onChange={setC('company_name')} required />
               <Select
                 label="Taille de l'entreprise"
                 options={SIZES}
@@ -159,7 +159,7 @@ export default function ClientRegisterPage() {
               />
               <Input label="Secteur d'activité" placeholder="Technologies de l'information" value={company.industry} onChange={setC('industry')} />
               <div className="grid grid-cols-2 gap-3">
-                <Input label="Pays" placeholder="France" value={company.country} onChange={setC('country')} required />
+                <Input label="Pays *" placeholder="France" value={company.country} onChange={setC('country')} required />
                 <Input label="Ville" placeholder="Paris" value={company.city} onChange={setC('city')} />
               </div>
               <Input label="Site web" type="url" placeholder="https://entreprise.com" value={company.website} onChange={setC('website')} />
@@ -176,14 +176,14 @@ export default function ClientRegisterPage() {
           {/* Step 2 — Contact */}
           {step === 2 && (
             <div className="space-y-4">
-              <Input label="Nom du contact" placeholder={`${account.first_name} ${account.last_name}`} value={contact.contact_name} onChange={setCt('contact_name')} />
-              <Input label="Email de contact" type="email" placeholder={account.email} value={contact.contact_email} onChange={setCt('contact_email')} />
+              <Input label="Nom du contact *" placeholder={`${account.first_name} ${account.last_name}`} value={contact.contact_name} onChange={setCt('contact_name')} required/>
+              <Input label="Email de contact *" type="email" placeholder={account.email} value={contact.contact_email} onChange={setCt('contact_email')} required/>
               <Input label="Téléphone" placeholder="+33 6 12 34 56 78" value={contact.contact_phone} onChange={setCt('contact_phone')} />
-              <Input label="Disponibilités" placeholder="Lundi-Vendredi, 9h-18h" value={contact.interview_availability} onChange={setCt('interview_availability')} />
+              <Input label="Disponibilités pour les entretiens" placeholder="Lundi-Vendredi, 9h-18h" value={contact.interview_availability} onChange={setCt('interview_availability')} />
               <div className="flex gap-3 mt-2">
                 <Button variant="secondary" className="flex-1" onClick={() => setStep(1)}>Retour</Button>
                 <Button className="flex-1" onClick={handleFinish} loading={loading}>
-                  Créer mon compte <Check className="w-4 h-4" />
+                  Créer mon compte
                 </Button>
               </div>
             </div>
