@@ -16,6 +16,7 @@ enum UserStatus {
   active
   suspended
   deleted
+  pending
 }
 
 enum Speciality {
@@ -87,14 +88,15 @@ enum CompanySize {
 }
 
 model User {
-  id         String     @id @default(uuid())
-  email      String     @unique
-  password   String
-  role       Role
-  first_name String?
-  last_name  String?
-  created_at DateTime   @default(now())
-  status     UserStatus @default(active)
+  id                       String     @id @default(uuid())
+  email                    String     @unique
+  password                 String
+  role                     Role
+  first_name               String?
+  last_name                String?
+  created_at               DateTime   @default(now())
+  status                   UserStatus @default(active)
+  email_verification_token String?
 
   refresh_tokens RefreshToken[]
   candidate      CandidateProfile?

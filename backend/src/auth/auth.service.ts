@@ -10,7 +10,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
-import { Role } from '@prisma/client';
+import { Role, UserStatus } from '@prisma/client';
+import { MailService } from '../mail/mail.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +20,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private mailService: MailService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -34,21 +37,28 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const verificationToken = crypto.randomBytes(32).toString('hex');
 
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
         password: hashedPassword,
         role: dto.role,
-        first_name: dto.first_name,
-        last_name: dto.last_name,
+        first_name: dto.first_name ?? null,
+        last_name: dto.last_name ?? null,
+        status: UserStatus.pending,
+        email_verification_token: verificationToken,
       },
     });
 
-    const tokens = await this.generateTokens(user.id, user.email, user.role);
+    try {
+      await this.mailService.sendVerificationEmail(user.email, verificationToken);
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+    }
 
     return {
-      message: 'Inscription réussie',
+      message: 'Inscription réussie. Veuillez vérifier votre e-mail pour activer votre compte.',
       user: {
         id: user.id,
         email: user.email,
@@ -56,7 +66,6 @@ export class AuthService {
         first_name: user.first_name,
         last_name: user.last_name,
       },
-      ...tokens,
     };
   }
 
@@ -69,7 +78,11 @@ export class AuthService {
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
-    if (user.status !== 'active') {
+    if (user.status === UserStatus.pending) {
+      throw new UnauthorizedException('Veuillez vérifier votre e-mail avant de vous connecter');
+    }
+
+    if (user.status !== UserStatus.active) {
       throw new UnauthorizedException('Votre compte est suspendu ou supprimé');
     }
 
@@ -125,6 +138,38 @@ export class AuthService {
     });
 
     return { message: 'Déconnexion de tous les appareils réussie' };
+  }
+
+  async verifyEmail(token: string) {
+    const user = await this.prisma.user.findFirst({
+      where: { email_verification_token: token },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Jeton de vérification invalide ou expiré');
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        status: UserStatus.active,
+        email_verification_token: null,
+      },
+    });
+
+    const tokens = await this.generateTokens(user.id, user.email, user.role);
+
+    return {
+      message: 'E-mail vérifié avec succès',
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        first_name: user.first_name,
+        last_name: user.last_name,
+      },
+      ...tokens,
+    };
   }
 
   async me(userId: string) {

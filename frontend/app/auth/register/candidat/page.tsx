@@ -27,18 +27,20 @@ export default function CandidatRegisterPage() {
     setError('')
     if (form.password !== form.confirm) return setError('Les mots de passe ne correspondent pas.')
     if (form.password.length < 8) return setError('Le mot de passe doit contenir au moins 8 caractères.')
+    const passwordRegex = /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/
+    if (!passwordRegex.test(form.password)) {
+      return setError('Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.')
+    }
     setLoading(true)
     try {
-      const { data } = await authApi.register({
+      await authApi.register({
         email: form.email,
         password: form.password,
         role: 'candidat',
         first_name: form.first_name,
         last_name: form.last_name,
       })
-      setTokens(data.access_token, data.refresh_token)
-      setUser(data.user)
-      router.push('/candidat/onboarding')
+      router.push('/auth/verify-email-notice')
     } catch (err: any) {
       const msg = err.response?.data?.message
       if (err.response?.status === 409) setError('Cet email est déjà utilisé.')

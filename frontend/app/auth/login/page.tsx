@@ -30,7 +30,8 @@ export default function LoginPage() {
       setUser(data.user)
       router.push(getDashboardByRole(data.user.role))
     } catch (err: any) {
-      if (err.response?.status === 401) setError('Email ou mot de passe incorrect.')
+      const msg = err.response?.data?.message
+      if (err.response?.status === 401) setError(typeof msg === 'string' ? msg : 'Email ou mot de passe incorrect.')
       else setError('Une erreur est survenue. Réessayez.')
     } finally {
       setLoading(false)

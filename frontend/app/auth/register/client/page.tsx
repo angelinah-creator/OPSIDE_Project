@@ -44,6 +44,10 @@ export default function ClientRegisterPage() {
     if (step === 0) {
       if (account.password !== account.confirm) return setError('Les mots de passe ne correspondent pas.')
       if (account.password.length < 8) return setError('Mot de passe trop court (min. 8 caractères).')
+      const passwordRegex = /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/
+      if (!passwordRegex.test(account.password)) {
+        return setError('Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.')
+      }
     }
     setStep(s => s + 1)
   }
@@ -53,12 +57,10 @@ export default function ClientRegisterPage() {
     setLoading(true)
     try {
       // 1. Register
-      const { data } = await authApi.register({
+      await authApi.register({
         email: account.email, password: account.password,
         role: 'client'
       })
-      setTokens(data.access_token, data.refresh_token)
-      setUser(data.user)
 
       // 2. Create profile
       const profileData = {
@@ -77,7 +79,7 @@ export default function ClientRegisterPage() {
       // 3. Upload logo if any
       if (logoFile) await clientApi.uploadLogo(logoFile).catch(() => {})
 
-      router.push('/client/dashboard')
+      router.push('/auth/verify-email-notice')
     } catch (err: any) {
       const msg = err.response?.data?.message
       if (err.response?.status === 409) setError('Cet email est déjà utilisé.')

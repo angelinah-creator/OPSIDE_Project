@@ -2,7 +2,7 @@ import api from './api';
 import Cookies from 'js-cookie';
 
 export type UserRole = 'candidat' | 'client' | 'admin';
-export type UserStatus = 'active' | 'suspended' | 'pending';
+export type UserStatus = 'active' | 'suspended' | 'pending' | 'deleted';
 
 export interface User {
   id: string;
@@ -86,4 +86,5 @@ export const authApi = {
   login: (email: string, password: string) => api.post<AuthResponse>('/auth/login', { email, password }),
   logout: (refresh_token: string) => api.post('/auth/logout', { refresh_token }),
   me: () => api.get<User>('/auth/me'),
+  verifyEmail: (token: string) => api.get<AuthResponse>(`/auth/verify-email?token=${token}`),
 };
