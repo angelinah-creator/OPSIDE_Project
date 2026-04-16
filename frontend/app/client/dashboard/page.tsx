@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
 import Button from '@/components/ui/Button'
-import { getUser, clearTokens } from '@/lib/auth-service'
-import { authApi  } from '@/lib/auth-service'
+import { getUser, clearTokens, authApi } from '@/lib/auth-service'
+import { clientApi } from '@/lib/client-service'
 import { LogOut, Settings, Briefcase, PlusCircle, User } from 'lucide-react'
 
 export default function ClientDashboard() {
@@ -14,9 +14,25 @@ export default function ClientDashboard() {
   const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    const u = getUser()
-    if (u) setUser(u)
-    else authApi.me().then(r => setUser(r.data)).catch(() => router.push('/auth/login'))
+    const checkProfile = async () => {
+      try {
+        const u = getUser()
+        if (u) setUser(u)
+        else {
+          const res = await authApi.me()
+          setUser(res.data)
+        }
+        await clientApi.getMyProfile()
+      } catch (err: any) {
+        if (err.response?.status === 404) {
+          router.push('/client/onboarding')
+        } else {
+          router.push('/auth/login')
+        }
+      }
+    }
+    
+    checkProfile()
   }, [router])
 
   const handleLogout = async () => {

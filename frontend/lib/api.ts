@@ -45,7 +45,9 @@ api.interceptors.response.use(
       const refresh = getRefreshToken();
       if (!refresh) {
         clearAuth();
-        window.location.href = '/auth/login';
+        if (!window.location.pathname.includes('/auth/')) {
+          window.location.href = '/auth/login';
+        }
         return Promise.reject(error);
       }
       try {

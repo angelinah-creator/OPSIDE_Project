@@ -25,7 +25,7 @@ export interface ClientProfile {
 }
 
 export const clientApi = {
-  getProfile: async (): Promise<ClientProfile> => {
+  getMyProfile: async (): Promise<ClientProfile> => {
     const res = await api.get('/client/profile/me');
     return res.data;
   },

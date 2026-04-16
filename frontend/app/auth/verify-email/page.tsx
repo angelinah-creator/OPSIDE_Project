@@ -39,7 +39,7 @@ export default function VerifyEmailPage() {
         
         // Redirect after 2 seconds
         setTimeout(() => {
-          const destination = data.user.role === 'candidat' ? '/candidat/onboarding' : '/client/dashboard'
+          const destination = data.user.role === 'candidat' ? '/candidat/onboarding' : '/client/onboarding'
           router.push(destination)
         }, 2000)
       } catch (err: any) {
