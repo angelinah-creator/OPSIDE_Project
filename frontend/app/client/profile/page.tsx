@@ -7,6 +7,7 @@ import Logo from '@/components/ui/Logo'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
+import CountrySelect from '@/components/ui/CountrySelect'
 import { authApi, clearTokens } from '@/lib/auth-service'
 import { clientApi } from '@/lib/client-service'
 import {
@@ -19,16 +20,36 @@ const SIZES = [
   { value: 'size_1_10', label: '1–10 employés' },
   { value: 'size_11_50', label: '11–50 employés' },
   { value: 'size_51_200', label: '51–200 employés' },
-  { value: 'size_201_500', label: '201–500 employés' },
-  { value: 'size_500_plus', label: '500+ employés' },
+  { value: 'size_200_plus', label: '200+ employés' },
 ]
 
 const SIZE_LABELS: Record<string, string> = {
   size_1_10: '1–10 employés',
   size_11_50: '11–50 employés',
   size_51_200: '51–200 employés',
-  size_201_500: '201–500 employés',
-  size_500_plus: '500+ employés',
+  size_200_plus: '200+ employés',
+}
+
+const COUNTRIES = [
+  { value: 'madagascar', label: 'Madagascar', flag: 'mg' },
+  { value: 'senegal', label: 'Sénégal', flag: 'sn' },
+  { value: 'maurice', label: 'Maurice', flag: 'mu' },
+  { value: 'kenya', label: 'Kenya', flag: 'ke' },
+  { value: 'nigeria', label: 'Nigeria', flag: 'ng' },
+  { value: 'egypte', label: 'Égypte', flag: 'eg' },
+  { value: 'maroc', label: 'Maroc', flag: 'ma' },
+  { value: 'tunisie', label: 'Tunisie', flag: 'tn' },
+]
+
+const COUNTRY_LABELS: Record<string, { label: string; flag: string }> = {
+  madagascar: { label: 'Madagascar', flag: 'mg' },
+  senegal: { label: 'Sénégal', flag: 'sn' },
+  maurice: { label: 'Maurice', flag: 'mu' },
+  kenya: { label: 'Kenya', flag: 'ke' },
+  nigeria: { label: 'Nigeria', flag: 'ng' },
+  egypte: { label: 'Égypte', flag: 'eg' },
+  maroc: { label: 'Maroc', flag: 'ma' },
+  tunisie: { label: 'Tunisie', flag: 'tn' },
 }
 
 // ─── Main Component ───────────────────────────────────────────────
@@ -72,7 +93,7 @@ export default function ClientProfilePage() {
 
   const loadProfile = async () => {
     try {
-      const p = await clientApi.getProfile()
+      const p = await clientApi.getMyProfile()
       setProfile(p)
       setLogoUrl(p.logo_url || '')
       
@@ -113,7 +134,7 @@ export default function ClientProfilePage() {
   const flash = (msg: string) => { setSuccess(msg); setTimeout(() => setSuccess(''), 3000) }
   const refresh = async () => {
     try {
-      const p = await clientApi.getProfile()
+      const p = await clientApi.getMyProfile()
       setProfile(p)
       setLogoUrl(p.logo_url || '')
     } catch {}
@@ -311,7 +332,12 @@ export default function ClientProfilePage() {
                 onChange={e => setInfoForm(p => ({ ...p, industry: e.target.value }))} 
               />
               <div className="grid grid-cols-2 gap-4">
-                <Input label="Pays *" value={infoForm.country} onChange={e => setInfoForm(p => ({ ...p, country: e.target.value }))} />
+                <CountrySelect 
+                  label="Pays *" 
+                  options={COUNTRIES} 
+                  value={infoForm.country} 
+                  onChange={v => setInfoForm(p => ({ ...p, country: v }))} 
+                />
                 <Input label="Ville" value={infoForm.city} onChange={e => setInfoForm(p => ({ ...p, city: e.target.value }))} />
               </div>
               <Input label="Site web" type="url" value={infoForm.website} onChange={e => setInfoForm(p => ({ ...p, website: e.target.value }))} />
@@ -325,13 +351,24 @@ export default function ClientProfilePage() {
               {[
                 { label: 'Taille', value: SIZE_LABELS[profile?.company_size] || profile?.company_size, icon: Building2 },
                 { label: 'Secteur', value: profile?.industry, icon: BriefcaseBusiness },
-                { label: 'Localisation', value: profile?.country && profile?.city ? `${profile.city}, ${profile.country}` : profile?.country || profile?.city, icon: MapPin },
+                { label: 'Localisation', value: profile?.country ? (
+                  <div className="flex items-center gap-2">
+                    {COUNTRY_LABELS[profile.country] && (
+                      <img 
+                        src={`https://flagcdn.com/w40/${COUNTRY_LABELS[profile.country].flag}.png`} 
+                        alt="" 
+                        className="w-4 h-3 object-cover rounded-sm"
+                      />
+                    )}
+                    <span>{profile.city ? `${profile.city}, ` : ''}{COUNTRY_LABELS[profile.country]?.label || profile.country}</span>
+                  </div>
+                ) : profile?.city, icon: MapPin },
               ].filter(r => r.value).map(row => (
                 <div key={row.label} className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center shrink-0 text-accent border border-border">
                     <row.icon className="w-5 h-5" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <dt className="text-xs text-muted font-medium uppercase tracking-wider">{row.label}</dt>
                     <dd className="text-foreground font-medium">{row.value}</dd>
                   </div>

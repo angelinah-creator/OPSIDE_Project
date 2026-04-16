@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Textarea from '@/components/ui/Textarea'
 import Select from '@/components/ui/Select'
+import CountrySelect from '@/components/ui/CountrySelect'
 import SkillSelector from '@/components/ui/SkillSelector'
 import { candidateApi } from '@/lib/candidate-service'
 import { clearTokens } from '@/lib/auth-service'
@@ -28,9 +29,38 @@ const AVAILABILITY = [
   { value: 'immediate', label: 'Immédiat' }, { value: 'two_weeks', label: 'Sous 2 semaines' },
   { value: 'one_month', label: 'Sous 1 mois' }, { value: 'three_months', label: 'Sous 3 mois' },
 ]
-const CURRENCIES = [
-  { value: 'EUR', label: 'EUR (€)' }, { value: 'USD', label: 'USD ($)' }, { value: 'MGA', label: 'MGA (Ar)' },
+const COUNTRIES = [
+  { value: 'madagascar', label: 'Madagascar', flag: 'mg' },
+  { value: 'senegal', label: 'Sénégal', flag: 'sn' },
+  { value: 'maurice', label: 'Maurice', flag: 'mu' },
+  { value: 'kenya', label: 'Kenya', flag: 'ke' },
+  { value: 'nigeria', label: 'Nigeria', flag: 'ng' },
+  { value: 'egypte', label: 'Égypte', flag: 'eg' },
+  { value: 'maroc', label: 'Maroc', flag: 'ma' },
+  { value: 'tunisie', label: 'Tunisie', flag: 'tn' },
 ]
+
+const COUNTRY_LABELS: Record<string, { label: string; flag: string }> = {
+  madagascar: { label: 'Madagascar', flag: 'mg' },
+  senegal: { label: 'Sénégal', flag: 'sn' },
+  maurice: { label: 'Maurice', flag: 'mu' },
+  kenya: { label: 'Kenya', flag: 'ke' },
+  nigeria: { label: 'Nigeria', flag: 'ng' },
+  egypte: { label: 'Égypte', flag: 'eg' },
+  maroc: { label: 'Maroc', flag: 'ma' },
+  tunisie: { label: 'Tunisie', flag: 'tn' },
+}
+
+const COUNTRY_TO_CURRENCY: Record<string, string> = {
+  madagascar: 'MGA',
+  senegal: 'XOF',
+  maurice: 'MUR',
+  kenya: 'KES',
+  nigeria: 'NGN',
+  egypte: 'EGP',
+  maroc: 'MAD',
+  tunisie: 'TND',
+}
 const EMP_TYPES = [
   { value: 'temps_plein', label: 'Temps plein' }, { value: 'temps_partiel', label: 'Temps partiel' },
   { value: 'freelance', label: 'Freelance' }, { value: 'stage', label: 'Stage' }, { value: 'alternance', label: 'Alternance' },
@@ -189,7 +219,7 @@ export default function CandidatProfilePage() {
 
   // ── Load ──
   useEffect(() => {
-    candidateApi.getProfile().then((p: any) => {
+    candidateApi.getMyProfile().then((p: any) => {
       setProfile(p)
       setPf({
         country: p.country || '', city: p.city || '', speciality: p.speciality || '',
@@ -214,7 +244,7 @@ export default function CandidatProfilePage() {
   }, [router])
 
   const flash = (msg: string) => { setSuccess(msg); setTimeout(() => setSuccess(''), 3000) }
-  const refresh = () => candidateApi.getProfile().then((p: any) => setProfile(p)).catch(() => { })
+  const refresh = () => candidateApi.getMyProfile().then((p: any) => setProfile(p)).catch(() => { })
 
   // ── Photo handlers ──
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -704,7 +734,12 @@ export default function CandidatProfilePage() {
           {editMain ? (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <Input label="Pays *" value={pf.country} onChange={e => setPf((p: any) => ({ ...p, country: e.target.value }))} />
+                <CountrySelect 
+                  label="Pays *" 
+                  options={COUNTRIES} 
+                  value={pf.country} 
+                  onChange={v => setPf((p: any) => ({ ...p, country: v }))} 
+                />
                 <Input label="Ville" value={pf.city} onChange={e => setPf((p: any) => ({ ...p, city: e.target.value }))} />
               </div>
               <Select label="Spécialité" options={SPECIALITIES} value={pf.speciality} onChange={e => setPf((p: any) => ({ ...p, speciality: e.target.value }))} />
@@ -712,9 +747,14 @@ export default function CandidatProfilePage() {
                 <Input label="Années d'expérience" type="number" value={pf.experience_years} onChange={e => setPf((p: any) => ({ ...p, experience_years: e.target.value }))} />
                 <Select label="Disponibilité" options={AVAILABILITY} value={pf.availability} onChange={e => setPf((p: any) => ({ ...p, availability: e.target.value }))} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Input label="Taux journalier" type="number" value={pf.daily_rate} onChange={e => setPf((p: any) => ({ ...p, daily_rate: e.target.value }))} />
-                <Select label="Devise" options={CURRENCIES} value={pf.currency} onChange={e => setPf((p: any) => ({ ...p, currency: e.target.value }))} />
+              <div className="grid grid-cols-1">
+                <Input 
+                  label="Taux journalier" 
+                  type="number" 
+                  value={pf.daily_rate} 
+                  onChange={e => setPf((p: any) => ({ ...p, daily_rate: e.target.value }))} 
+                  suffix={pf.country ? COUNTRY_TO_CURRENCY[pf.country] : undefined}
+                />
               </div>
               <Input label="Téléphone" value={pf.phone} onChange={e => setPf((p: any) => ({ ...p, phone: e.target.value }))} />
               <Input label="LinkedIn" type="url" value={pf.linkedin_url} onChange={e => setPf((p: any) => ({ ...p, linkedin_url: e.target.value }))} />
@@ -727,7 +767,18 @@ export default function CandidatProfilePage() {
           ) : (
             <dl className="space-y-3 text-sm">
               {[
-                { label: 'Pays', value: profile?.country },
+                { label: 'Pays', value: profile?.country ? (
+                  <div className="flex items-center gap-2">
+                    {COUNTRY_LABELS[profile.country] && (
+                      <img 
+                        src={`https://flagcdn.com/w40/${COUNTRY_LABELS[profile.country].flag}.png`} 
+                        alt="" 
+                        className="w-4 h-3 object-cover rounded-sm"
+                      />
+                    )}
+                    <span>{COUNTRY_LABELS[profile.country]?.label || profile.country}</span>
+                  </div>
+                ) : undefined },
                 { label: 'Ville', value: profile?.city },
                 { label: 'Spécialité', value: SPEC_LABEL[profile?.speciality] || profile?.speciality },
                 { label: 'Expérience', value: profile?.experience_years ? `${profile.experience_years} an(s)` : undefined },

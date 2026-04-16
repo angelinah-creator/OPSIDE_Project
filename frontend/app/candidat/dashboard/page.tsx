@@ -18,7 +18,7 @@ export default function CandidatDashboard() {
     if (u) setUser(u)
     else authApi.me().then(r => setUser(r.data)).catch(() => router.push('/auth/login'))
 
-    candidateApi.getProfile().catch((err: any) => {
+    candidateApi.getMyProfile().catch((err: any) => {
       if (err.response?.status === 404) {
         router.replace('/candidat/onboarding')
       }

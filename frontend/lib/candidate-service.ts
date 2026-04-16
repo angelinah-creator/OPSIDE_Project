@@ -2,7 +2,7 @@ import api from './api';
 import { Skill } from './skill-service';
 
 export type Availability = 'immediate' | 'two_weeks' | 'one_month' | 'three_months';
-export type Currency = 'EUR' | 'USD' | 'MGA';
+export type Currency = 'EUR' | 'USD' | 'MGA' | 'NGN' | 'KES' | 'EGP' | 'XOF' | 'MAD' | 'TND' | 'MUR';
 export type CandidateStatus = 'open_to_work' | 'not_available' | 'in_mission';
 
 export interface Media {
@@ -67,7 +67,7 @@ export interface CandidateProfile {
 }
 
 export const candidateApi = {
-  getProfile: async (): Promise<CandidateProfile> => {
+  getMyProfile: async (): Promise<CandidateProfile> => {
     const res = await api.get('/candidate/profile/me');
     return res.data;
   },

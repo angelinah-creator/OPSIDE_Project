@@ -1,6 +1,6 @@
 import api from './api';
 
-export type CompanySize = 'size_1_10' | 'size_11_50' | 'size_51_200' | 'size_201_500' | 'size_500_plus';
+export type CompanySize = 'size_1_10' | 'size_11_50' | 'size_51_200' | 'size_200_plus';
 
 export interface ClientProfile {
   id: string;
