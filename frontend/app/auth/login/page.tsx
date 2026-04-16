@@ -63,6 +63,11 @@ export default function LoginPage() {
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+            <div className="flex justify-end mt-[-8px]">
+              <Link href="/auth/forgot-password" title="Réinitialiser mon mot de passe" className="text-xs text-muted hover:text-accent transition-colors">
+                Mot de passe oublié ?
+              </Link>
+            </div>
             <Button type="submit" className="w-full" loading={loading}>Se connecter</Button>
           </form>
 

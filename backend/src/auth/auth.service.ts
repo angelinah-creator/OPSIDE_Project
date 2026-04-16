@@ -9,6 +9,8 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import * as bcrypt from 'bcrypt';
 import { Role, UserStatus } from '@prisma/client';
 import { MailService } from '../mail/mail.service';
@@ -202,6 +204,68 @@ export class AuthService {
     });
 
     return user;
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (!user) {
+      // Pour des raisons de sécurité, on ne dit pas si l'email existe ou non
+      return { message: 'Si votre adresse e-mail est enregistrée, vous recevrez un lien de réinitialisation.' };
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date();
+    expires.setHours(expires.getHours() + 1); // Expire dans 1 heure
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        reset_password_token: token,
+        reset_password_expires: expires,
+      },
+    });
+
+    try {
+      await this.mailService.sendPasswordResetEmail(user.email, token);
+    } catch (error) {
+      console.error('Error sending reset password email:', error);
+    }
+
+    return { message: 'Si votre adresse e-mail est enregistrée, vous recevrez un lien de réinitialisation.' };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        reset_password_token: dto.token,
+        reset_password_expires: {
+          gt: new Date(),
+        },
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Le jeton de réinitialisation est invalide ou a expiré');
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        reset_password_token: null,
+        reset_password_expires: null,
+      },
+    });
+
+    // Optionnel: révoquer tous les refresh tokens existants pour forcer une nouvelle connexion partout
+    await this.logoutAll(user.id);
+
+    return { message: 'Votre mot de passe a été réinitialisé avec succès.' };
   }
 
   private async generateTokens(userId: string, email: string, role: Role) {

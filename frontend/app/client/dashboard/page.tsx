@@ -70,13 +70,6 @@ export default function ClientDashboard() {
             <Briefcase className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-3">Poster une offre</h1>
-          <div className="flex gap-3 justify-center">
-            <Link href="/client/profile">
-              <Button variant="secondary">
-                <Settings className="w-4 h-4" /> Modifier mon profil
-              </Button>
-            </Link>
-          </div>
         </div>
       </main>
     </div>
