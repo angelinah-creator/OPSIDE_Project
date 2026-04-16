@@ -17,8 +17,7 @@ const SIZES = [
   { value: 'size_1_10', label: '1–10 employés' },
   { value: 'size_11_50', label: '11–50 employés' },
   { value: 'size_51_200', label: '51–200 employés' },
-  { value: 'size_201_500', label: '201–500 employés' },
-  { value: 'size_500_plus', label: '500+ employés' },
+  { value: 'size_200_plus', label: '200+ employés' },
 ]
 
 const COUNTRIES = [
@@ -164,7 +163,12 @@ export default function ClientOnboardingPage() {
               
               <div className="flex gap-3 mt-2">
                 <Button variant="secondary" className="flex-1" onClick={() => setStep(0)}>Retour</Button>
-                <Button className="flex-1" onClick={handleFinish} loading={loading}>
+                <Button 
+                  className="flex-1" 
+                  onClick={handleFinish} 
+                  loading={loading}
+                  disabled={!contact.contact_name || !contact.contact_email}
+                >
                   Terminer
                 </Button>
               </div>
