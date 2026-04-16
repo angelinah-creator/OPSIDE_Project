@@ -5,7 +5,7 @@ import {
   IsString,
   IsUrl,
 } from 'class-validator';
-import { CompanySize } from '@prisma/client';
+import { CompanySize, Country } from '@prisma/client';
 
 export class UpdateClientProfileDto {
   @IsOptional()
@@ -21,8 +21,8 @@ export class UpdateClientProfileDto {
   industry?: string;
 
   @IsOptional()
-  @IsString()
-  country?: string;
+  @IsEnum(Country)
+  country?: Country;
 
   @IsOptional()
   @IsString()

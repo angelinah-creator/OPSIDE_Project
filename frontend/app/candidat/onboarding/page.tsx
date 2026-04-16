@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Textarea from '@/components/ui/Textarea'
 import Select from '@/components/ui/Select'
+import CountrySelect from '@/components/ui/CountrySelect'
 import SkillSelector from '@/components/ui/SkillSelector'
 import { candidateApi } from '@/lib/candidate-service'
 import { User, Plus, Trash2, X, ImagePlus, Video } from 'lucide-react'
@@ -27,11 +28,27 @@ const AVAILABILITY = [
   { value: 'one_month', label: 'Sous un mois' },
   { value: 'three_months', label: 'Sous trois mois' },
 ]
-const CURRENCIES = [
-  { value: 'EUR', label: 'EUR (€)' },
-  { value: 'USD', label: 'USD ($)' },
-  { value: 'MGA', label: 'MGA (Ar)' },
+const COUNTRIES = [
+  { value: 'madagascar', label: 'Madagascar', flag: 'mg' },
+  { value: 'senegal', label: 'Sénégal', flag: 'sn' },
+  { value: 'maurice', label: 'Maurice', flag: 'mu' },
+  { value: 'kenya', label: 'Kenya', flag: 'ke' },
+  { value: 'nigeria', label: 'Nigeria', flag: 'ng' },
+  { value: 'egypte', label: 'Égypte', flag: 'eg' },
+  { value: 'maroc', label: 'Maroc', flag: 'ma' },
+  { value: 'tunisie', label: 'Tunisie', flag: 'tn' },
 ]
+
+const COUNTRY_TO_CURRENCY: Record<string, string> = {
+  madagascar: 'MGA',
+  senegal: 'XOF',
+  maurice: 'MUR',
+  kenya: 'KES',
+  nigeria: 'NGN',
+  egypte: 'EGP',
+  maroc: 'MAD',
+  tunisie: 'TND',
+}
 const EMP_TYPES = [
   { value: 'temps_plein', label: 'Temps plein' },
   { value: 'temps_partiel', label: 'Temps partiel' },
@@ -123,7 +140,7 @@ export default function CandidatOnboarding() {
 
   const [profile, setProfile] = useState({
     country: '', city: '', speciality: '', custom_speciality: '', experience_years: '',
-    daily_rate: '', currency: 'EUR', availability: 'immediate',
+    daily_rate: '', availability: 'immediate',
     bio: '', title: '', phone: '', linkedin_url: '', portfolio_url: '', skill_ids: [] as string[],
   })
 
@@ -199,7 +216,6 @@ export default function CandidatOnboarding() {
         custom_speciality: isSpecialityOther ? profile.custom_speciality : undefined,
         experience_years: Number(profile.experience_years),
         daily_rate: Number(profile.daily_rate),
-        currency: profile.currency,
         availability: profile.availability,
         bio: profile.bio || undefined,
         title: profile.title || undefined,
@@ -319,7 +335,14 @@ export default function CandidatOnboarding() {
         <div className="bg-white rounded-2xl border border-border p-6 space-y-4">
           <h2 className="font-semibold text-foreground">Informations principales</h2>
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Pays *" placeholder="Madagascar" value={profile.country} onChange={setP('country')} required />
+            <CountrySelect 
+              label="Pays *" 
+              options={COUNTRIES} 
+              placeholder="Choisir..." 
+              value={profile.country} 
+              onChange={(v) => setProfile(p => ({ ...p, country: v }))} 
+              error={!profile.country && error ? 'Obligatoire' : undefined}
+            />
             <Input label="Ville" placeholder="Antananarivo" value={profile.city} onChange={setP('city')} />
           </div>
           <Input label="Titre du profil *" placeholder="Ex: Développeur Fullstack Senior" value={profile.title} onChange={setP('title')} required />
@@ -338,9 +361,15 @@ export default function CandidatOnboarding() {
             <Input label="Années d'expérience *" type="number" min="0" max="50" placeholder="4" value={profile.experience_years} onChange={setP('experience_years')} />
             <Select label="Disponibilité *" options={AVAILABILITY} value={profile.availability} onChange={setP('availability') as any} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Input label="Taux journalier *" type="number" placeholder="80" value={profile.daily_rate} onChange={setP('daily_rate')} />
-            <Select label="Devise" options={CURRENCIES} value={profile.currency} onChange={setP('currency') as any} />
+          <div className="grid grid-cols-1">
+            <Input 
+              label="Taux journalier *" 
+              type="number" 
+              placeholder="80" 
+              value={profile.daily_rate} 
+              onChange={setP('daily_rate')} 
+              suffix={profile.country ? COUNTRY_TO_CURRENCY[profile.country] : undefined}
+            />
           </div>
           <AutoTextarea label="Bio" placeholder="Décrivez-vous en quelques lignes..." value={profile.bio} onChange={v => setProfile(p => ({ ...p, bio: v }))} />
         </div>

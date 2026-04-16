@@ -6,7 +6,7 @@ import {
   IsUrl,
   IsEmail,
 } from 'class-validator';
-import { CompanySize } from '@prisma/client';
+import { CompanySize, Country } from '@prisma/client';
 
 export class CreateClientProfileDto {
   @IsString()
@@ -21,9 +21,9 @@ export class CreateClientProfileDto {
   @IsString()
   industry?: string;
 
-  @IsString()
+  @IsEnum(Country)
   @IsNotEmpty()
-  country: string;
+  country: Country;
 
   @IsOptional()
   @IsString()

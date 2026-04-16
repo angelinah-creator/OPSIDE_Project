@@ -6,6 +6,7 @@ import Logo from '@/components/ui/Logo'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
+import CountrySelect from '@/components/ui/CountrySelect'
 import FileUpload from '@/components/ui/FileUpload'
 import { clientApi } from '@/lib/client-service'
 import { Check, ArrowRight } from 'lucide-react'
@@ -18,6 +19,17 @@ const SIZES = [
   { value: 'size_51_200', label: '51–200 employés' },
   { value: 'size_201_500', label: '201–500 employés' },
   { value: 'size_500_plus', label: '500+ employés' },
+]
+
+const COUNTRIES = [
+  { value: 'madagascar', label: 'Madagascar', flag: 'mg' },
+  { value: 'senegal', label: 'Sénégal', flag: 'sn' },
+  { value: 'maurice', label: 'Maurice', flag: 'mu' },
+  { value: 'kenya', label: 'Kenya', flag: 'ke' },
+  { value: 'nigeria', label: 'Nigeria', flag: 'ng' },
+  { value: 'egypte', label: 'Égypte', flag: 'eg' },
+  { value: 'maroc', label: 'Maroc', flag: 'ma' },
+  { value: 'tunisie', label: 'Tunisie', flag: 'tn' },
 ]
 
 export default function ClientOnboardingPage() {
@@ -123,7 +135,14 @@ export default function ClientOnboardingPage() {
               />
               <Input label="Secteur d'activité" placeholder="Technologies de l'information" value={company.industry} onChange={setC('industry')} />
               <div className="grid grid-cols-2 gap-3">
-                <Input label="Pays *" placeholder="France" value={company.country} onChange={setC('country')} required />
+                <CountrySelect 
+                  label="Pays *" 
+                  options={COUNTRIES} 
+                  placeholder="Choisir..." 
+                  value={company.country} 
+                  onChange={(v) => setCompany(p => ({ ...p, country: v }))} 
+                  error={!company.country && error ? 'Obligatoire' : undefined}
+                />
                 <Input label="Ville" placeholder="Paris" value={company.city} onChange={setC('city')} />
               </div>
               <Input label="Site web" type="url" placeholder="https://entreprise.com" value={company.website} onChange={setC('website')} />

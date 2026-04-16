@@ -36,8 +36,23 @@ enum Currency {
   XAF
   MAD
   TND
+  KES
+  NGN
+  EGP
+  MUR
   EUR
   USD
+}
+
+enum Country {
+  kenya
+  nigeria
+  egypte
+  maroc
+  tunisie
+  madagascar
+  senegal
+  maurice
 }
 
 enum Availability {
@@ -145,7 +160,7 @@ model CandidateProfile {
   id                 String           @id @default(uuid())
   user_id            String           @unique
   phone              String?
-  country            String
+  country            Country
   city               String?
   bio                String?
   title              String?
@@ -283,7 +298,7 @@ model ClientProfile {
   company_name           String
   company_size           CompanySize?
   industry               String?
-  country                String
+  country                Country
   city                   String?
   contact_name           String
   contact_email          String

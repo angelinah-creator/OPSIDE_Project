@@ -10,7 +10,7 @@ import {
   IsArray,
   IsUUID,
 } from 'class-validator';
-import { Speciality, Currency, Availability, CandidateStatus } from '@prisma/client';
+import { Speciality, Currency, Availability, CandidateStatus, Country } from '@prisma/client';
 
 export class UpdateCandidateProfileDto {
   @IsOptional()
@@ -18,8 +18,8 @@ export class UpdateCandidateProfileDto {
   phone?: string;
 
   @IsOptional()
-  @IsString()
-  country?: string;
+  @IsEnum(Country)
+  country?: Country;
 
   @IsOptional()
   @IsString()

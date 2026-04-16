@@ -11,16 +11,16 @@ import {
   IsArray,
   IsUUID,
 } from 'class-validator';
-import { Speciality, Currency, Availability } from '@prisma/client';
+import { Speciality, Currency, Availability, CandidateStatus, Country } from '@prisma/client';
 
 export class CreateCandidateProfileDto {
   @IsOptional()
   @IsString()
   phone?: string;
 
-  @IsString()
-  @IsNotEmpty()
-  country: string;
+  @IsOptional()
+  @IsEnum(Country)
+  country: Country;
 
   @IsOptional()
   @IsString()
@@ -50,6 +50,7 @@ export class CreateCandidateProfileDto {
   @Min(0)
   daily_rate: number;
 
+  @IsOptional()
   @IsEnum(Currency)
   currency: Currency;
 

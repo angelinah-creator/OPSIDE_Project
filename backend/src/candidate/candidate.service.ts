@@ -13,6 +13,7 @@ import { CreateExperienceDto } from './dto/create-experience.dto';
 import { UpdateExperienceDto } from './dto/update-experience.dto';
 import { CreateEducationDto } from './dto/create-education.dto';
 import { UpdateEducationDto } from './dto/update-education.dto';
+import { Country, Currency } from '@prisma/client';
 
 @Injectable()
 export class CandidateService {
@@ -43,14 +44,18 @@ export class CandidateService {
       }
     }
 
-    const requiredFields = ['country', 'speciality', 'experience_years', 'daily_rate', 'currency', 'availability'];
+    const requiredFields = ['country', 'speciality', 'experience_years', 'daily_rate', 'availability'];
     const profileCompleted = requiredFields.every((f) => dto[f] !== undefined && dto[f] !== null);
 
-    const { skill_ids, ...profileData } = dto;
+    const { skill_ids, currency, ...profileData } = dto;
+    
+    // Automatic currency mapping
+    const mappedCurrency = this.mapCountryToCurrency(profileData.country);
 
     const profile = await this.prisma.candidateProfile.create({
       data: {
         ...profileData,
+        currency: mappedCurrency,
         user_id: userId,
         profile_completed: profileCompleted,
         candidate_skills: skill_ids && skill_ids.length > 0
@@ -477,5 +482,19 @@ export class CandidateService {
 
     await this.prisma.educationMedia.delete({ where: { id: mediaId } });
     return { message: 'Média supprimé avec succès' };
+  }
+
+  private mapCountryToCurrency(country: Country): Currency {
+    const mapping: Record<Country, Currency> = {
+      madagascar: Currency.MGA,
+      senegal: Currency.XOF,
+      maurice: Currency.MUR,
+      kenya: Currency.KES,
+      nigeria: Currency.NGN,
+      egypte: Currency.EGP,
+      maroc: Currency.MAD,
+      tunisie: Currency.TND,
+    };
+    return mapping[country] || Currency.USD;
   }
 }
