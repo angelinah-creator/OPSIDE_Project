@@ -58,6 +58,10 @@ export class CreateEducationDto {
 
   @IsOptional()
   @IsString()
+  custom_level?: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(1000)
   description?: string;
 

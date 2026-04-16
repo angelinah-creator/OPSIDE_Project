@@ -38,6 +38,10 @@ export class UpdateCandidateProfileDto {
   speciality?: Speciality;
 
   @IsOptional()
+  @IsString()
+  custom_speciality?: string;
+
+  @IsOptional()
   @IsInt()
   @Min(0)
   @Max(50)

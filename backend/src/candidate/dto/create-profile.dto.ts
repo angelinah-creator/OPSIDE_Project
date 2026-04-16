@@ -37,6 +37,10 @@ export class CreateCandidateProfileDto {
   @IsEnum(Speciality)
   speciality: Speciality;
 
+  @IsOptional()
+  @IsString()
+  custom_speciality?: string;
+
   @IsInt()
   @Min(0)
   @Max(50)

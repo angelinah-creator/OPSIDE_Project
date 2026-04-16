@@ -9,7 +9,7 @@ export default function VerifyEmailNoticePage() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-md text-center">
         <div className="mb-8 flex justify-center">
-          <div className="w-20 h-20 bg-accent-soft rounded-full flex items-center justify-center animate-pulse">
+          <div className="w-20 h-20 bg-accent-soft rounded-full flex items-center justify-center">
             <Mail className="w-10 h-10 text-accent" />
           </div>
         </div>
@@ -17,7 +17,7 @@ export default function VerifyEmailNoticePage() {
         <h1 className="text-2xl font-bold text-foreground mb-4">Vérifiez votre boîte mail</h1>
         <p className="text-muted mb-8 leading-relaxed">
           Nous vous avons envoyé un lien de confirmation par e-mail. 
-          Veuillez cliquer sur ce lien pour activer votre compte et accéder à OPSIDE.
+          Veuillez cliquer sur ce lien pour valider votre compte OPSIDE.
         </p>
 
         <div className="space-y-4">

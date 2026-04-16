@@ -26,6 +26,8 @@ enum Speciality {
   mobile
   devops
   data
+  design
+  other
 }
 
 enum Currency {
@@ -68,6 +70,8 @@ enum EmploymentType {
   independant
   stage_alternance
   apprentissage
+  stage
+  alternance
 }
 
 enum EducationLevel {
@@ -77,6 +81,7 @@ enum EducationLevel {
   bac_plus_4
   bac_plus_5
   doctorat
+  bac_plus_8
   autre
 }
 
@@ -145,6 +150,7 @@ model CandidateProfile {
   bio                String?
   title              String?
   speciality         Speciality
+  custom_speciality  String?
   experience_years   Int
   daily_rate         Decimal
   currency           Currency
@@ -235,6 +241,7 @@ model Education {
   end_year     Int?
   is_current   Boolean         @default(false)
   level        EducationLevel?
+  custom_level String?
   description  String?
   created_at   DateTime        @default(now())
   updated_at   DateTime        @updatedAt

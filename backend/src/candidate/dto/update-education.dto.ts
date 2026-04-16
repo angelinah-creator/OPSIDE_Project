@@ -59,6 +59,10 @@ export class UpdateEducationDto {
 
   @IsOptional()
   @IsString()
+  custom_level?: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(1000)
   description?: string;
 
