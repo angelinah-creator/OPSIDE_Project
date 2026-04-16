@@ -20,27 +20,6 @@ export default function VerifyEmailNoticePage() {
           Veuillez cliquer sur ce lien pour activer votre compte et accéder à OPSIDE.
         </p>
 
-        <div className="bg-white rounded-2xl border border-border p-6 shadow-card mb-8 text-left">
-          <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-accent" />
-            Prochaines étapes :
-          </h3>
-          <ul className="space-y-3 text-sm text-muted">
-            <li className="flex gap-2">
-              <span className="text-accent font-bold">1.</span>
-              Ouvrez l'e-mail envoyé par OPSIDE.
-            </li>
-            <li className="flex gap-2">
-              <span className="text-accent font-bold">2.</span>
-              Cliquez sur le bouton de confirmation.
-            </li>
-            <li className="flex gap-2">
-              <span className="text-accent font-bold">3.</span>
-              Vous serez automatiquement redirigé vers votre espace.
-            </li>
-          </ul>
-        </div>
-
         <div className="space-y-4">
           <Button variant="secondary" className="w-full" onClick={() => window.location.reload()}>
             Je n'ai rien reçu, renvoyer l'e-mail
