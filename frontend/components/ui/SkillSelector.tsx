@@ -18,9 +18,11 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
   const [activeCategory, setActiveCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
+  const [localCategories, setLocalCategories] = useState<string[]>([]);
 
   // Add / Edit State
-  const [isAdding, setIsAdding] = useState(false);
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [isAddingSkill, setIsAddingSkill] = useState(false);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [form, setForm] = useState({ name: '', category: '', customCategory: '' });
 
@@ -38,8 +40,9 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
   const categories = useMemo(() => {
     const cats = new Set(SYSTEM_CATEGORIES);
     skills.forEach(s => cats.add(s.category));
+    localCategories.forEach(c => cats.add(c));
     return ['all', ...Array.from(cats)];
-  }, [skills]);
+  }, [skills, localCategories]);
 
   const filtered = useMemo(() => {
     let res = skills;
@@ -57,25 +60,32 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
     else onChange([...selectedIds, id]);
   };
 
-  const handleCreate = async () => {
-    if (!form.name || (!form.category && !form.customCategory)) return;
+  const handleCreateSkill = async () => {
+    if (!form.name || activeCategory === 'all') return;
     setLoading(true);
     try {
-      const cat = form.category === 'other' ? form.customCategory : form.category;
-      const newSkill = await skillApi.createSkill(form.name, cat);
+      const newSkill = await skillApi.createSkill(form.name, activeCategory);
       await loadSkills();
       toggle(newSkill.id);
-      setIsAdding(false);
+      setIsAddingSkill(false);
       setForm({ name: '', category: '', customCategory: '' });
+      // If it was a local category, it now has a skill, but keeping it in localCategories doesn't hurt (Set handles duplicates)
     } catch (err) {} finally { setLoading(false); }
   };
 
+  const handleCreateCategory = async () => {
+    if (!form.customCategory) return;
+    setLocalCategories(prev => [...prev, form.customCategory]);
+    setActiveCategory(form.customCategory);
+    setIsAddingCategory(false);
+    setForm({ name: '', category: '', customCategory: '' });
+  };
+
   const handleUpdate = async () => {
-    if (!editingSkill || !form.name || (!form.category && !form.customCategory)) return;
+    if (!editingSkill || !form.name) return;
     setLoading(true);
     try {
-      const cat = form.category === 'other' ? form.customCategory : form.category;
-      await skillApi.updateSkill(editingSkill.id, form.name, cat);
+      await skillApi.updateSkill(editingSkill.id, form.name, editingSkill.category);
       await loadSkills();
       setEditingSkill(null);
       setForm({ name: '', category: '', customCategory: '' });
@@ -95,11 +105,10 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
   const startEdit = (e: React.MouseEvent, skill: Skill) => {
     e.stopPropagation();
     setEditingSkill(skill);
-    const isSystemCat = SYSTEM_CATEGORIES.includes(skill.category);
     setForm({
       name: skill.name,
-      category: isSystemCat ? skill.category : 'other',
-      customCategory: isSystemCat ? '' : skill.category
+      category: skill.category,
+      customCategory: ''
     });
   };
 
@@ -109,56 +118,26 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <label className="font-semibold text-foreground">{label}</label>
-        <button
-          type="button"
-          onClick={() => { setIsAdding(!isAdding); setEditingSkill(null); setForm({ name: '', category: '', customCategory: '' }); }}
-          className="text-xs font-medium text-accent hover:text-accent/80 flex items-center gap-1 transition-colors"
-        >
-          {isAdding ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-          {isAdding ? 'Annuler' : 'Ajouter une compétence'}
-        </button>
       </div>
 
-      {/* Add / Edit Form */}
-      {(isAdding || editingSkill) && (
-        <div className="bg-background rounded-2xl border-2 border-accent/20 p-4 space-y-4 animate-in fade-in slide-in-from-top-2">
-          <h3 className="text-sm font-bold text-foreground">
-            {editingSkill ? 'Modifier la compétence' : 'Nouvelle compétence'}
-          </h3>
-          <div className="space-y-3">
-            <Input
-              placeholder="Nom de la compétence (ex: Redis)"
+      {/* Edit Form (Simple inline for editing) */}
+      {editingSkill && (
+        <div className="bg-background rounded-2xl border-2 border-accent/20 p-4 space-y-3 animate-in fade-in slide-in-from-top-2">
+          <h3 className="text-sm font-bold text-foreground">Modifier la compétence</h3>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Nom de la compétence"
               value={form.name}
               onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+              className="flex-1 px-4 py-2 rounded-xl border border-border bg-white text-sm outline-none focus:border-accent"
             />
-            <div className="flex gap-2">
-              <select
-                value={form.category}
-                onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                className="flex-1 px-3 py-2 rounded-xl border border-border bg-white text-sm outline-none focus:border-accent"
-              >
-                <option value="">Choisir une catégorie...</option>
-                {SYSTEM_CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
-                ))}
-                <option value="other">Autre...</option>
-              </select>
-            </div>
-            {form.category === 'other' && (
-              <Input
-                placeholder="Nom de la nouvelle catégorie"
-                value={form.customCategory}
-                onChange={e => setForm(f => ({ ...f, customCategory: e.target.value }))}
-              />
-            )}
-            <div className="flex gap-2 pt-1">
-              <Button size="sm" className="flex-1" onClick={editingSkill ? handleUpdate : handleCreate} loading={loading}>
-                <Check className="w-3.5 h-3.5 mr-1" /> {editingSkill ? 'Enregistrer' : 'Créer et ajouter'}
-              </Button>
-              <Button size="sm" variant="secondary" onClick={() => { setIsAdding(false); setEditingSkill(null); }}>
-                Annuler
-              </Button>
-            </div>
+            <Button size="sm" onClick={handleUpdate} loading={loading}>
+              <Check className="w-3.5 h-3.5" />
+            </Button>
+            <Button size="sm" variant="secondary" onClick={() => setEditingSkill(null)}>
+              <X className="w-3.5 h-3.5" />
+            </Button>
           </div>
         </div>
       )}
@@ -198,72 +177,127 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
           />
         </div>
 
-        <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-                activeCategory === cat
-                  ? 'bg-foreground text-white shadow-md'
-                  : 'bg-background border border-border text-muted hover:border-accent hover:text-accent'
-              }`}
-            >
-              {cat === 'all' ? 'Toutes' : cat}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          <div className="flex-1 flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                  activeCategory === cat
+                    ? 'bg-foreground text-white shadow-md'
+                    : 'bg-background border border-border text-muted hover:border-accent hover:text-accent'
+                }`}
+              >
+                {cat === 'all' ? 'Toutes' : cat}
+              </button>
+            ))}
+            
+            {/* Inline Add Category */}
+            {isAddingCategory ? (
+              <div className="flex items-center gap-1 animate-in slide-in-from-left-2">
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="Nom catégorie..."
+                  value={form.customCategory}
+                  onChange={e => setForm(f => ({ ...f, customCategory: e.target.value }))}
+                  onKeyDown={e => e.key === 'Enter' && handleCreateCategory()}
+                  className="px-3 py-1 rounded-full border border-accent bg-white text-xs outline-none w-32"
+                />
+                <button onClick={handleCreateCategory} className="text-accent hover:text-accent-hover p-1">
+                  <Check className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={() => setIsAddingCategory(false)} className="text-muted hover:text-foreground p-1">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => { setIsAddingCategory(true); setForm({ ...form, customCategory: '' }); }}
+                className="p-1.5 rounded-full bg-accent/10 text-accent hover:bg-accent hover:text-white transition-all transform hover:scale-110 shadow-sm flex items-center justify-center shrink-0 border border-accent/20"
+                title="Ajouter une catégorie"
+              >
+                <Plus className="w-4 h-4 stroke-[2.5]" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Skills Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-56 overflow-y-auto rounded-2xl border border-border p-3 bg-background/50">
-        {filtered.length === 0 ? (
-          <div className="col-span-full py-8 text-center space-y-2">
-            <p className="text-sm text-muted">Aunuce compétence trouvée</p>
-            {search && (
-              <button
-                type="button"
-                onClick={() => { setIsAdding(true); setForm(f => ({ ...f, name: search })); }}
-                className="text-xs text-accent font-medium hover:underline"
-              >
-                Créer "{search}" ?
-              </button>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 rounded-2xl border border-border p-3 bg-background/50">
+        {filtered.map(skill => (
+          <div
+            key={skill.id}
+            onClick={() => toggle(skill.id)}
+            className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
+              selectedIds.includes(skill.id)
+                ? 'bg-accent border-accent text-white shadow-sm'
+                : 'bg-white border-border text-foreground hover:border-accent hover:shadow-sm'
+            }`}
+          >
+            <span className="truncate pr-1">{skill.name}</span>
+            
+            {skill.is_custom && (
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button
+                  type="button"
+                  onClick={(e) => startEdit(e, skill)}
+                  className={`p-1 rounded-md transition-colors ${selectedIds.includes(skill.id) ? 'hover:bg-white/20' : 'hover:bg-accent-soft text-accent'}`}
+                >
+                  <Pencil className="w-3 h-3" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => handleDelete(e, skill.id)}
+                  className={`p-1 rounded-md transition-colors ${selectedIds.includes(skill.id) ? 'hover:bg-red-500' : 'hover:bg-red-50 text-red-500'}`}
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </div>
             )}
           </div>
-        ) : (
-          filtered.map(skill => (
-            <div
-              key={skill.id}
-              onClick={() => toggle(skill.id)}
-              className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
-                selectedIds.includes(skill.id)
-                  ? 'bg-accent border-accent text-white shadow-sm'
-                  : 'bg-white border-border text-foreground hover:border-accent hover:shadow-sm'
-              }`}
-            >
-              <span className="truncate pr-1">{skill.name}</span>
-              
-              {skill.is_custom && (
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    type="button"
-                    onClick={(e) => startEdit(e, skill)}
-                    className={`p-1 rounded-md transition-colors ${selectedIds.includes(skill.id) ? 'hover:bg-white/20' : 'hover:bg-accent-soft text-accent'}`}
-                  >
-                    <Pencil className="w-3 h-3" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => handleDelete(e, skill.id)}
-                    className={`p-1 rounded-md transition-colors ${selectedIds.includes(skill.id) ? 'hover:bg-red-500' : 'hover:bg-red-50 text-red-500'}`}
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
+        ))}
+
+        {/* Inline Add Skill */}
+        {activeCategory !== 'all' && (
+          isAddingSkill ? (
+            <div className="col-span-1 flex items-center gap-1 bg-white rounded-xl border border-accent p-1 animate-in zoom-in-95">
+              <input
+                autoFocus
+                type="text"
+                placeholder="Nom..."
+                value={form.name}
+                onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                onKeyDown={e => e.key === 'Enter' && handleCreateSkill()}
+                className="w-full px-2 py-1.5 text-xs outline-none"
+              />
+              <button onClick={handleCreateSkill} className="text-accent p-1">
+                <Check className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={() => setIsAddingSkill(false)} className="text-muted p-1">
+                <X className="w-3.5 h-3.5" />
+              </button>
             </div>
-          ))
+          ) : (
+            <button
+              type="button"
+              onClick={() => { setIsAddingSkill(true); setForm({ ...form, name: '' }); }}
+              className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold border-2 border-dashed border-accent/20 text-accent bg-accent/5 hover:bg-accent/10 hover:border-accent/40 transition-all group"
+            >
+              <Plus className="w-4 h-4 group-hover:scale-125 transition-transform" />
+              <span>Ajouter</span>
+            </button>
+          )
+        )}
+
+        {filtered.length === 0 && !search && activeCategory === 'all' && (
+          <div className="col-span-full py-8 text-center text-muted text-xs">
+            Aucune compétence trouvée
+          </div>
         )}
       </div>
     </div>

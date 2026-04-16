@@ -91,8 +91,8 @@ model User {
   email      String     @unique
   password   String
   role       Role
-  first_name String
-  last_name  String
+  first_name String?
+  last_name  String?
   created_at DateTime   @default(now())
   status     UserStatus @default(active)
 

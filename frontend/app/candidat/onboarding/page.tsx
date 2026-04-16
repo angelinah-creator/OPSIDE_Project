@@ -69,9 +69,9 @@ interface ExpForm {
   mediaFiles: MediaPreview[]
 }
 interface EduForm {
-  school: string; degree: string; field: string; level: string
+  school: string; degree: string; custom_degree?: string; field: string; level: string; custom_level?: string;
   start_month: string; start_year: string; end_month: string; end_year: string
-  is_current: boolean; description: string; skill_ids: string[]
+  is_current: boolean; is_self_taught: boolean; description: string; skill_ids: string[]
   mediaFiles: MediaPreview[]
 }
 
@@ -81,9 +81,9 @@ const emptyExp = (): ExpForm => ({
   is_current: false, location: '', description: '', skill_ids: [], mediaFiles: [],
 })
 const emptyEdu = (): EduForm => ({
-  school: '', degree: '', field: '', level: 'bac_plus_3',
+  school: '', degree: '', custom_degree: '', field: '', level: 'bac_plus_3', custom_level: '',
   start_month: '', start_year: '', end_month: '', end_year: '',
-  is_current: false, description: '', skill_ids: [], mediaFiles: [],
+  is_current: false, is_self_taught: false, description: '', skill_ids: [], mediaFiles: [],
 })
 
 // ─── Auto-resize textarea ─────────────────────────────────────────
@@ -122,7 +122,7 @@ export default function CandidatOnboarding() {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
 
   const [profile, setProfile] = useState({
-    country: '', city: '', speciality: '', experience_years: '',
+    country: '', city: '', speciality: '', custom_speciality: '', experience_years: '',
     daily_rate: '', currency: 'EUR', availability: 'immediate',
     bio: '', title: '', phone: '', linkedin_url: '', portfolio_url: '', skill_ids: [] as string[],
   })
@@ -182,8 +182,11 @@ export default function CandidatOnboarding() {
 
   const handleSubmit = async () => {
     setError('')
-    if (!profile.country || !profile.speciality || !profile.experience_years || !profile.daily_rate) {
-      setError('Les champs Pays, Spécialité, Années d\'expérience et Taux journalier sont obligatoires.')
+    const isSpecialityOther = profile.speciality === 'other'
+    const finalSpeciality = isSpecialityOther ? profile.custom_speciality : profile.speciality
+
+    if (!profile.country || !profile.title || !finalSpeciality || !profile.experience_years || !profile.daily_rate) {
+      setError('Les champs Pays, Titre, Spécialité, Années d\'expérience et Taux journalier sont obligatoires.')
       return
     }
     setLoading(true)
@@ -192,7 +195,7 @@ export default function CandidatOnboarding() {
       await candidateApi.createProfile({
         country: profile.country,
         city: profile.city || undefined,
-        speciality: profile.speciality,
+        speciality: finalSpeciality,
         experience_years: Number(profile.experience_years),
         daily_rate: Number(profile.daily_rate),
         currency: profile.currency,
@@ -229,13 +232,22 @@ export default function CandidatOnboarding() {
 
       // 4. Create educations
       for (const edu of educations) {
-        if (!edu.school || !edu.degree || !edu.start_year) continue
+        if (!edu.school || (!edu.is_self_taught && (!edu.degree || !edu.start_year))) continue
+        
+        const finalLevel = edu.level === 'autre' ? edu.custom_level : edu.level
+
         const res = await candidateApi.createEducation({
-          school: edu.school, degree: edu.degree, field: edu.field, level: edu.level,
-          start_month: Number(edu.start_month), start_year: Number(edu.start_year),
+          school: edu.school, 
+          degree: edu.is_self_taught ? 'Autodidacte' : edu.degree, 
+          field: edu.field, 
+          level: edu.is_self_taught ? 'autre' : (finalLevel as any),
+          start_month: Number(edu.start_month), 
+          start_year: Number(edu.start_year),
           end_month: edu.is_current ? undefined : (edu.end_month ? Number(edu.end_month) : undefined),
           end_year: edu.is_current ? undefined : (edu.end_year ? Number(edu.end_year) : undefined),
-          is_current: edu.is_current, description: edu.description || undefined, skill_ids: edu.skill_ids,
+          is_current: edu.is_current, 
+          description: edu.description || undefined, 
+          skill_ids: edu.skill_ids,
         })
         const eduId = res?.education?.id
         if (eduId) {
@@ -309,7 +321,17 @@ export default function CandidatOnboarding() {
             <Input label="Ville" placeholder="Antananarivo" value={profile.city} onChange={setP('city')} />
           </div>
           <Input label="Titre du profil *" placeholder="Ex: Développeur Fullstack Senior" value={profile.title} onChange={setP('title')} required />
-          <Select label="Spécialité *" options={SPECIALITIES} placeholder="Choisir..." value={profile.speciality} onChange={setP('speciality') as any} />
+          <div className="space-y-3">
+            <Select label="Spécialité *" options={SPECIALITIES} placeholder="Choisir..." value={profile.speciality} onChange={setP('speciality') as any} />
+            {profile.speciality === 'other' && (
+              <Input
+                placeholder="Précisez votre spécialité..."
+                value={profile.custom_speciality}
+                onChange={e => setProfile(p => ({ ...p, custom_speciality: e.target.value }))}
+                className="animate-in fade-in slide-in-from-top-1"
+              />
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <Input label="Années d'expérience *" type="number" min="0" max="50" placeholder="4" value={profile.experience_years} onChange={setP('experience_years')} />
             <Select label="Disponibilité *" options={AVAILABILITY} value={profile.availability} onChange={setP('availability') as any} />
@@ -429,9 +451,45 @@ export default function CandidatOnboarding() {
                 </button>
               </div>
               <Input label="École / Organisme *" placeholder="EMIT Antananarivo" value={edu.school} onChange={e => setEdu(i, 'school', e.target.value)} />
+
               <div className="grid grid-cols-2 gap-4">
-                <Input label="Diplôme *" placeholder="Licence en Informatique" value={edu.degree} onChange={e => setEdu(i, 'degree', e.target.value)} />
-                <Select label="Niveau" options={LEVELS} value={edu.level} onChange={e => setEdu(i, 'level', e.target.value)} />
+                <div className="space-y-2">
+                  <Input 
+                    label="Diplôme *" 
+                    placeholder={edu.is_self_taught ? "N/A" : "Licence en Informatique"} 
+                    value={edu.is_self_taught ? "" : edu.degree} 
+                    onChange={e => setEdu(i, 'degree', e.target.value)} 
+                    disabled={edu.is_self_taught}
+                    className={edu.is_self_taught ? 'opacity-50 grayscale' : ''}
+                  />
+                  <label className="flex items-center gap-2 cursor-pointer pt-1">
+                    <input 
+                      type="checkbox" 
+                      checked={edu.is_self_taught} 
+                      onChange={e => setEdu(i, 'is_self_taught', e.target.checked)} 
+                      className="w-4 h-4 rounded border-border text-accent focus:ring-accent/20" 
+                    />
+                    <span className="text-xs font-medium text-muted">Cacher si vous etes autodidacte</span>
+                  </label>
+                </div>
+                <div className="space-y-3">
+                  <Select 
+                    label="Niveau *" 
+                    options={LEVELS} 
+                    value={edu.is_self_taught ? "autre" : edu.level} 
+                    onChange={e => setEdu(i, 'level', e.target.value)} 
+                    disabled={edu.is_self_taught}
+                    className={edu.is_self_taught ? 'opacity-50 grayscale' : ''}
+                  />
+                  {!edu.is_self_taught && edu.level === 'autre' && (
+                    <Input
+                      placeholder="Précisez votre niveau / certification..."
+                      value={edu.custom_level}
+                      onChange={e => setEdu(i, 'custom_level', e.target.value)}
+                      className="animate-in fade-in slide-in-from-top-1"
+                    />
+                  )}
+                </div>
               </div>
               <Input label="Domaine" placeholder="Génie Logiciel" value={edu.field} onChange={e => setEdu(i, 'field', e.target.value)} />
               <div className="grid grid-cols-2 gap-4">
@@ -498,7 +556,7 @@ export default function CandidatOnboarding() {
           size="lg"
           onClick={handleSubmit}
           loading={loading}
-          disabled={!profile.country || !profile.speciality || !profile.experience_years || !profile.daily_rate}
+          disabled={!profile.country || !profile.title || !(profile.speciality === 'other' ? profile.custom_speciality : profile.speciality) || !profile.experience_years || !profile.daily_rate}
         >
           Créer mon profil et accéder au tableau de bord
         </Button>

@@ -31,7 +31,7 @@ export default function ClientRegisterPage() {
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [showPw, setShowPw] = useState(false)
 
-  const [account, setAccount] = useState({ first_name: '', last_name: '', email: '', password: '', confirm: '' })
+  const [account, setAccount] = useState({ email: '', password: '', confirm: '' })
   const [company, setCompany] = useState({ company_name: '', company_size: '', industry: '', country: '', city: '', website: '' })
   const [contact, setContact] = useState({ contact_name: '', contact_email: '', contact_phone: '', interview_availability: '' })
 
@@ -55,7 +55,7 @@ export default function ClientRegisterPage() {
       // 1. Register
       const { data } = await authApi.register({
         email: account.email, password: account.password,
-        role: 'client', first_name: account.first_name, last_name: account.last_name,
+        role: 'client'
       })
       setTokens(data.access_token, data.refresh_token)
       setUser(data.user)
@@ -63,7 +63,7 @@ export default function ClientRegisterPage() {
       // 2. Create profile
       const profileData = {
         ...company, ...contact,
-        contact_name: contact.contact_name || `${account.first_name} ${account.last_name}`,
+        contact_name: contact.contact_name || company.company_name,
         contact_email: contact.contact_email || account.email,
       }
       
@@ -128,10 +128,6 @@ export default function ClientRegisterPage() {
           {/* Step 0 — Account */}
           {step === 0 && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <Input label="Prénom *" placeholder="Marie" value={account.first_name} onChange={setA('first_name')} required />
-                <Input label="Nom *" placeholder="Dupont" value={account.last_name} onChange={setA('last_name')} required />
-              </div>
               <Input label="Email de l'entreprise *" type="email" placeholder="marie@entreprise.com" value={account.email} onChange={setA('email')} required />
               <div className="relative">
                 <Input label="Mot de passe *" type={showPw ? 'text' : 'password'} placeholder="Min. 8 caractères" value={account.password} onChange={setA('password')} required />
@@ -140,7 +136,7 @@ export default function ClientRegisterPage() {
                 </button>
               </div>
               <Input label="Confirmer *" type="password" placeholder="Répétez le mot de passe" value={account.confirm} onChange={setA('confirm')} required />
-              <Button className="w-full mt-2" onClick={nextStep} disabled={!account.email || !account.password || !account.first_name}>
+              <Button className="w-full mt-2" onClick={nextStep} disabled={!account.email || !account.password || !account.confirm}>
                 Continuer <ArrowRight className="w-4 h-4" />
               </Button>
             </div>
@@ -176,7 +172,7 @@ export default function ClientRegisterPage() {
           {/* Step 2 — Contact */}
           {step === 2 && (
             <div className="space-y-4">
-              <Input label="Nom du contact *" placeholder={`${account.first_name} ${account.last_name}`} value={contact.contact_name} onChange={setCt('contact_name')} required/>
+              <Input label="Nom du contact *" placeholder={company.company_name} value={contact.contact_name} onChange={setCt('contact_name')} required/>
               <Input label="Email de contact *" type="email" placeholder={account.email} value={contact.contact_email} onChange={setCt('contact_email')} required/>
               <Input label="Téléphone" placeholder="+33 6 12 34 56 78" value={contact.contact_phone} onChange={setCt('contact_phone')} />
               <Input label="Disponibilités pour les entretiens" placeholder="Lundi-Vendredi, 9h-18h" value={contact.interview_availability} onChange={setCt('interview_availability')} />
