@@ -65,8 +65,8 @@ export default function VerifyEmailPage() {
 
         {status === 'success' && (
           <div className="flex flex-col items-center py-8 animate-in fade-in zoom-in duration-500">
-            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6">
-              <CheckCircle2 className="w-10 h-10 text-green-500" />
+            <div className="w-20 h-20 bg-accent-soft rounded-full flex items-center justify-center mb-6">
+              <CheckCircle2 className="w-10 h-10 text-accent" />
             </div>
             <h1 className="text-2xl font-bold text-foreground mb-4">E-mail vérifié !</h1>
             <p className="text-muted mb-8 leading-relaxed">{message}</p>

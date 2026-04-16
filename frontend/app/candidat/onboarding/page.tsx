@@ -500,7 +500,7 @@ export default function CandidatOnboarding() {
                       onChange={e => setEdu(i, 'is_self_taught', e.target.checked)} 
                       className="w-4 h-4 rounded border-border text-accent focus:ring-accent/20" 
                     />
-                    <span className="text-xs font-medium text-muted">Cacher si vous etes autodidacte</span>
+                    <span className="text-xs font-medium text-muted">Cochez si vous etes autodidacte</span>
                   </label>
                 </div>
                 <div className="space-y-3">
