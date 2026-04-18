@@ -15,7 +15,6 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   const email = 'admin@gmail.com';
   
-  // Try to find the admin
   const admin = await prisma.user.findUnique({
     where: { email },
   });
