@@ -107,6 +107,19 @@ enum CompanySize {
   size_200_plus
 }
 
+enum TestType {
+  platform
+  client
+}
+
+enum TestStatus {
+  pending
+  in_progress
+  submitted
+  scored
+  expired
+}
+
 model User {
   id                       String     @id @default(uuid())
   email                    String     @unique
@@ -124,6 +137,7 @@ model User {
   candidate      CandidateProfile?
   client         ClientProfile?
   skills         Skill[]
+  tests          Test[]
 
   @@map("users")
 }
@@ -315,4 +329,30 @@ model ClientProfile {
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("client_profiles")
+}
+
+model Test {
+  id                    String     @id @default(uuid())
+  candidate_id          String
+  type                  TestType
+  skills_tested         String[]   // Stocké comme array de strings (technos)
+  speciality            String     // frontend | backend | fullstack | mobile | devops | data
+  difficulty            String     // junior | mid | senior
+  questions             Json       // Array de questions générées
+  answers               Json?      // Réponses du candidat
+  score                 Int?       // 0-100
+  score_details         Json?      // Détail par question
+  duration_minutes      Int
+  started_at            DateTime?
+  submitted_at          DateTime?
+  status                TestStatus @default(pending)
+  ai_model              String?    
+  ai_generation_prompt  String?    
+  ai_evaluation_prompt  String?    
+  created_at            DateTime   @default(now())
+  updated_at            DateTime   @updatedAt
+
+  candidate             User       @relation(fields: [candidate_id], references: [id], onDelete: Cascade)
+
+  @@map("tests")
 }
