@@ -9,6 +9,8 @@ import { ClientModule } from './client/client.module';
 import { SkillsModule } from './skills/skills.module';
 import { UploadModule } from './upload/upload.module';
 import { MailModule } from './mail/mail.module';
+import { TestModule } from './test/test.module';
+
 
 @Module({
   imports: [
@@ -30,6 +32,7 @@ import { MailModule } from './mail/mail.module';
     SkillsModule,
     UploadModule,
     MailModule,
+    TestModule,
   ],
 })
 export class AppModule {}
