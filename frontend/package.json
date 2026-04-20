@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.10",
+    "@monaco-editor/react": "^4.7.0",
     "axios": "^1.15.0",
     "clsx": "^2.1.1",
     "js-cookie": "^3.0.5",
