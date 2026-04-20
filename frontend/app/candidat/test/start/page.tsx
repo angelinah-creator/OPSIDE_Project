@@ -31,7 +31,7 @@ export default function StartTestPage() {
     candidateApi.getMyProfile().then((p) => {
       setProfileSpeciality(p.speciality);
       setSpeciality(p.speciality);
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   const handleStart = async () => {
@@ -52,7 +52,7 @@ export default function StartTestPage() {
     setError('');
     try {
       const res = await testApi.startTest(skills, speciality);
-      router.push(`/candidat/test/${res.data.testId}`);
+      router.push(`/candidat/test/${res.testId}`);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erreur lors de la création du test.');
     } finally {

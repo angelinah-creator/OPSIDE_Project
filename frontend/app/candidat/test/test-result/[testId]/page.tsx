@@ -19,7 +19,7 @@ export default function TestResultPage() {
   useEffect(() => {
     testApi
       .getTestResult(testId)
-      .then((res) => setResult(res.data))
+      .then((res) => setResult(res))
       .catch((err) => setError(err.response?.data?.message || 'Erreur'))
       .finally(() => setLoading(false));
   }, [testId]);

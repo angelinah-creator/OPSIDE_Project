@@ -28,9 +28,9 @@ export default function TakeTestPage() {
     testApi
       .startTestById(testId)
       .then((res) => {
-        setQuestions(res.data.questions);
-        setDuration(res.data.durationMinutes);
-        setAnswers(new Array(res.data.questions.length).fill(''));
+        setQuestions(res.questions);
+        setDuration(res.durationMinutes);
+        setAnswers(new Array(res.questions.length).fill(''));
       })
       .catch((err) => {
         setError(err.response?.data?.message || 'Impossible de charger le test.');
