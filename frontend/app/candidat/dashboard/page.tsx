@@ -33,7 +33,7 @@ export default function CandidatDashboard() {
         }
       });
 
-    testApi.getLatestScore().then((res) => setLatestScore(res.data.score)).catch(() => { });
+    testApi.getLatestScore().then((res) => setLatestScore(res.score)).catch(() => { });
   }, [router]);
 
   const handleLogout = async () => {
