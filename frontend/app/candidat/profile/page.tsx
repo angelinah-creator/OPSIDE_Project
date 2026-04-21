@@ -566,7 +566,7 @@ export default function CandidatProfilePage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <img src="/logo.png" alt="OPSIDE" className='w-28'/>
+              <img src="/logo.webp" alt="OPSIDE" className='w-28' />
             </div>
           </div>
           <button onClick={handleLogout} className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors">
@@ -734,11 +734,11 @@ export default function CandidatProfilePage() {
           {editMain ? (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <CountrySelect 
-                  label="Pays *" 
-                  options={COUNTRIES} 
-                  value={pf.country} 
-                  onChange={v => setPf((p: any) => ({ ...p, country: v }))} 
+                <CountrySelect
+                  label="Pays *"
+                  options={COUNTRIES}
+                  value={pf.country}
+                  onChange={v => setPf((p: any) => ({ ...p, country: v }))}
                 />
                 <Input label="Ville" value={pf.city} onChange={e => setPf((p: any) => ({ ...p, city: e.target.value }))} />
               </div>
@@ -748,11 +748,11 @@ export default function CandidatProfilePage() {
                 <Select label="Disponibilité" options={AVAILABILITY} value={pf.availability} onChange={e => setPf((p: any) => ({ ...p, availability: e.target.value }))} />
               </div>
               <div className="grid grid-cols-1">
-                <Input 
-                  label="Taux journalier" 
-                  type="number" 
-                  value={pf.daily_rate} 
-                  onChange={e => setPf((p: any) => ({ ...p, daily_rate: e.target.value }))} 
+                <Input
+                  label="Taux journalier"
+                  type="number"
+                  value={pf.daily_rate}
+                  onChange={e => setPf((p: any) => ({ ...p, daily_rate: e.target.value }))}
                   suffix={pf.country ? COUNTRY_TO_CURRENCY[pf.country] : undefined}
                 />
               </div>
@@ -767,18 +767,20 @@ export default function CandidatProfilePage() {
           ) : (
             <dl className="space-y-3 text-sm">
               {[
-                { label: 'Pays', value: profile?.country ? (
-                  <div className="flex items-center gap-2">
-                    {COUNTRY_LABELS[profile.country] && (
-                      <img 
-                        src={`https://flagcdn.com/w40/${COUNTRY_LABELS[profile.country].flag}.png`} 
-                        alt="" 
-                        className="w-4 h-3 object-cover rounded-sm"
-                      />
-                    )}
-                    <span>{COUNTRY_LABELS[profile.country]?.label || profile.country}</span>
-                  </div>
-                ) : undefined },
+                {
+                  label: 'Pays', value: profile?.country ? (
+                    <div className="flex items-center gap-2">
+                      {COUNTRY_LABELS[profile.country] && (
+                        <img
+                          src={`https://flagcdn.com/w40/${COUNTRY_LABELS[profile.country].flag}.png`}
+                          alt=""
+                          className="w-4 h-3 object-cover rounded-sm"
+                        />
+                      )}
+                      <span>{COUNTRY_LABELS[profile.country]?.label || profile.country}</span>
+                    </div>
+                  ) : undefined
+                },
                 { label: 'Ville', value: profile?.city },
                 { label: 'Spécialité', value: SPEC_LABEL[profile?.speciality] || profile?.speciality },
                 { label: 'Expérience', value: profile?.experience_years ? `${profile.experience_years} an(s)` : undefined },

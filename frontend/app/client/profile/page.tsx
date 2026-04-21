@@ -66,8 +66,8 @@ export default function ClientProfilePage() {
 
   // Hero section
   const [editHero, setEditHero] = useState(false)
-  const [heroForm, setHeroForm] = useState({ 
-    company_name: '', 
+  const [heroForm, setHeroForm] = useState({
+    company_name: '',
     industry: '',
     first_name: '',
     last_name: ''
@@ -96,14 +96,14 @@ export default function ClientProfilePage() {
       const p = await clientApi.getMyProfile()
       setProfile(p)
       setLogoUrl(p.logo_url || '')
-      
+
       setHeroForm({
         company_name: p.company_name || '',
         industry: p.industry || '',
         first_name: p.user?.first_name || '',
         last_name: p.user?.last_name || '',
       })
-      
+
       setInfoForm({
         company_size: p.company_size || '',
         industry: p.industry || '',
@@ -111,7 +111,7 @@ export default function ClientProfilePage() {
         city: p.city || '',
         website: p.website || '',
       })
-      
+
       setContactForm({
         contact_name: p.contact_name || '',
         contact_email: p.contact_email || '',
@@ -137,7 +137,7 @@ export default function ClientProfilePage() {
       const p = await clientApi.getMyProfile()
       setProfile(p)
       setLogoUrl(p.logo_url || '')
-    } catch {}
+    } catch { }
   }
 
   // ── Logo handlers ──
@@ -155,13 +155,13 @@ export default function ClientProfilePage() {
   const saveHero = async () => {
     setSaving(true); setError('')
     try {
-      await clientApi.updateUserNames({ 
-        first_name: heroForm.first_name, 
-        last_name: heroForm.last_name 
+      await clientApi.updateUserNames({
+        first_name: heroForm.first_name,
+        last_name: heroForm.last_name
       })
-      await clientApi.updateProfile({ 
-        company_name: heroForm.company_name, 
-        industry: heroForm.industry 
+      await clientApi.updateProfile({
+        company_name: heroForm.company_name,
+        industry: heroForm.industry
       })
       await refresh()
       setEditHero(false)
@@ -196,9 +196,9 @@ export default function ClientProfilePage() {
   }
 
   const handleLogout = async () => {
-    try { 
+    try {
       const Cookies = (await import('js-cookie')).default
-      await authApi.logout(Cookies.get('refresh_token') || '') 
+      await authApi.logout(Cookies.get('refresh_token') || '')
     } catch { }
     clearTokens(); router.push('/')
   }
@@ -218,7 +218,7 @@ export default function ClientProfilePage() {
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <img src="/logo.png" alt="OPSIDE" className='w-28'/>
+              <img src="/logo.webp" alt="OPSIDE" className='w-28' />
             </div>
           </div>
           <button onClick={handleLogout} className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors">
@@ -320,23 +320,23 @@ export default function ClientProfilePage() {
 
           {editInfo ? (
             <div className="space-y-4">
-              <Select 
-                label="Taille de l'entreprise" 
-                options={SIZES} 
-                value={infoForm.company_size} 
-                onChange={e => setInfoForm(p => ({ ...p, company_size: e.target.value }))} 
+              <Select
+                label="Taille de l'entreprise"
+                options={SIZES}
+                value={infoForm.company_size}
+                onChange={e => setInfoForm(p => ({ ...p, company_size: e.target.value }))}
               />
-              <Input 
-                label="Secteur" 
-                value={infoForm.industry} 
-                onChange={e => setInfoForm(p => ({ ...p, industry: e.target.value }))} 
+              <Input
+                label="Secteur"
+                value={infoForm.industry}
+                onChange={e => setInfoForm(p => ({ ...p, industry: e.target.value }))}
               />
               <div className="grid grid-cols-2 gap-4">
-                <CountrySelect 
-                  label="Pays *" 
-                  options={COUNTRIES} 
-                  value={infoForm.country} 
-                  onChange={v => setInfoForm(p => ({ ...p, country: v }))} 
+                <CountrySelect
+                  label="Pays *"
+                  options={COUNTRIES}
+                  value={infoForm.country}
+                  onChange={v => setInfoForm(p => ({ ...p, country: v }))}
                 />
                 <Input label="Ville" value={infoForm.city} onChange={e => setInfoForm(p => ({ ...p, city: e.target.value }))} />
               </div>
@@ -351,18 +351,20 @@ export default function ClientProfilePage() {
               {[
                 { label: 'Taille', value: SIZE_LABELS[profile?.company_size] || profile?.company_size, icon: Building2 },
                 { label: 'Secteur', value: profile?.industry, icon: BriefcaseBusiness },
-                { label: 'Localisation', value: profile?.country ? (
-                  <div className="flex items-center gap-2">
-                    {COUNTRY_LABELS[profile.country] && (
-                      <img 
-                        src={`https://flagcdn.com/w40/${COUNTRY_LABELS[profile.country].flag}.png`} 
-                        alt="" 
-                        className="w-4 h-3 object-cover rounded-sm"
-                      />
-                    )}
-                    <span>{profile.city ? `${profile.city}, ` : ''}{COUNTRY_LABELS[profile.country]?.label || profile.country}</span>
-                  </div>
-                ) : profile?.city, icon: MapPin },
+                {
+                  label: 'Localisation', value: profile?.country ? (
+                    <div className="flex items-center gap-2">
+                      {COUNTRY_LABELS[profile.country] && (
+                        <img
+                          src={`https://flagcdn.com/w40/${COUNTRY_LABELS[profile.country].flag}.png`}
+                          alt=""
+                          className="w-4 h-3 object-cover rounded-sm"
+                        />
+                      )}
+                      <span>{profile.city ? `${profile.city}, ` : ''}{COUNTRY_LABELS[profile.country]?.label || profile.country}</span>
+                    </div>
+                  ) : profile?.city, icon: MapPin
+                },
               ].filter(r => r.value).map(row => (
                 <div key={row.label} className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center shrink-0 text-accent border border-border">

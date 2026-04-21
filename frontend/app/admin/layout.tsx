@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
 import { getUser, clearTokens } from '@/lib/auth-service'
-import { authApi  } from '@/lib/auth-service'
+import { authApi } from '@/lib/auth-service'
 import { Users, LayoutDashboard, LogOut, Menu, X } from 'lucide-react'
 import clsx from 'clsx'
 
@@ -30,7 +30,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [router])
 
   const handleLogout = async () => {
-    try { const Cookies = (await import('js-cookie')).default; await authApi.logout(Cookies.get('refresh_token') || '') } catch {}
+    try { const Cookies = (await import('js-cookie')).default; await authApi.logout(Cookies.get('refresh_token') || '') } catch { }
     clearTokens(); router.push('/')
   }
 
@@ -39,7 +39,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex flex-col w-60 bg-white border-r border-border fixed inset-y-0 left-0">
         <div className="p-6 border-b border-border">
-          <img src="/logo.png" alt="Logo" className="w-28" />
+          <img src="/logo.webp" alt="Logo" className="w-28" />
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {NAV.map(({ href, label, icon: Icon }) => (

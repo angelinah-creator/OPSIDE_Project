@@ -123,12 +123,12 @@ describe('ClientService', () => {
       });
       mockUploadService.deleteFile.mockResolvedValue(undefined);
       mockUploadService.uploadImage.mockResolvedValue({
-        url: 'https://cloudinary.com/logo.png',
+        url: 'https://cloudinary.com/logo.webp',
         public_id: 'new-public-id',
       });
       mockPrismaService.clientProfile.update.mockResolvedValue({
         ...clientProfile,
-        logo_url: 'https://cloudinary.com/logo.png',
+        logo_url: 'https://cloudinary.com/logo.webp',
         logo_public_id: 'new-public-id',
       });
 

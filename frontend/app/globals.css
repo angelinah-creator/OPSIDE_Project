@@ -47,14 +47,14 @@ body {
 }
 
 @utility text-gradient {
-  background: linear-gradient(135deg, #7C3AED 0%, #C026D3 100%);
+  background: linear-gradient(135deg, #7f39ef 0%, #ec4699 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 @utility bg-gradient-primary {
-  background: linear-gradient(135deg, #7C3AED 0%, #C026D3 100%);
+  background: linear-gradient(135deg, #7f39ef 0%, #ec4699 100%);
 }
 
 @utility scrollbar-hide {

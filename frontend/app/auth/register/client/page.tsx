@@ -15,22 +15,22 @@ export default function ClientRegisterPage() {
   const [error, setError] = useState('')
   const [showPw, setShowPw] = useState(false)
 
-  const [form, setForm] = useState({ 
-    email: '', 
-    password: '', 
-    confirm: '' 
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+    confirm: ''
   })
 
-  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => 
+  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(p => ({ ...p, [k]: e.target.value }))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    
+
     if (form.password !== form.confirm) return setError('Les mots de passe ne correspondent pas.')
     if (form.password.length < 8) return setError('Le mot de passe doit contenir au moins 8 caractères.')
-    
+
     const passwordRegex = /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/
     if (!passwordRegex.test(form.password)) {
       return setError('Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.')
@@ -63,7 +63,7 @@ export default function ClientRegisterPage() {
 
         <div className="bg-white rounded-3xl border border-border shadow-card p-8">
           <div className="flex justify-center mb-6">
-            <img src="/logo.png" alt="OPSIDE" className='w-28' />
+            <img src="/logo.webp" alt="OPSIDE" className='w-28' />
           </div>
           <h1 className="text-xl font-bold text-foreground text-center mb-1">Créer mon compte entreprise</h1>
           <p className="text-sm text-muted text-center mb-8">Étape 1 : Création de votre compte</p>
@@ -73,43 +73,43 @@ export default function ClientRegisterPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input 
-              label="Email de l'entreprise *" 
-              type="email" 
-              placeholder="marie@entreprise.com" 
-              value={form.email} 
-              onChange={set('email')} 
-              required 
+            <Input
+              label="Email de l'entreprise *"
+              type="email"
+              placeholder="marie@entreprise.com"
+              value={form.email}
+              onChange={set('email')}
+              required
             />
             <div className="relative">
-              <Input 
-                label="Mot de passe *" 
-                type={showPw ? 'text' : 'password'} 
-                placeholder="Min. 8 caractères" 
-                value={form.password} 
-                onChange={set('password')} 
-                required 
+              <Input
+                label="Mot de passe *"
+                type={showPw ? 'text' : 'password'}
+                placeholder="Min. 8 caractères"
+                value={form.password}
+                onChange={set('password')}
+                required
               />
-              <button 
-                type="button" 
-                onClick={() => setShowPw(!showPw)} 
+              <button
+                type="button"
+                onClick={() => setShowPw(!showPw)}
                 className="absolute right-3 top-8 text-muted hover:text-foreground"
               >
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            <Input 
-              label="Confirmer le mot de passe *" 
-              type="password" 
-              placeholder="Répétez le mot de passe" 
-              value={form.confirm} 
-              onChange={set('confirm')} 
-              required 
+            <Input
+              label="Confirmer le mot de passe *"
+              type="password"
+              placeholder="Répétez le mot de passe"
+              value={form.confirm}
+              onChange={set('confirm')}
+              required
             />
-            
-            <Button 
+
+            <Button
               type="submit"
-              className="w-full mt-2" 
+              className="w-full mt-2"
               loading={loading}
               disabled={!form.email || !form.password || !form.confirm}
             >

@@ -38,26 +38,26 @@ export default function ClientOnboardingPage() {
   const [error, setError] = useState('')
   const [logoFile, setLogoFile] = useState<File | null>(null)
 
-  const [company, setCompany] = useState({ 
-    company_name: '', 
-    company_size: '', 
-    industry: '', 
-    country: '', 
-    city: '', 
-    website: '' 
-  })
-  
-  const [contact, setContact] = useState({ 
-    contact_name: '', 
-    contact_email: '', 
-    contact_phone: '', 
-    interview_availability: '' 
+  const [company, setCompany] = useState({
+    company_name: '',
+    company_size: '',
+    industry: '',
+    country: '',
+    city: '',
+    website: ''
   })
 
-  const setC = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => 
+  const [contact, setContact] = useState({
+    contact_name: '',
+    contact_email: '',
+    contact_phone: '',
+    interview_availability: ''
+  })
+
+  const setC = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setCompany(p => ({ ...p, [k]: e.target.value }))
-    
-  const setCt = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => 
+
+  const setCt = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setContact(p => ({ ...p, [k]: e.target.value }))
 
   const handleFinish = async () => {
@@ -70,7 +70,7 @@ export default function ClientOnboardingPage() {
         contact_name: contact.contact_name || company.company_name,
         contact_email: contact.contact_email,
       }
-      
+
       const cleanedData = Object.fromEntries(
         Object.entries(profileData).filter(([_, v]) => v !== '')
       )
@@ -78,7 +78,7 @@ export default function ClientOnboardingPage() {
       await clientApi.createProfile(cleanedData)
 
       // 2. Upload logo if any
-      if (logoFile) await clientApi.uploadLogo(logoFile).catch(() => {})
+      if (logoFile) await clientApi.uploadLogo(logoFile).catch(() => { })
 
       router.push('/client/dashboard')
     } catch (err: any) {
@@ -94,9 +94,9 @@ export default function ClientOnboardingPage() {
       <div className="w-full max-w-lg">
         <div className="bg-white rounded-3xl border border-border shadow-card p-8">
           <div className="flex justify-center mb-6">
-            <img src="/logo.png" alt="OPSIDE" className='w-28' />
+            <img src="/logo.webp" alt="OPSIDE" className='w-28' />
           </div>
-          
+
           <h1 className="text-xl font-bold text-foreground text-center mb-1">Configuration de votre profil entreprise</h1>
           <p className="text-sm text-muted text-center mb-8">Complétez ces informations pour commencer à recruter</p>
 
@@ -104,11 +104,10 @@ export default function ClientOnboardingPage() {
           <div className="flex items-center justify-center gap-0 mb-8">
             {STEPS.map((s, i) => (
               <div key={i} className="flex items-center">
-                <div className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold transition-all ${
-                  i < step ? 'bg-accent text-white' :
-                  i === step ? 'bg-foreground text-white' :
-                  'bg-background border border-border text-muted'
-                }`}>
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold transition-all ${i < step ? 'bg-accent text-white' :
+                    i === step ? 'bg-foreground text-white' :
+                      'bg-background border border-border text-muted'
+                  }`}>
                   {i < step ? <Check className="w-3.5 h-3.5" /> : i + 1}
                 </div>
                 <span className={`ml-1.5 text-xs font-medium hidden sm:block ${i === step ? 'text-foreground' : 'text-muted'}`}>{s}</span>
@@ -134,19 +133,19 @@ export default function ClientOnboardingPage() {
               />
               <Input label="Secteur d'activité" placeholder="Technologies de l'information" value={company.industry} onChange={setC('industry')} />
               <div className="grid grid-cols-2 gap-3">
-                <CountrySelect 
-                  label="Pays *" 
-                  options={COUNTRIES} 
-                  placeholder="Choisir..." 
-                  value={company.country} 
-                  onChange={(v) => setCompany(p => ({ ...p, country: v }))} 
+                <CountrySelect
+                  label="Pays *"
+                  options={COUNTRIES}
+                  placeholder="Choisir..."
+                  value={company.country}
+                  onChange={(v) => setCompany(p => ({ ...p, country: v }))}
                   error={!company.country && error ? 'Obligatoire' : undefined}
                 />
                 <Input label="Ville" placeholder="Paris" value={company.city} onChange={setC('city')} />
               </div>
               <Input label="Site web" type="url" placeholder="https://entreprise.com" value={company.website} onChange={setC('website')} />
               <FileUpload label="Logo de l'entreprise (optionnel)" accept="image/*" onUpload={async (f) => { setLogoFile(f); }} />
-              
+
               <Button className="w-full mt-2" onClick={() => setStep(1)} disabled={!company.company_name || !company.country}>
                 Continuer <ArrowRight className="w-4 h-4" />
               </Button>
@@ -156,16 +155,16 @@ export default function ClientOnboardingPage() {
           {/* Step 1 — Contact */}
           {step === 1 && (
             <div className="space-y-4">
-              <Input label="Nom du contact *" placeholder="Prénom Nom" value={contact.contact_name} onChange={setCt('contact_name')} required/>
-              <Input label="Email de contact *" type="email" placeholder="marie@entreprise.com" value={contact.contact_email} onChange={setCt('contact_email')} required/>
+              <Input label="Nom du contact *" placeholder="Prénom Nom" value={contact.contact_name} onChange={setCt('contact_name')} required />
+              <Input label="Email de contact *" type="email" placeholder="marie@entreprise.com" value={contact.contact_email} onChange={setCt('contact_email')} required />
               <Input label="Téléphone" placeholder="+33 6 12 34 56 78" value={contact.contact_phone} onChange={setCt('contact_phone')} />
               <Input label="Disponibilités pour les entretiens" placeholder="Lundi-Vendredi, 9h-18h" value={contact.interview_availability} onChange={setCt('interview_availability')} />
-              
+
               <div className="flex gap-3 mt-2">
                 <Button variant="secondary" className="flex-1" onClick={() => setStep(0)}>Retour</Button>
-                <Button 
-                  className="flex-1" 
-                  onClick={handleFinish} 
+                <Button
+                  className="flex-1"
+                  onClick={handleFinish}
                   loading={loading}
                   disabled={!contact.contact_name || !contact.contact_email}
                 >

@@ -97,7 +97,7 @@ export default function TakeTestPage() {
       <header className="bg-white border-b border-border px-6 py-4 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <img src="/logo.png" alt="OPSIDE" className="w-24" />
+            <img src="/logo.webp" alt="OPSIDE" className="w-24" />
             <span className="text-sm font-medium text-muted hidden sm:inline">
               Question {currentIndex + 1}/{questions.length}
             </span>

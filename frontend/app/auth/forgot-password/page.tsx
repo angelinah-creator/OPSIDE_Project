@@ -31,8 +31,8 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-md">
-        <Link 
-          href="/auth/login" 
+        <Link
+          href="/auth/login"
           className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground mb-8 transition-colors self-start"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -41,9 +41,9 @@ export default function ForgotPasswordPage() {
 
         <div className="bg-white rounded-3xl border border-border shadow-card p-8">
           <div className="flex justify-center mb-2">
-             <img src="/logo.png" alt="OPSIDE" className='w-40' />
+            <img src="/logo.webp" alt="OPSIDE" className='w-40' />
           </div>
-          
+
           {!success ? (
             <>
               <h1 className="text-xl font-semibold text-center mt-4">Mot de passe oublié ?</h1>
@@ -58,13 +58,13 @@ export default function ForgotPasswordPage() {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
-                <Input 
-                  label="Email" 
-                  type="email" 
-                  placeholder="votre@email.com" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  required 
+                <Input
+                  label="Email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
                 <Button type="submit" className="w-full" loading={loading}>
                   Envoyer le lien

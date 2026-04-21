@@ -226,7 +226,7 @@ export default function CandidatOnboarding() {
       })
 
       // 2. Upload photo
-      if (photoFile) await candidateApi.uploadPhoto(photoFile).catch(() => {})
+      if (photoFile) await candidateApi.uploadPhoto(photoFile).catch(() => { })
 
       // 3. Create experiences
       for (const exp of experiences) {
@@ -242,7 +242,7 @@ export default function CandidatOnboarding() {
         const expId = res?.experience?.id
         if (expId) {
           for (const m of exp.mediaFiles) {
-            await candidateApi.uploadExperienceMedia(expId, m.file).catch(() => {})
+            await candidateApi.uploadExperienceMedia(expId, m.file).catch(() => { })
           }
         }
       }
@@ -250,27 +250,27 @@ export default function CandidatOnboarding() {
       // 4. Create educations
       for (const edu of educations) {
         if (!edu.school || (!edu.is_self_taught && (!edu.degree || !edu.start_year))) continue
-        
+
         const finalLevel = edu.level === 'autre' ? edu.custom_level : edu.level
 
         const res = await candidateApi.createEducation({
-          school: edu.school, 
-          degree: edu.is_self_taught ? 'Autodidacte' : edu.degree, 
-          field: edu.field, 
+          school: edu.school,
+          degree: edu.is_self_taught ? 'Autodidacte' : edu.degree,
+          field: edu.field,
           level: (edu.is_self_taught || edu.level === 'autre') ? 'autre' : (edu.level as any),
           custom_level: (!edu.is_self_taught && edu.level === 'autre') ? edu.custom_level : undefined,
-          start_month: Number(edu.start_month), 
+          start_month: Number(edu.start_month),
           start_year: Number(edu.start_year),
           end_month: edu.is_current ? undefined : (edu.end_month ? Number(edu.end_month) : undefined),
           end_year: edu.is_current ? undefined : (edu.end_year ? Number(edu.end_year) : undefined),
-          is_current: edu.is_current, 
-          description: edu.description || undefined, 
+          is_current: edu.is_current,
+          description: edu.description || undefined,
           skill_ids: edu.skill_ids,
         })
         const eduId = res?.education?.id
         if (eduId) {
           for (const m of edu.mediaFiles) {
-            await candidateApi.uploadEducationMedia(eduId, m.file).catch(() => {})
+            await candidateApi.uploadEducationMedia(eduId, m.file).catch(() => { })
           }
         }
       }
@@ -289,7 +289,7 @@ export default function CandidatOnboarding() {
       {/* Header */}
       <div className="bg-white border-b border-border px-6 py-4 sticky top-0 z-40">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <img src="/logo.png" alt="" className="w-24" />
+          <img src="/logo.webp" alt="" className="w-24" />
           <span className="text-sm text-muted">Créez votre profil pour continuer</span>
         </div>
       </div>
@@ -335,12 +335,12 @@ export default function CandidatOnboarding() {
         <div className="bg-white rounded-2xl border border-border p-6 space-y-4">
           <h2 className="font-semibold text-foreground">Informations principales</h2>
           <div className="grid grid-cols-2 gap-4">
-            <CountrySelect 
-              label="Pays *" 
-              options={COUNTRIES} 
-              placeholder="Choisir..." 
-              value={profile.country} 
-              onChange={(v) => setProfile(p => ({ ...p, country: v }))} 
+            <CountrySelect
+              label="Pays *"
+              options={COUNTRIES}
+              placeholder="Choisir..."
+              value={profile.country}
+              onChange={(v) => setProfile(p => ({ ...p, country: v }))}
               error={!profile.country && error ? 'Obligatoire' : undefined}
             />
             <Input label="Ville" placeholder="Antananarivo" value={profile.city} onChange={setP('city')} />
@@ -362,12 +362,12 @@ export default function CandidatOnboarding() {
             <Select label="Disponibilité *" options={AVAILABILITY} value={profile.availability} onChange={setP('availability') as any} />
           </div>
           <div className="grid grid-cols-1">
-            <Input 
-              label="Taux journalier *" 
-              type="number" 
-              placeholder="80" 
-              value={profile.daily_rate} 
-              onChange={setP('daily_rate')} 
+            <Input
+              label="Taux journalier *"
+              type="number"
+              placeholder="80"
+              value={profile.daily_rate}
+              onChange={setP('daily_rate')}
               suffix={profile.country ? COUNTRY_TO_CURRENCY[profile.country] : undefined}
             />
           </div>
@@ -485,30 +485,30 @@ export default function CandidatOnboarding() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Input 
-                    label="Diplôme *" 
-                    placeholder={edu.is_self_taught ? "N/A" : "Licence en Informatique"} 
-                    value={edu.is_self_taught ? "" : edu.degree} 
-                    onChange={e => setEdu(i, 'degree', e.target.value)} 
+                  <Input
+                    label="Diplôme *"
+                    placeholder={edu.is_self_taught ? "N/A" : "Licence en Informatique"}
+                    value={edu.is_self_taught ? "" : edu.degree}
+                    onChange={e => setEdu(i, 'degree', e.target.value)}
                     disabled={edu.is_self_taught}
                     className={edu.is_self_taught ? 'opacity-50 grayscale' : ''}
                   />
                   <label className="flex items-center gap-2 cursor-pointer pt-1">
-                    <input 
-                      type="checkbox" 
-                      checked={edu.is_self_taught} 
-                      onChange={e => setEdu(i, 'is_self_taught', e.target.checked)} 
-                      className="w-4 h-4 rounded border-border text-accent focus:ring-accent/20" 
+                    <input
+                      type="checkbox"
+                      checked={edu.is_self_taught}
+                      onChange={e => setEdu(i, 'is_self_taught', e.target.checked)}
+                      className="w-4 h-4 rounded border-border text-accent focus:ring-accent/20"
                     />
                     <span className="text-xs font-medium text-muted">Cochez si vous etes autodidacte</span>
                   </label>
                 </div>
                 <div className="space-y-3">
-                  <Select 
-                    label="Niveau *" 
-                    options={LEVELS} 
-                    value={edu.is_self_taught ? "autre" : edu.level} 
-                    onChange={e => setEdu(i, 'level', e.target.value)} 
+                  <Select
+                    label="Niveau *"
+                    options={LEVELS}
+                    value={edu.is_self_taught ? "autre" : edu.level}
+                    onChange={e => setEdu(i, 'level', e.target.value)}
                     disabled={edu.is_self_taught}
                     className={edu.is_self_taught ? 'opacity-50 grayscale' : ''}
                   />

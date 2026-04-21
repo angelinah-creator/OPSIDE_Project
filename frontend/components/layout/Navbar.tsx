@@ -8,12 +8,12 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#F0F0F0]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="shrink-0 flex items-center">
             <Link href="/">
-              <img src="/logo.png" alt="OPSIDE" className="w-24 lg:w-28" />
+              <img src="/logo.webp" alt="OPSIDE" className="w-24 lg:w-28" />
             </Link>
           </div>
 
@@ -36,10 +36,7 @@ export default function Navbar() {
               <Button variant="ghost" size="sm" className="font-medium">Se connecter</Button>
             </Link>
             <Link href="/auth/register">
-              <Button size="sm" className="bg-[#F5F5F5] text-[#1A1A1A] hover:bg-[#EAEAEA] border-none shadow-none font-medium">S'inscrire</Button>
-            </Link>
-            <Link href="#cta">
-              <Button variant="gradient" size="sm" className="rounded-full px-6">Demander une démo</Button>
+              <Button variant="gradient" size="sm" className="bg-[#F5F5F5] text-[#1A1A1A] hover:bg-[#EAEAEA] border-none shadow-none font-medium">S'inscrire</Button>
             </Link>
           </div>
 
@@ -69,9 +66,6 @@ export default function Navbar() {
             </Link>
             <Link href="/auth/register" onClick={() => setOpen(false)}>
               <Button variant="secondary" className="w-full justify-center">S'inscrire</Button>
-            </Link>
-            <Link href="#cta" onClick={() => setOpen(false)}>
-              <Button variant="gradient" className="w-full justify-center rounded-full">Demander une démo</Button>
             </Link>
           </div>
         </div>

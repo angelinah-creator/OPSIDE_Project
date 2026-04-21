@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import { authApi  } from '@/lib/auth-service'
+import { authApi } from '@/lib/auth-service'
 import { setTokens, setUser, getDashboardByRole } from '@/lib/auth-service'
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 
@@ -47,7 +47,7 @@ export default function LoginPage() {
         </Link>
         <div className="bg-white rounded-3xl border border-border shadow-card p-8">
           <div className="flex justify-center mb-2">
-            <img src="/logo.png" alt="OPSIDE" className='w-40' />
+            <img src="/logo.webp" alt="OPSIDE" className='w-40' />
           </div>
           <p className="text-sm text-muted text-center mb-8">Connectez-vous à votre compte OPSIDE</p>
 

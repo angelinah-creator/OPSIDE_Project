@@ -10,25 +10,22 @@ export default function LandingPage() {
 
       <main>
         {/* --- HERO SECTION --- */}
-        <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-4 overflow-hidden">
+        <section className="relative pt-28 pb-18 lg:pt-40 lg:pb-28 px-4 overflow-hidden">
           <div className="max-w-7xl mx-auto text-center relative z-10">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F3EEFF] border border-[#E9D5FF] mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[#7C3AED] shadow-[0_0_8px_rgba(124,58,237,0.4)]">
-                <span className="text-[10px] text-white font-bold leading-none">$</span>
-              </span>
-              <span className="text-sm font-medium text-[#7C3AED]">Le Goal de l'Afrique francophone</span>
+              <span className="text-sm font-medium text-[#7C3AED]">Le Deel de l'Afrique francophone</span>
             </div>
 
             {/* Heading */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] mb-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100 text-[#1A1A1A]">
+            <h1 className="text-5xl md:text-7xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100 text-[#1A1A1A]">
               Recrutez les meilleurs<br />
               <span className="text-gradient">développeurs africains</span><br />
               en 72h
             </h1>
 
             {/* Subtitle */}
-            <p className="text-lg md:text-xl text-[#6B6B6B] max-w-2xl mx-auto mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+            <p className="text-md md:text-lg text-[#6B6B6B] max-w-2xl mx-auto mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
               OPSIDE connecte les entreprises aux talents tech d'Afrique francophone. 
               Matching, tests techniques, contrats et paie — tout est géré.
             </p>
@@ -41,7 +38,7 @@ export default function LandingPage() {
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link href="/talents">
+              <Link href="/">
                 <Button variant="ghost" size="lg" className="rounded-full px-10 bg-[#F5F5F5] hover:bg-[#EAEAEA] text-[#1A1A1A]">
                   Voir les talents
                 </Button>
@@ -57,7 +54,7 @@ export default function LandingPage() {
             <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-40 grayscale">
               <span className="text-2xl font-bold italic tracking-tighter">TechCorp</span>
               <span className="text-2xl font-bold tracking-tight">InnovateLab</span>
-              <span className="text-2xl font-black underline decoration-2 underline-offset-4">DataFlow</span>
+              <span className="text-2xl font-black">DataFlow</span>
               <span className="text-2xl font-semibold tracking-wide">CloudSync</span>
               <span className="text-2xl font-mono">CodeBase</span>
             </div>
@@ -66,15 +63,15 @@ export default function LandingPage() {
 
         {/* --- HOW IT WORKS SECTION --- */}
         <section id="how-it-works" className="py-24 md:py-32 bg-[#FAFAFA]">
-          <div className="max-w-4xl mx-auto px-4 text-center mb-16 md:mb-24">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight text-[#1A1A1A]">Comment ça marche</h2>
+          <div className="max-w-4xl mx-auto px-4 text-center mb-10 md:mb-18">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight text-[#1A1A1A]">Comment ça marche</h2>
             <p className="text-[#6B6B6B] text-lg">Trois étapes simples pour constituer votre équipe tech en Afrique.</p>
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             {/* Step 1 */}
             <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group">
-              <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors mx-auto">
                 <Search className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
               </div>
               <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 1</p>
@@ -86,7 +83,7 @@ export default function LandingPage() {
 
             {/* Step 2 */}
             <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group">
-              <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors mx-auto">
                 <ShieldCheck className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
               </div>
               <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 2</p>
@@ -98,7 +95,7 @@ export default function LandingPage() {
 
             {/* Step 3 */}
             <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group">
-              <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors mx-auto">
                 <CheckCircle className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
               </div>
               <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 3</p>
@@ -111,22 +108,22 @@ export default function LandingPage() {
         </section>
 
         {/* --- STATS SECTION --- */}
-        <section id="stats" className="py-24 md:py-32 bg-white">
+        <section id="stats" className="py-14 md:py-22 bg-white">
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8">
             <div className="text-center">
-              <p className="text-5xl md:text-7xl font-black text-gradient leading-none mb-4">50+</p>
+              <p className="text-3xl md:text-5xl font-black text-gradient leading-none mb-4">50+</p>
               <p className="text-[#6B6B6B] font-medium">Développeurs vérifiés</p>
             </div>
             <div className="text-center">
-              <p className="text-5xl md:text-7xl font-black text-gradient leading-none mb-4">3</p>
+              <p className="text-3xl md:text-5xl font-black text-gradient leading-none mb-4">3</p>
               <p className="text-[#6B6B6B] font-medium">Marchés africains</p>
             </div>
             <div className="text-center">
-              <p className="text-5xl md:text-7xl font-black text-gradient leading-none mb-4 tracking-tighter">&lt;72h</p>
+              <p className="text-3xl md:text-5xl font-black text-gradient leading-none mb-4 tracking-tighter">&lt;72h</p>
               <p className="text-[#6B6B6B] font-medium">Temps de matching</p>
             </div>
             <div className="text-center">
-              <p className="text-5xl md:text-7xl font-black text-gradient leading-none mb-4">98%</p>
+              <p className="text-3xl md:text-5xl font-black text-gradient leading-none mb-4">98%</p>
               <p className="text-[#6B6B6B] font-medium">Taux de satisfaction</p>
             </div>
           </div>
@@ -134,9 +131,9 @@ export default function LandingPage() {
 
         {/* --- CTA SECTION --- */}
         <section id="cta" className="py-24 px-4">
-          <div className="max-w-5xl mx-auto bg-white rounded-[2.5rem] p-12 md:p-24 border border-[#F0F0F0] text-center shadow-elevated relative overflow-hidden">
-            <h2 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight text-[#1A1A1A]">Prêt à scaler votre équipe ?</h2>
-            <p className="text-[#6B6B6B] text-lg md:text-xl mb-12 max-w-xl mx-auto">
+          <div className="max-w-4xl mx-auto bg-white rounded-[2.5rem] p-12 md:p-24 border border-[#F0F0F0] text-center shadow-elevated shadow-accent/25 relative overflow-hidden">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight text-[#1A1A1A]">Prêt à scaler votre équipe ?</h2>
+            <p className="text-[#6B6B6B] text-md md:text-lg mb-12 max-w-xl mx-auto">
               Rejoignez les entreprises qui construisent avec les meilleurs talents africains.
             </p>
             <Link href="#">
@@ -150,10 +147,10 @@ export default function LandingPage() {
       </main>
 
       {/* --- FOOTER SECTION --- */}
-      <footer className="border-t border-[#F0F0F0] py-12 md:py-16 px-4 bg-white">
+      <footer className="border-t border-[#F0F0F0] py-12 md:py-10 px-4 bg-white">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="OPSIDE" className="w-24 grayscale brightness-0" />
+            <img src="/logo.webp" alt="OPSIDE" className="w-24 grayscale brightness-0" />
           </div>
           <p className="text-sm text-[#AEAEAE]">© 2026 OPSIDE. Tous droits réservés.</p>
           <div className="flex items-center gap-8">

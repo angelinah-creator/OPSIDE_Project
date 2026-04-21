@@ -31,7 +31,7 @@ export default function ClientDashboard() {
         }
       }
     }
-    
+
     checkProfile()
   }, [router])
 
@@ -40,7 +40,7 @@ export default function ClientDashboard() {
       const Cookies = (await import('js-cookie')).default
       const rt = Cookies.get('refresh_token') || ''
       await authApi.logout(rt)
-    } catch {}
+    } catch { }
     clearTokens()
     router.push('/')
   }
@@ -49,7 +49,7 @@ export default function ClientDashboard() {
     <div className="min-h-screen bg-background">
       <header className="bg-white border-b border-border px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <img src="/logo.png" alt="OPSIDE" className='w-28'/>
+          <img src="/logo.webp" alt="OPSIDE" className='w-28' />
           <div className="flex items-center gap-3">
             <Link href="/client/profile">
               <Button variant="ghost" size="sm">

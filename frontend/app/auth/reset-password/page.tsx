@@ -92,30 +92,30 @@ function ResetPasswordForm() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="relative">
-              <Input 
-                label="Nouveau mot de passe" 
-                type={showPw ? 'text' : 'password'} 
-                placeholder="Au moins 8 caractères" 
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)} 
-                required 
+              <Input
+                label="Nouveau mot de passe"
+                type={showPw ? 'text' : 'password'}
+                placeholder="Au moins 8 caractères"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
-              <button 
-                type="button" 
-                onClick={() => setShowPw(!showPw)} 
+              <button
+                type="button"
+                onClick={() => setShowPw(!showPw)}
                 className="absolute right-3 top-8 text-muted hover:text-foreground mt-2"
               >
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
 
-            <Input 
-              label="Confirmer le mot de passe" 
-              type={showPw ? 'text' : 'password'} 
-              placeholder="Répétez le mot de passe" 
-              value={confirmPassword} 
-              onChange={(e) => setConfirmPassword(e.target.value)} 
-              required 
+            <Input
+              label="Confirmer le mot de passe"
+              type={showPw ? 'text' : 'password'}
+              placeholder="Répétez le mot de passe"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
             />
 
             <Button type="submit" className="w-full mt-6" loading={loading}>
@@ -149,8 +149,8 @@ export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-md">
-        <Link 
-          href="/auth/login" 
+        <Link
+          href="/auth/login"
           className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground mb-8 transition-colors self-start"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -159,7 +159,7 @@ export default function ResetPasswordPage() {
 
         <div className="bg-white rounded-3xl border border-border shadow-card p-8">
           <div className="flex justify-center mb-2">
-             <img src="/logo.png" alt="OPSIDE" className='w-40' />
+            <img src="/logo.webp" alt="OPSIDE" className='w-40' />
           </div>
           <Suspense fallback={<div className="text-center py-8">Chargement...</div>}>
             <ResetPasswordForm />
