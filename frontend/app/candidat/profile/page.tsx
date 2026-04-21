@@ -671,10 +671,17 @@ export default function CandidatProfilePage() {
                     </button>
                   </div>
                   {profile?.title ? (
-                    <p className="text-xl text-accent font-medium">{profile.title}</p>
+                    <div className="flex flex-col items-center md:items-start">
+                      <p className="text-xl text-accent font-medium mb-1">{profile.title}</p>
+                      {profile.speciality && (
+                        <span className="px-2.5 py-0.5 rounded-full bg-accent-soft text-accent text-xs font-bold uppercase tracking-wider border border-accent/10">
+                          {SPEC_LABEL[profile.speciality] || profile.speciality}
+                        </span>
+                      )}
+                    </div>
                   ) : (
                     <button onClick={() => setEditHero(true)} className="text-sm text-muted hover:text-accent transition-colors italic">
-                      + Ajouter un titre professionnel
+                      + Ajouter un titre professionnel et une spécialité
                     </button>
                   )}
                 </div>
