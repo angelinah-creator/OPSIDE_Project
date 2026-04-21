@@ -36,7 +36,7 @@ export default function Navbar() {
               <Button variant="ghost" size="sm" className="font-medium">Se connecter</Button>
             </Link>
             <Link href="/auth/register">
-              <Button variant="gradient" size="sm" className="bg-[#F5F5F5] text-[#1A1A1A] hover:bg-[#EAEAEA] border-none shadow-none font-medium">S'inscrire</Button>
+              <Button variant="gradient" size="sm" className="text-[#1A1A1A]   border-none shadow-none font-medium">S'inscrire</Button>
             </Link>
           </div>
 

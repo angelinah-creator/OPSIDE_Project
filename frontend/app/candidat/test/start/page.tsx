@@ -53,8 +53,17 @@ export default function StartTestPage() {
     setLoading(true);
     setError('');
     try {
+      /* --- MOCK MODE: Bypass API for testing --- */
+      /*
       const res = await testApi.startTest(selectedSkills, profile.speciality);
       router.push(`/candidat/test/${res.testId}`);
+      */
+      console.log('MOCK: Starting test with skills:', selectedSkills);
+      setTimeout(() => {
+        router.push(`/candidat/test/mock-test-id`);
+        setLoading(false);
+      }, 800);
+      /* --- END MOCK MODE --- */
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erreur lors de la création du test.');
     } finally {
