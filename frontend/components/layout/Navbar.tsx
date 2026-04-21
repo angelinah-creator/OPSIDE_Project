@@ -7,32 +7,76 @@ import Button from '@/components/ui/Button';
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#F0F0F0]">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#F0F0F0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div>
-            <img src="/logo.png" alt="OPSIDE" className='w-28'/>
+        <div className="flex items-center justify-between h-20">
+          {/* Logo */}
+          <div className="shrink-0 flex items-center">
+            <Link href="/">
+              <img src="/logo.png" alt="OPSIDE" className="w-24 lg:w-28" />
+            </Link>
           </div>
-          <div className="hidden md:flex items-center gap-3">
-            <Link href="/auth/login"><Button variant="ghost" size="sm">Se connecter</Button></Link>
-            <Link href="/auth/register"><Button size="sm">S'inscrire</Button></Link>
+
+          {/* Center Links */}
+          <nav className="hidden md:flex items-center gap-8">
+            <Link href="#how-it-works" className="text-sm font-medium text-[#1A1A1A] hover:text-[#7C3AED] transition-colors">
+              Comment ça marche
+            </Link>
+            <Link href="#stats" className="text-sm font-medium text-[#1A1A1A] hover:text-[#7C3AED] transition-colors">
+              Chiffres
+            </Link>
+            <Link href="#" className="text-sm font-medium text-[#1A1A1A] hover:text-[#7C3AED] transition-colors">
+              Dashboard
+            </Link>
+          </nav>
+
+          {/* Right Buttons */}
+          <div className="hidden md:flex items-center gap-4">
+            <Link href="/auth/login">
+              <Button variant="ghost" size="sm" className="font-medium">Se connecter</Button>
+            </Link>
+            <Link href="/auth/register">
+              <Button size="sm" className="bg-[#F5F5F5] text-[#1A1A1A] hover:bg-[#EAEAEA] border-none shadow-none font-medium">S'inscrire</Button>
+            </Link>
+            <Link href="#cta">
+              <Button variant="gradient" size="sm" className="rounded-full px-6">Demander une démo</Button>
+            </Link>
           </div>
-          <button className="md:hidden p-2" onClick={() => setOpen(!open)}>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {open ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
+
+          {/* Mobile menu button */}
+          <button className="md:hidden p-2 text-[#1A1A1A]" onClick={() => setOpen(!open)}>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {open ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
             </svg>
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
       {open && (
-        <div className="md:hidden bg-white border-t border-[#F0F0F0] px-4 py-4 flex flex-col gap-4">
-          <Link href="#how-it-works" className="text-sm text-[#6B6B6B] font-medium">Comment ça marche</Link>
-          <Link href="#features" className="text-sm text-[#6B6B6B] font-medium">Fonctionnalités</Link>
-          <Link href="/auth/login"><Button variant="outline" size="sm" className="w-full">Se connecter</Button></Link>
-          <Link href="/auth/register"><Button size="sm" className="w-full">Commencer</Button></Link>
+        <div className="md:hidden bg-white border-t border-[#F0F0F0] px-4 py-6 flex flex-col gap-4 animate-in fade-in slide-in-from-top-4">
+          <Link href="#how-it-works" onClick={() => setOpen(false)} className="text-base font-medium text-[#1A1A1A]">Comment ça marche</Link>
+          <Link href="#stats" onClick={() => setOpen(false)} className="text-base font-medium text-[#1A1A1A]">Chiffres</Link>
+          <Link href="#" onClick={() => setOpen(false)} className="text-base font-medium text-[#1A1A1A]">Dashboard</Link>
+          <hr className="border-[#F0F0F0]" />
+          <div className="flex flex-col gap-3">
+            <Link href="/auth/login" onClick={() => setOpen(false)}>
+              <Button variant="ghost" className="w-full justify-center">Se connecter</Button>
+            </Link>
+            <Link href="/auth/register" onClick={() => setOpen(false)}>
+              <Button variant="secondary" className="w-full justify-center">S'inscrire</Button>
+            </Link>
+            <Link href="#cta" onClick={() => setOpen(false)}>
+              <Button variant="gradient" className="w-full justify-center rounded-full">Demander une démo</Button>
+            </Link>
+          </div>
         </div>
       )}
     </header>
   );
 }
+
