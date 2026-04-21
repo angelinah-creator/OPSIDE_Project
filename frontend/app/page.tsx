@@ -16,7 +16,7 @@ export default function LandingPage() {
             {/* Heading */}
             <h1 className="text-5xl md:text-7xl lg:text-7xl font-black tracking-tight leading-[1.05] mb-8 animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-100 text-[#1A1A1A]">
               Recrutez les meilleurs<br />
-              <span className="text-gradient">développeurs africains</span><br />
+              <span className="text-[#7f39ef]">développeurs africains</span><br />
               en 72h
             </h1>
 
@@ -107,19 +107,19 @@ export default function LandingPage() {
         <section id="stats" className="py-14 md:py-22 bg-white">
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8">
             <div className="text-center">
-              <p className="text-3xl md:text-5xl font-black text-gradient leading-none mb-4">50+</p>
+              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4">50+</p>
               <p className="text-[#6B6B6B] font-medium">Développeurs vérifiés</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl md:text-5xl font-black text-gradient leading-none mb-4">3</p>
+              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4">3</p>
               <p className="text-[#6B6B6B] font-medium">Marchés africains</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl md:text-5xl font-black text-gradient leading-none mb-4 tracking-tighter">&lt;72h</p>
+              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4 tracking-tighter">&lt;72h</p>
               <p className="text-[#6B6B6B] font-medium">Temps de matching</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl md:text-5xl font-black text-gradient leading-none mb-4">98%</p>
+              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4">98%</p>
               <p className="text-[#6B6B6B] font-medium">Taux de satisfaction</p>
             </div>
           </div>
