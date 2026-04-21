@@ -1,63 +1,73 @@
-// npx tsx .\prisma\seed-admin.ts
+// npx tsx .\\prisma\\seed-admin.ts
 
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import * as dotenv from 'dotenv';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
-import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+function validateAdminPassword(password: string): void {
+  const strong = /(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{12,}/;
+  if (!strong.test(password)) {
+    throw new Error(
+      'ADMIN_SEED_PASSWORD must be at least 12 chars with uppercase, lowercase and number.',
+    );
+  }
+}
+
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error('Missing required env var: DATABASE_URL');
+}
+
+const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const email = 'admin@gmail.com';
-  
-  const admin = await prisma.user.findUnique({
-    where: { email },
-  });
+  const email = process.env.ADMIN_SEED_EMAIL || 'admin@gmail.com';
+  const password = process.env.ADMIN_SEED_PASSWORD || 'Admin@123456';
+  validateAdminPassword(password);
+
+  const admin = await prisma.user.findUnique({ where: { email } });
 
   if (admin) {
-    console.log('Admin user exists. Verifying password...');
-    const isValid = await bcrypt.compare('Admin@123456', admin.password);
-    console.log('Password valid for Admin@123456?', isValid);
-    
-    if (!isValid) {
-      console.log('Updating password to valid hash...');
-      const hashedPassword = await bcrypt.hash('Admin@123456', 10);
+    const isValid = await bcrypt.compare(password, admin.password);
+    if (!isValid || admin.status !== 'active') {
+      const hashedPassword = await bcrypt.hash(password, 10);
       await prisma.user.update({
         where: { email },
-        data: { password: hashedPassword }
+        data: { password: hashedPassword, status: 'active' },
       });
-      console.log('Password updated.');
+      console.log(`Admin user updated: ${email}`);
+    } else {
+      console.log(`Admin user already up-to-date: ${email}`);
     }
-  } else {
-    console.log('Admin user NOT FOUND. Creating it now...');
-    const hashedPassword = await bcrypt.hash('Admin@123456', 10);
-    await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        role: 'admin',
-        first_name: 'Super',
-        last_name: 'Admin',
-        status: 'active'
-      }
-    });
-    console.log('Admin user created successfully.');
+    return;
   }
 
-  const allAdmins = await prisma.user.findMany({ where: { role: 'admin' } });
-  console.log('Current admins:', allAdmins);
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+      role: 'admin',
+      first_name: process.env.ADMIN_SEED_FIRST_NAME || 'Super',
+      last_name: process.env.ADMIN_SEED_LAST_NAME || 'Admin',
+      status: 'active',
+    },
+  });
+  console.log(`Admin user created: ${email}`);
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error(e);
     process.exit(1);
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

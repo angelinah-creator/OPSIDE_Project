@@ -10,7 +10,11 @@ import { SkillsModule } from './skills/skills.module';
 import { UploadModule } from './upload/upload.module';
 import { MailModule } from './mail/mail.module';
 import { TestModule } from './test/test.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { validateEnvironment } from './config/validate-environment';
 
+validateEnvironment();
 
 @Module({
   imports: [
@@ -20,8 +24,8 @@ import { TestModule } from './test/test.module';
     }),
     ThrottlerModule.forRoot([
       {
-        ttl: 60000,
-        limit: 100,
+        ttl: Number(process.env.THROTTLE_TTL_MS || 60000),
+        limit: Number(process.env.THROTTLE_LIMIT || 100),
       },
     ]),
     PrismaModule,
@@ -34,5 +38,7 @@ import { TestModule } from './test/test.module';
     MailModule,
     TestModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
