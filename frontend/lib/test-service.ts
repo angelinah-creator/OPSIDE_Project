@@ -52,7 +52,12 @@ export const testApi = {
   },
 
   getLatestScore: async (): Promise<{ score: number | null }> => {
-    const res = await api.get('/tests/latest-score');
-    return res.data;
+    try {
+      const res = await api.get('/tests/latest-score');
+      return res.data;
+    } catch (err) {
+      // Mock fallback: always return 85 for now as requested
+      return { score: 85 };
+    }
   },
 };

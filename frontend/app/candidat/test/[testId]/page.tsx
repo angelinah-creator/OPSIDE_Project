@@ -83,6 +83,10 @@ export default function TakeTestPage() {
       router.push(`/candidat/test-result/${testId}`);
       */
       setTimeout(() => {
+        // MOCK: Save score to localStorage for flow guard bypass
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('opside_mock_score', '85');
+        }
         router.push(`/candidat/test/test-result/${testId}`);
         setSubmitting(false);
       }, 1500);
