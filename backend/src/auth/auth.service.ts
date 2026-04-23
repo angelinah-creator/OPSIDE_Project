@@ -30,8 +30,9 @@ export class AuthService {
       throw new BadRequestException('Impossible de créer un compte admin via inscription');
     }
 
+    const email = dto.email.toLowerCase();
     const existingUser = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+      where: { email },
     });
 
     if (existingUser) {
@@ -43,7 +44,7 @@ export class AuthService {
 
     const user = await this.prisma.user.create({
       data: {
-        email: dto.email,
+        email,
         password: hashedPassword,
         role: dto.role,
         first_name: dto.first_name ?? null,
@@ -72,11 +73,13 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
+    const email = dto.email.toLowerCase();
     const user = await this.prisma.user.findUnique({
-      where: { email: dto.email },
+      where: { email },
     });
 
     if (!user) {
+      console.log(`Login failed: User not found for email ${email}`);
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
@@ -90,6 +93,7 @@ export class AuthService {
 
     const passwordValid = await bcrypt.compare(dto.password, user.password);
     if (!passwordValid) {
+      console.log(`Login failed: Invalid password for user ${email}`);
       throw new UnauthorizedException('Email ou mot de passe incorrect');
     }
 
