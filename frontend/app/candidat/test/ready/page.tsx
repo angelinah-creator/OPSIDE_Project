@@ -40,9 +40,6 @@ export default function TestReadyPage() {
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-accent/10 text-accent rounded-full text-xs font-bold uppercase tracking-wider mb-6">
-                <Zap className="w-3 h-3" /> Dernière étape
-              </div>
               
               <h1 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight mb-6">
                 Bonjour {user?.first_name}, <br />
@@ -50,27 +47,12 @@ export default function TestReadyPage() {
               </h1>
               
               <p className="text-lg text-slate-600 mb-8 leading-relaxed">
-                Votre profil est complet. Maintenant, prouvez vos compétences techniques avec notre test généré par IA pour accéder à votre espace candidat personnalisé.
+                Votre profil est complet. Maintenant, prouvez vos compétences techniques en passant un test technique
               </p>
 
-              <div className="space-y-4 mb-10">
-                {[
-                  { icon: CheckCircle2, text: "Audit de compétences en temps réel" },
-                  { icon: ShieldCheck, text: "Certification visible par les recruteurs" },
-                  { icon: Laptop, text: "Questions adaptées à votre niveau" }
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-green-50 text-green-500 flex items-center justify-center shadow-sm">
-                      <item.icon className="w-4 h-4" />
-                    </div>
-                    <span className="text-slate-700 font-medium">{item.text}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* <Link href="/candidat/test/start"> */}
-              <Link href="#">
-                <Button size="lg" className="w-full md:w-auto px-10 py-7 rounded-2xl text-lg font-bold shadow-xl shadow-accent/20 group">
+              <Link href="/candidat/test/start">
+              {/* <Link href="#"> */}
+                <Button size="lg" className="w-full md:w-auto rounded-2xl text-lg font-bold shadow-xl shadow-accent/20 group">
                   Commencer le test technique
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -121,15 +103,6 @@ export default function TestReadyPage() {
                   <div className="flex gap-4">
                     <span className="text-slate-600">07</span>
                     <span className="text-slate-300">{"}"}</span>
-                  </div>
-                </div>
-
-                <div className="mt-8 flex justify-end">
-                  <div className="bg-accent/20 border border-accent/30 rounded-xl p-3 flex items-center gap-3 animate-pulse">
-                    <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center shadow-lg">
-                      <Code2 className="w-5 h-5 text-white" />
-                    </div>
-                    <span className="text-[10px] uppercase font-black tracking-widest text-accent">IA Ready</span>
                   </div>
                 </div>
               </div>

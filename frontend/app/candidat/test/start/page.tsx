@@ -112,9 +112,6 @@ export default function StartTestPage() {
         <div className="bg-white rounded-3xl border border-border p-8 shadow-card">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-accent-soft flex items-center justify-center">
-                <Code2 className="w-6 h-6 text-accent" />
-              </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Test technique</h1>
                 <p className="text-sm text-muted">Évaluation basée sur votre profil</p>

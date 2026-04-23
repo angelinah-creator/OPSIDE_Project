@@ -53,14 +53,14 @@ export default function TechniqueTab({ score, profile }: TechniqueTabProps) {
                 </Button>
               </Link>
               <Button variant="outline" className="flex-1 rounded-2xl py-6 text-base font-bold text-slate-700">
-                Partager le badge
+                Voir les détails du test
               </Button>
             </div>
           </div>
         </div>
 
         {/* Skills Breakdown */}
-        <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+        {/* <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
           <h2 className="text-xl font-bold text-slate-900 mb-6">Détail par compétences</h2>
           <div className="space-y-6">
             {(profile?.candidate_skills || [
@@ -82,10 +82,10 @@ export default function TechniqueTab({ score, profile }: TechniqueTabProps) {
               );
             })}
           </div>
-        </div>
+        </div> */}
       </div>
 
-      <div className="space-y-8">
+      {/* <div className="space-y-8">
         <div className="bg-[#1E293B] text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-accent/20 blur-3xl rounded-full" />
           <h3 className="text-lg font-bold mb-4 relative z-10">Prochaine étape</h3>
@@ -128,7 +128,7 @@ export default function TechniqueTab({ score, profile }: TechniqueTabProps) {
           </div>
           <p className="text-xs text-slate-400 text-center">Votre profil a été vu par 8 entreprises cette semaine.</p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
