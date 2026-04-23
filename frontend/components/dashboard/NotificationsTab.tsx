@@ -8,7 +8,7 @@ export default function NotificationsTab() {
     <div className="max-w-2xl mx-auto space-y-4">
       {[
         { title: 'Nouvelle Offre Matchée', desc: 'Google a posté une offre qui correspond à 95% à votre profil.', time: 'Il y a 2h', isNew: true },
-        { title: 'Test technique réussi', desc: 'Félicitations ! Votre score de 92/100 vous place dans le top 5% des candidats.', time: 'Hier', isNew: true },
+        { title: 'Test technique réussi', desc: 'Félicitations ! Votre score de Validé vous place dans le top 5% des candidats.', time: 'Hier', isNew: true },
         { title: 'Nouvelle vue de profil', desc: 'L\'entreprise Vercel a consulté votre profil technique.', time: 'Il y a 2 jours', isNew: false },
         { title: 'Mise à jour plateforme', desc: 'Découvrez les nouvelles fonctionnalités de votre workspace OPSIDE.', time: 'Il y a 1 semaine', isNew: false },
       ].map((n, i) => (

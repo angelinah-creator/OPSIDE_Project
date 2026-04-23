@@ -11,10 +11,11 @@ export default function HistoriqueTab() {
       </div>
       <div className="divide-y divide-slate-50">
         {[
-          { type: 'test', title: 'Test Technique Frontend', date: 'Hier, 14:30', result: '92/100', icon: Code2, color: 'bg-accent' },
+          { type: 'test', title: 'Candidature envoyée - Microsoft', date: 'Hier, 14:30', result: 'Rejeté', icon: Briefcase, color: 'bg-red-500'},
           { type: 'apply', title: 'Candidature envoyée - Google', date: '20 Avril', result: 'En attente', icon: Briefcase, color: 'bg-blue-500' },
           { type: 'profile', title: 'Mise à jour des compétences', date: '19 Avril', result: 'Complété', icon: User, color: 'bg-emerald-500' },
-          { type: 'test', title: 'Test Technique Backend', date: '15 Mars', result: '68/100', icon: Code2, color: 'bg-accent' },
+          { type: 'test', title: 'Candidature envoyée - Meta', date: '15 Mars', result: 'En attente', icon: Briefcase, color: 'bg-blue-500' },
+          { type: 'profile', title: 'Mise à jour des compétences', date: '19 Avril', result: 'Complété', icon: User, color: 'bg-emerald-500' },
         ].map((item, i) => (
           <div key={i} className="p-6 flex items-center gap-4 hover:bg-slate-50 transition-colors cursor-pointer group">
             <div className={`w-10 h-10 rounded-xl ${item.color} text-white flex items-center justify-center shrink-0`}>

@@ -13,10 +13,10 @@ import {
   ChevronRight as ChevronRightIcon,
   TrendingUp,
   MapPin,
-  RotateCcw
+  RotateCcw,
+  Send
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import OfferModal from './OfferModal';
 
 interface Offer {
   id: string;
@@ -33,6 +33,7 @@ interface Offer {
   minExperience: string;
   experienceValue: number; 
   publishedAt: string;
+  createdAt: number; // Timestamp for sorting
 }
 
 const MOCK_OFFERS: Offer[] = [
@@ -40,7 +41,7 @@ const MOCK_OFFERS: Offer[] = [
     id: '1',
     title: 'Senior Frontend Developer (React)',
     description: 'Refonte complète d\'une plateforme SaaS avec React 18 et Next.js. Focus sur la performance et l\'expérience utilisateur.',
-    fullDescription: 'En tant que développeur frontend senior, vous serez responsable de l\'architecture et du développement des nouvelles fonctionnalités. \n\n### Responsabilités\n- Concevoir et implémenter des composants UI réutilisables.\n- Optimiser les performances (Core Web Vitals).\n- Mentorat des développeurs juniors.',
+    fullDescription: 'En tant que développeur frontend senior, vous serez responsable de l\'architecture et du développement des nouvelles fonctionnalités.',
     skills: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS'],
     tjm: '550€ - 700€',
     tjmValue: 550,
@@ -50,13 +51,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1 / GMT+3',
     minExperience: '5 ans',
     experienceValue: 5,
-    publishedAt: 'Il y a 2h'
+    publishedAt: 'Il y a 2h',
+    createdAt: Date.now() - 2 * 60 * 60 * 1000
   },
   {
     id: '2',
     title: 'Architecte Cloud & Backend Go',
     description: 'Expertise requise en Go et Kubernetes pour le passage à l\'échelle d\'une infrastructure microservices.',
-    fullDescription: 'Mise en place d\'une architecture scalable sur AWS avec Go. \n\n### Stack\n- Go, gRPC, Protobuf\n- Kubernetes, Terraform, AWS',
+    fullDescription: 'Mise en place d\'une architecture scalable sur AWS avec Go.',
     skills: ['Go', 'Kubernetes', 'AWS', 'Docker'],
     tjm: '600€ - 850€',
     tjmValue: 600,
@@ -66,13 +68,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'Anywhere',
     minExperience: '7 ans',
     experienceValue: 7,
-    publishedAt: 'Il y a 5h'
+    publishedAt: 'Il y a 5h',
+    createdAt: Date.now() - 5 * 60 * 60 * 1000
   },
   {
     id: '3',
     title: 'Lead Fullstack Node/React',
     description: 'Piloter le développement d\'une marketplace internationale. Management d\'une équipe de 4 personnes.',
-    fullDescription: 'Développement de nouvelles features et maintenance de l\'existant. \n\n### Stack\n- Node.js (Express), React, Prisma, PostgreSQL',
+    fullDescription: 'Développement de nouvelles features et maintenance de l\'existant.',
     skills: ['Node.js', 'React', 'Prisma', 'PostgreSQL'],
     tjm: '500€ - 650€',
     tjmValue: 500,
@@ -82,13 +85,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '4 ans',
     experienceValue: 4,
-    publishedAt: 'Il y a 1j'
+    publishedAt: 'Il y a 1j',
+    createdAt: Date.now() - 1 * 24 * 60 * 60 * 1000
   },
   {
     id: '4',
     title: 'Mobile Engineer (Flutter)',
     description: 'Développement d\'une application de Fintech pour le marché africain. Intégration de services de paiement.',
-    fullDescription: 'Conception et développement de l\'application Flutter. \n\n### Stack\n- Flutter, Dart, Firebase, Stripe API',
+    fullDescription: 'Conception et développement de l\'application Flutter.',
     skills: ['Flutter', 'Dart', 'Firebase', 'State Management'],
     tjm: '450€ - 600€',
     tjmValue: 450,
@@ -98,13 +102,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+0 / GMT+2',
     minExperience: '3 ans',
     experienceValue: 3,
-    publishedAt: 'Il y a 3j'
+    publishedAt: 'Il y a 3j',
+    createdAt: Date.now() - 3 * 24 * 60 * 60 * 1000
   },
   {
     id: '5',
     title: 'DevOps Engineer / SRE',
     description: 'Automatisation de l\'infrastructure et mise en place de pipelines CI/CD robustes.',
-    fullDescription: 'Amélioration de la fiabilité des systèmes et automatisation. \n\n### Outils\n- Terraform, Ansible, GitHub Actions, Azure',
+    fullDescription: 'Amélioration de la fiabilité des systèmes et automatisation.',
     skills: ['Terraform', 'CI/CD', 'Azure', 'Kubernetes'],
     tjm: '550€ - 750€',
     tjmValue: 550,
@@ -114,13 +119,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT-1 / GMT+3',
     minExperience: '5 ans',
     experienceValue: 5,
-    publishedAt: 'Il y a 11h'
+    publishedAt: 'Il y a 11h',
+    createdAt: Date.now() - 11 * 60 * 60 * 1000
   },
   {
     id: '6',
     title: 'Backend Python Developer (FastAPI)',
     description: 'APIs haute performance pour le traitement de données massives en temps réel.',
-    fullDescription: 'Implémentation de logiques métier complexes et optimisation SQL. \n\n### Stack\n- Python, FastAPI, Redis, Kafka',
+    fullDescription: 'Implémentation de logiques métier complexes et optimisation SQL.',
     skills: ['Python', 'FastAPI', 'Redis', 'SQL'],
     tjm: '480€ - 620€',
     tjmValue: 480,
@@ -130,13 +136,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '3 ans',
     experienceValue: 3,
-    publishedAt: 'Il y a 2j'
+    publishedAt: 'Il y a 2j',
+    createdAt: Date.now() - 2 * 24 * 60 * 60 * 1000
   },
   {
     id: '7',
     title: 'Data Scientist (Machine Learning)',
     description: 'Mise en place de modèles prédictifs pour l\'analyse comportementale des utilisateurs.',
-    fullDescription: 'Analyse de données et déploiement de modèles ML. \n\n### Outils\n- Python (Scikit-learn), PyTorch, SQL, MLflow',
+    fullDescription: 'Analyse de données et déploiement de modèles ML.',
     skills: ['Python', 'Machine Learning', 'PyTorch', 'SQL'],
     tjm: '500€ - 700€',
     tjmValue: 500,
@@ -146,13 +153,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '4 ans',
     experienceValue: 4,
-    publishedAt: 'Il y a 14h'
+    publishedAt: 'Il y a 14h',
+    createdAt: Date.now() - 14 * 60 * 60 * 1000
   },
   {
     id: '8',
     title: 'Cybersecurity Analyst',
     description: 'Audit de sécurité et monitoring des vulnérabilités sur une plateforme critique.',
-    fullDescription: 'Protection des infrastructures et gestion des incidents. \n\n### Compétences\n- Pentesting, SOC, SIEM, ISO 27001',
+    fullDescription: 'Protection des infrastructures et gestion des incidents.',
     skills: ['Pentesting', 'Security', 'SIEM', 'Audit'],
     tjm: '650€ - 900€',
     tjmValue: 650,
@@ -162,13 +170,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+0',
     minExperience: '6 ans',
     experienceValue: 6,
-    publishedAt: 'Il y a 6h'
+    publishedAt: 'Il y a 6h',
+    createdAt: Date.now() - 6 * 60 * 60 * 1000
   },
   {
     id: '9',
     title: 'UI/UX Designer Senior',
     description: 'Conception d\'interfaces complexes pour un outil de gestion interne (B2B).',
-    fullDescription: 'Recherche utilisateur, wireframing et design haute fidélité. \n\n### Outils\n- Figma, Storybook, Design Systems',
+    fullDescription: 'Recherche utilisateur, wireframing et design haute fidélité.',
     skills: ['Figma', 'UX Research', 'Design System', 'UI'],
     tjm: '450€ - 550€',
     tjmValue: 450,
@@ -178,13 +187,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '5 ans',
     experienceValue: 5,
-    publishedAt: 'Il y a 1j'
+    publishedAt: 'Il y a 1j',
+    createdAt: Date.now() - 25 * 60 * 60 * 1000
   },
   {
     id: '10',
     title: 'Lead QA Engineer',
     description: 'Mise en place d\'une stratégie de tests automatisés (E2E) sur une application web complexe.',
-    fullDescription: 'Définition de la stratégie QA et automatisation. \n\n### Outils\n- Playwright, Cypress, Jest, CI/CD',
+    fullDescription: 'Définition de la stratégie QA et automatisation.',
     skills: ['Playwright', 'Cypress', 'Jest', 'Automation'],
     tjm: '480€ - 600€',
     tjmValue: 480,
@@ -194,13 +204,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '4 ans',
     experienceValue: 4,
-    publishedAt: 'Il y a 22h'
+    publishedAt: 'Il y a 22h',
+    createdAt: Date.now() - 22 * 60 * 60 * 1000
   },
   {
     id: '11',
     title: 'Backend Node.js Specialist',
     description: 'Migration d\'un monolithe vers des microservices Node.js.',
-    fullDescription: 'Refactorisation et développement de nouveaux services. \n\n### Stack\n- Node.js, NestJS, RabbitMQ, MongoDB',
+    fullDescription: 'Refactorisation et développement de nouveaux services.',
     skills: ['NestJS', 'Node.js', 'RabbitMQ', 'MongoDB'],
     tjm: '520€ - 680€',
     tjmValue: 520,
@@ -210,13 +221,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT-1 / GMT+2',
     minExperience: '4 ans',
     experienceValue: 4,
-    publishedAt: 'Il y a 3h'
+    publishedAt: 'Il y a 3h',
+    createdAt: Date.now() - 3 * 60 * 60 * 1000
   },
   {
     id: '12',
     title: 'Consultant SAP (S/4HANA)',
     description: 'Accompagnement sur l\'implémentation du module FI/CO pour un grand compte.',
-    fullDescription: 'Paramétrage et support utilisateur SAP. \n\n### Compétences\n- SAP S/4HANA, FI/CO, ABAP (notions)',
+    fullDescription: 'Paramétrage et support utilisateur SAP.',
     skills: ['SAP', 'FI/CO', 'S/4HANA', 'Consulting'],
     tjm: '800€ - 1100€',
     tjmValue: 800,
@@ -226,13 +238,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '8 ans',
     experienceValue: 8,
-    publishedAt: 'Il y a 4j'
+    publishedAt: 'Il y a 4j',
+    createdAt: Date.now() - 4 * 24 * 60 * 60 * 1000
   },
   {
     id: '13',
     title: 'React Native Developer',
     description: 'Refonte d\'une application E-commerce pour iOS et Android.',
-    fullDescription: 'Développement de nouvelles features et optimisation mobile. \n\n### Stack\n- React Native, TypeScript, Redux, GraphQL',
+    fullDescription: 'Développement de nouvelles features et optimisation mobile.',
     skills: ['React Native', 'TypeScript', 'GraphQL', 'iOS/Android'],
     tjm: '450€ - 580€',
     tjmValue: 450,
@@ -242,13 +255,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '3 ans',
     experienceValue: 3,
-    publishedAt: 'Il y a 10h'
+    publishedAt: 'Il y a 10h',
+    createdAt: Date.now() - 10 * 60 * 60 * 1000
   },
   {
     id: '14',
     title: 'Solution Architect (Cloud/Java)',
     description: 'Conception de solutions cloud natives pour des applications critiques.',
-    fullDescription: 'Architecture et guidance technique. \n\n### Stack\n- Java (Spring Boot), Microservices, GCP, Kafka',
+    fullDescription: 'Architecture et guidance technique.',
     skills: ['Java', 'Spring Boot', 'GCP', 'Kafka'],
     tjm: '700€ - 950€',
     tjmValue: 700,
@@ -258,13 +272,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '7 ans',
     experienceValue: 7,
-    publishedAt: 'Il y a 1j'
+    publishedAt: 'Il y a 1j',
+    createdAt: Date.now() - 28 * 60 * 60 * 1000
   },
   {
     id: '15',
     title: 'Blockchain Developer (Solidity)',
     description: 'Développement de smart contracts pour une nouvelle plateforme DeFi.',
-    fullDescription: 'Audit et déploiement de contrats intelligents. \n\n### Stack\n- Solidity, Hardhat, Web3.js, Ethereum',
+    fullDescription: 'Audit et déploiement de contrats intelligents.',
     skills: ['Solidity', 'Ethereum', 'Web3.js', 'Rust'],
     tjm: '750€ - 1200€',
     tjmValue: 750,
@@ -274,13 +289,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'Anywhere',
     minExperience: '4 ans',
     experienceValue: 4,
-    publishedAt: 'Il y a 8h'
+    publishedAt: 'Il y a 8h',
+    createdAt: Date.now() - 8 * 60 * 60 * 1000
   },
   {
     id: '16',
     title: 'Embedded Systems Engineer',
     description: 'Développement de firmware pour des objets connectés (IoT).',
-    fullDescription: 'Programmation bas niveau et optimisation ressources. \n\n### Stack\n- C/C++, RTOS, STM32, Bluetooth LE',
+    fullDescription: 'Programmation bas niveau et optimisation ressources.',
     skills: ['C/C++', 'IoT', 'Embedded', 'RTOS'],
     tjm: '500€ - 650€',
     tjmValue: 500,
@@ -290,13 +306,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '5 ans',
     experienceValue: 5,
-    publishedAt: 'Il y a 2j'
+    publishedAt: 'Il y a 2j',
+    createdAt: Date.now() - 48 * 60 * 60 * 1000
   },
   {
     id: '17',
     title: 'Fullstack Laravel/Vue.js',
     description: 'Maintenance et évolution d\'un outil métier interne.',
-    fullDescription: 'Développement agile et déploiement continu. \n\n### Stack\n- PHP (Laravel), Vue.js, MySQL, Redis',
+    fullDescription: 'Développement agile et déploiement continu.',
     skills: ['Laravel', 'Vue.js', 'PHP', 'MySQL'],
     tjm: '350€ - 480€',
     tjmValue: 350,
@@ -306,13 +323,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '3 ans',
     experienceValue: 3,
-    publishedAt: 'Il y a 5j'
+    publishedAt: 'Il y a 5j',
+    createdAt: Date.now() - 5 * 24 * 60 * 60 * 1000
   },
   {
     id: '18',
     title: 'Elasticsearch Specialist',
     description: 'Optimisation de moteurs de recherche et analyse de logs à grande échelle.',
-    fullDescription: 'Architecture de cluster et optimisation de requêtes. \n\n### Stack\n- Elasticsearch, Kibana, Logstash, Docker',
+    fullDescription: 'Architecture de cluster et optimisation de requêtes.',
     skills: ['Elasticsearch', 'ELK', 'Big Data', 'Lucene'],
     tjm: '600€ - 800€',
     tjmValue: 600,
@@ -322,13 +340,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '5 ans',
     experienceValue: 5,
-    publishedAt: 'Il y a 15h'
+    publishedAt: 'Il y a 15h',
+    createdAt: Date.now() - 15 * 60 * 60 * 1000
   },
   {
     id: '19',
     title: 'Ruby on Rails Senior Dev',
     description: 'Amélioration de la scalabilité d\'une plateforme Web historique.',
-    fullDescription: 'Optimisation performances et développement de nouvelles APIs. \n\n### Stack\n- Ruby, Rails 7, PostgreSQL, Hotwire',
+    fullDescription: 'Optimisation performances et développement de nouvelles APIs.',
     skills: ['Ruby', 'Rails', 'PostgreSQL', 'Hotwire'],
     tjm: '550€ - 720€',
     tjmValue: 550,
@@ -338,13 +357,14 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '6 ans',
     experienceValue: 6,
-    publishedAt: 'Il y a 3j'
+    publishedAt: 'Il y a 3j',
+    createdAt: Date.now() - 72 * 60 * 60 * 1000
   },
   {
     id: '20',
     title: 'Vue.js Specialist (Nuxt 3)',
     description: 'Développement d\'une application E-commerce performante en SSR.',
-    fullDescription: 'Intégration de maquettes Figma et gestion d\'état complexe. \n\n### Stack\n- Vue.js, Nuxt 3, Pinia, TypeScript',
+    fullDescription: 'Intégration de maquettes Figma et gestion d\'état complexe.',
     skills: ['Vue.js', 'Nuxt 3', 'Pinia', 'Tailwind'],
     tjm: '450€ - 580€',
     tjmValue: 450,
@@ -354,7 +374,8 @@ const MOCK_OFFERS: Offer[] = [
     timezone: 'GMT+1',
     minExperience: '4 ans',
     experienceValue: 4,
-    publishedAt: 'Il y a 7h'
+    publishedAt: 'Il y a 7h',
+    createdAt: Date.now() - 7 * 60 * 60 * 1000
   }
 ];
 
@@ -363,7 +384,6 @@ const ITEMS_PER_PAGE = 6;
 export default function OffresTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
   
   // Filter States
   const [filters, setFilters] = useState({
@@ -374,19 +394,21 @@ export default function OffresTab() {
   });
 
   const filteredOffers = useMemo(() => {
-    return MOCK_OFFERS.filter(offer => {
-      const q = searchQuery.toLowerCase();
-      const matchesSearch = offer.title.toLowerCase().includes(q) || 
-                           offer.skills.some(s => s.toLowerCase().includes(q)) ||
-                           offer.description.toLowerCase().includes(q);
-      
-      const matchesExp = filters.minExperience === 'all' || offer.experienceValue >= parseInt(filters.minExperience);
-      const matchesTjm = filters.minTjm === 'all' || offer.tjmValue >= parseInt(filters.minTjm);
-      const matchesDuration = filters.minDuration === 'all' || offer.durationValue >= parseInt(filters.minDuration);
-      const matchesWorkType = filters.workType === 'all' || offer.workType === filters.workType;
+    return MOCK_OFFERS
+      .filter(offer => {
+        const q = searchQuery.toLowerCase();
+        const matchesSearch = offer.title.toLowerCase().includes(q) || 
+                             offer.skills.some(s => s.toLowerCase().includes(q)) ||
+                             offer.description.toLowerCase().includes(q);
+        
+        const matchesExp = filters.minExperience === 'all' || offer.experienceValue >= parseInt(filters.minExperience);
+        const matchesTjm = filters.minTjm === 'all' || offer.tjmValue >= parseInt(filters.minTjm);
+        const matchesDuration = filters.minDuration === 'all' || offer.durationValue >= parseInt(filters.minDuration);
+        const matchesWorkType = filters.workType === 'all' || offer.workType === filters.workType;
 
-      return matchesSearch && matchesExp && matchesTjm && matchesDuration && matchesWorkType;
-    });
+        return matchesSearch && matchesExp && matchesTjm && matchesDuration && matchesWorkType;
+      })
+      .sort((a, b) => b.createdAt - a.createdAt); // Most recent first
   }, [searchQuery, filters]);
 
   const totalPages = Math.ceil(filteredOffers.length / ITEMS_PER_PAGE);
@@ -511,8 +533,7 @@ export default function OffresTab() {
           {paginatedOffers.map((offer) => (
             <div 
               key={offer.id} 
-              onClick={() => setSelectedOffer(offer)}
-              className="bg-white rounded-[2rem] p-7 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer flex flex-col h-full"
+              className="bg-white rounded-[2rem] p-7 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full"
             >
               <div className="flex justify-between items-start mb-5">
                 <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full">
@@ -573,14 +594,17 @@ export default function OffresTab() {
                 ))}
               </div>
               
-              <div className="flex items-center justify-between pt-5 border-t border-slate-50 mt-auto">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
-                  <MapPin className="w-3.5 h-3.5" />
-                  {offer.timezone}
+              <div className="flex items-center justify-between pt-5 border-t border-slate-50 mt-auto gap-4">
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-widest min-w-0">
+                  <MapPin className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">{offer.timezone}</span>
                 </div>
-                <div className="text-accent text-sm font-black flex items-center gap-1 group-hover:gap-2 transition-all">
-                  Détails <ChevronRight className="w-4 h-4" />
-                </div>
+                <Button 
+                  variant="gradient" 
+                  className="rounded-xl h-10 px-4 text-xs font-black shadow-lg shadow-accent/20 group/btn"
+                >
+                  Postuler
+                </Button>
               </div>
             </div>
           ))}
@@ -637,12 +661,6 @@ export default function OffresTab() {
           </button>
         </div>
       )}
-
-      {/* Offer Detail Modal - Now separated */}
-      <OfferModal 
-        offer={selectedOffer} 
-        onClose={() => setSelectedOffer(null)} 
-      />
     </div>
   );
 }

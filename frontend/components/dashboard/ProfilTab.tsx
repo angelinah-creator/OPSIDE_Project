@@ -267,26 +267,6 @@ export default function ProfilTab({ user, profile }: ProfilTabProps) {
           </div>
         </div>
 
-        {/* Documents */}
-        <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm relative group">
-          <button className="absolute top-6 right-6 p-2 rounded-xl bg-slate-50 text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm">
-            <Pencil className="w-4 h-4" />
-          </button>
-          <h3 className="font-bold text-slate-900 mb-6 uppercase text-xs tracking-widest">Documents</h3>
-          <div className="space-y-4">
-            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between hover:border-accent transition-colors cursor-pointer group/doc">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 font-black text-xs shrink-0">PDF</div>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold text-slate-900 truncate">CV_{user?.last_name || 'Candidat'}.pdf</p>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase truncate">Mis à jour récemment</p>
-                </div>
-              </div>
-              <ExternalLink className="w-4 h-4 text-slate-300 group-hover/doc:text-accent" />
-            </div>
-          </div>
-        </div>
-
         {/* Languages or Other (Small visual card) */}
         <div className="bg-slate-900 rounded-[2rem] p-8 text-white shadow-xl relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-24 h-24 bg-accent/20 rounded-full -mr-12 -mt-12 blur-2xl" />
