@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { Suspense, useEffect, useState, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { authApi, setTokens, setUser, getDashboardByRole } from '@/lib/auth-service'
 import { Loader2, CheckCircle2, XCircle, ArrowRight } from 'lucide-react'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
 
-export default function VerifyEmailPage() {
+function VerifyEmailPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
@@ -97,5 +97,13 @@ export default function VerifyEmailPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Chargement...</div>}>
+      <VerifyEmailPageContent />
+    </Suspense>
   )
 }

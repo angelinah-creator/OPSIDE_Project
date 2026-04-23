@@ -1,5 +1,6 @@
 import api from './api';
 import { Skill } from './skill-service';
+import { optimizeImageForUpload, uploadLimits } from './upload-utils';
 
 export type Availability = 'immediate' | 'two_weeks' | 'one_month' | 'three_months';
 export type Currency = 'EUR' | 'USD' | 'MGA' | 'NGN' | 'KES' | 'EGP' | 'XOF' | 'MAD' | 'TND' | 'MUR';
@@ -83,8 +84,13 @@ export const candidateApi = {
   },
 
   uploadPhoto: async (file: File) => {
+    const optimizedFile = await optimizeImageForUpload(file);
+    if (optimizedFile.size > uploadLimits.defaultMaxBytes) {
+      throw new Error('IMAGE_TOO_LARGE');
+    }
+
     const form = new FormData();
-    form.append('photo', file);
+    form.append('photo', optimizedFile);
     const res = await api.post('/candidate/profile/photo', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -112,8 +118,13 @@ export const candidateApi = {
   },
 
   uploadExperienceMedia: async (experienceId: string, file: File) => {
+    const optimizedFile = await optimizeImageForUpload(file);
+    if (optimizedFile.type.startsWith('image/') && optimizedFile.size > uploadLimits.defaultMaxBytes) {
+      throw new Error('IMAGE_TOO_LARGE');
+    }
+
     const form = new FormData();
-    form.append('media', file);
+    form.append('media', optimizedFile);
     const res = await api.post(`/candidate/experiences/${experienceId}/media`, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -146,8 +157,13 @@ export const candidateApi = {
   },
 
   uploadEducationMedia: async (educationId: string, file: File) => {
+    const optimizedFile = await optimizeImageForUpload(file);
+    if (optimizedFile.type.startsWith('image/') && optimizedFile.size > uploadLimits.defaultMaxBytes) {
+      throw new Error('IMAGE_TOO_LARGE');
+    }
+
     const form = new FormData();
-    form.append('media', file);
+    form.append('media', optimizedFile);
     const res = await api.post(`/candidate/educations/${educationId}/media`, form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -169,4 +185,3 @@ export const candidateApi = {
     return res.data;
   },
 };
-

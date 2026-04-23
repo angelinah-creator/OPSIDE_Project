@@ -1,12 +1,12 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import Logo from '@/components/ui/Logo'
 import { User, Building2, ArrowRight, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
-export default function RegisterChoicePage() {
+function RegisterChoiceContent() {
   const router = useRouter()
   const params = useSearchParams()
 
@@ -94,5 +94,13 @@ export default function RegisterChoicePage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function RegisterChoicePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Chargement...</div>}>
+      <RegisterChoiceContent />
+    </Suspense>
   )
 }
