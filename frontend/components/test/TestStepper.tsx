@@ -5,14 +5,12 @@ interface TestStepperProps {
   questions: Question[];
   currentIndex: number;
   answers: any[];
-  onSelect: (index: number) => void;
 }
 
 export default function TestStepper({
   questions,
   currentIndex,
   answers,
-  onSelect,
 }: TestStepperProps) {
   return (
     <div className="bg-white rounded-2xl border border-border p-4">
@@ -22,18 +20,17 @@ export default function TestStepper({
           const isAnswered = answers[idx] !== undefined && answers[idx] !== '';
           const isCurrent = idx === currentIndex;
           return (
-            <button
+            <div
               key={q.id}
-              onClick={() => onSelect(idx)}
               className={`
                 w-full aspect-square rounded-xl flex items-center justify-center text-sm font-medium transition-all
                 ${isCurrent ? 'bg-accent text-white ring-2 ring-accent/30' : ''}
                 ${!isCurrent && isAnswered ? 'bg-green-100 text-green-700 border border-green-300' : ''}
-                ${!isCurrent && !isAnswered ? 'bg-background border border-border text-muted hover:border-accent/50' : ''}
+                ${!isCurrent && !isAnswered ? 'bg-background border border-border text-muted' : ''}
               `}
             >
               {idx + 1}
-            </button>
+            </div>
           );
         })}
       </div>

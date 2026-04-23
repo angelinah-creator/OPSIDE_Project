@@ -7,7 +7,7 @@ import QuestionCard from '@/components/test/QuestionCard';
 import Timer from '@/components/test/Timer';
 import TestStepper from '@/components/test/TestStepper';
 import Button from '@/components/ui/Button';
-import { ChevronLeft, ChevronRight, Send, AlertTriangle } from 'lucide-react';
+import { ChevronRight, Send, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function TakeTestPage() {
@@ -159,17 +159,12 @@ export default function TakeTestPage() {
             />
 
             {/* Navigation */}
-            <div className="flex items-center justify-between">
-              <Button
-                variant="secondary"
-                onClick={() => setCurrentIndex((i) => i - 1)}
-                disabled={currentIndex === 0}
-              >
-                <ChevronLeft className="w-4 h-4 mr-1" /> Précédent
-              </Button>
-
+            <div className="flex items-center justify-end">
               {!isLast ? (
-                <Button onClick={() => setCurrentIndex((i) => i + 1)}>
+                <Button 
+                  onClick={() => setCurrentIndex((i) => i + 1)}
+                  disabled={!answers[currentIndex]}
+                >
                   Suivant <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               ) : (
@@ -190,7 +185,6 @@ export default function TakeTestPage() {
               questions={questions}
               currentIndex={currentIndex}
               answers={answers}
-              onSelect={setCurrentIndex}
             />
             <div className="mt-4">
               <Button
