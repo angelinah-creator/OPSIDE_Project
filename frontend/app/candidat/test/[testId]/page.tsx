@@ -120,7 +120,7 @@ export default function TakeTestPage() {
           <h1 className="text-xl font-bold text-foreground mb-2">Erreur</h1>
           <p className="text-muted mb-6">{error}</p>
           <Link href="/candidat/dashboard">
-            <Button>Retour au dashboard</Button>
+            <Button>Allez au dashboard</Button>
           </Link>
         </div>
       </div>

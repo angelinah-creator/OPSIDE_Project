@@ -89,7 +89,7 @@ export default function TestResultPage() {
 
           <Link href="/candidat/dashboard">
             <Button className="w-full" size="lg">
-              Retour au dashboard
+              Allez au dashboard
             </Button>
           </Link>
         </div>
