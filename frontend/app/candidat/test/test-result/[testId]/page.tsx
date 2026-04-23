@@ -17,11 +17,20 @@ export default function TestResultPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    /* --- MOCK MODE: Bypass API for testing --- */
+    /*
     testApi
       .getTestResult(testId)
       .then((res) => setResult(res))
       .catch((err) => setError(err.response?.data?.message || 'Erreur'))
       .finally(() => setLoading(false));
+    */
+
+    setTimeout(() => {
+      setResult({ score: 85, status: 'completed' });
+      setLoading(false);
+    }, 1000);
+    /* --- END MOCK MODE --- */
   }, [testId]);
 
   if (loading) {
@@ -68,10 +77,6 @@ export default function TestResultPage() {
           </div>
 
           <h1 className="text-2xl font-bold text-foreground mb-2">Test terminé</h1>
-          <p className="text-muted mb-6">
-            Votre test a été évalué automatiquement par notre IA.
-          </p>
-
           <div className="bg-background rounded-2xl p-6 mb-6">
             <div className="text-5xl font-bold text-accent mb-2">{score}%</div>
             <p className="text-sm text-muted">Score final</p>
@@ -84,7 +89,7 @@ export default function TestResultPage() {
 
           <Link href="/candidat/dashboard">
             <Button className="w-full" size="lg">
-              Retour au dashboard
+              Allez au dashboard
             </Button>
           </Link>
         </div>

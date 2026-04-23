@@ -275,7 +275,7 @@ export default function CandidatOnboarding() {
         }
       }
 
-      router.push('/candidat/dashboard')
+      router.push('/candidat/test/ready')
     } catch (err: any) {
       const msg = err.response?.data?.message
       setError(typeof msg === 'string' ? msg : 'Une erreur est survenue. Veuillez réessayer.')

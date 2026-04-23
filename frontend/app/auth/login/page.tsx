@@ -26,9 +26,12 @@ export default function LoginPage() {
     setLoading(true)
     try {
       const { data } = await authApi.login(form.email, form.password)
+      console.log('Login success, user data:', data.user);
       setTokens(data.access_token, data.refresh_token)
       setUser(data.user)
-      router.push(getDashboardByRole(data.user.role))
+      const target = getDashboardByRole(data.user.role);
+      console.log('Redirecting to:', target);
+      router.push(target)
     } catch (err: any) {
       const msg = err.response?.data?.message
       if (err.response?.status === 401) setError(typeof msg === 'string' ? msg : 'Email ou mot de passe incorrect.')
