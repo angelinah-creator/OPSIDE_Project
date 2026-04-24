@@ -65,9 +65,58 @@ export default function LandingPage() {
         </section>
 
         {/* --- HOW IT WORKS SECTION --- */}
-        <section id="how-it-works" className="py-24 md:py-32 bg-[#FAFAFA]">
+        {/* <section id="how-it-works" className="py-24 md:py-32 bg-[#FAFAFA]">
           <FadeIn delay={100} className="max-w-4xl mx-auto px-4 text-center mb-10 md:mb-18">
             <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight text-[#1A1A1A]">Comment ça marche</h2>
+            <p className="text-[#6B6B6B] text-lg">Trois étapes simples pour constituer votre équipe tech en Afrique.</p>
+          </FadeIn>
+
+          <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <FadeIn delay={200}>
+              <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group hover:-translate-y-2 duration-300 h-full">
+                <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors group-hover:scale-110 duration-300 mx-auto">
+                  <Search className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
+                </div>
+                <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 1</p>
+                <h3 className="text-2xl font-bold mb-4 text-[#1A1A1A]">Match</h3>
+                <p className="text-[#6B6B6B] leading-relaxed">
+                  Décrivez votre besoin. Notre algorithme identifie les meilleurs profils en Afrique francophone.
+                </p>
+              </div>
+            </FadeIn>
+
+            <FadeIn delay={400}>
+              <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group hover:-translate-y-2 duration-300 h-full">
+                <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors group-hover:scale-110 duration-300 mx-auto">
+                  <ShieldCheck className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
+                </div>
+                <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 2</p>
+                <h3 className="text-2xl font-bold mb-4 text-[#1A1A1A]">Test</h3>
+                <p className="text-[#6B6B6B] leading-relaxed">
+                  Chaque candidat passe un test technique rigoureux adapté à votre stack.
+                </p>
+              </div>
+            </FadeIn>
+
+            <FadeIn delay={600}>
+              <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group hover:-translate-y-2 duration-300 h-full">
+                <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors group-hover:scale-110 duration-300 mx-auto">
+                  <CheckCircle className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
+                </div>
+                <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 3</p>
+                <h3 className="text-2xl font-bold mb-4 text-[#1A1A1A]">Hire</h3>
+                <p className="text-[#6B6B6B] leading-relaxed">
+                  Intégrez votre développeur en 72h. Nous gérons contrats, paie et conformité.
+                </p>
+              </div>
+            </FadeIn>
+          </div>
+        </section> */}
+
+        {/* --- HOW IT WORKS SECTION --- */}
+        <section id="how-it-works" className="py-24 md:py-32 bg-[#FAFAFA]">
+          <FadeIn delay={100} className="max-w-4xl mx-auto px-4 text-center mb-10 md:mb-18">
+            <h2 className="text-3xl md:text-4xl font-black mb-3 tracking-tight text-[#1A1A1A]">Comment ça marche</h2>
             <p className="text-[#6B6B6B] text-lg">Trois étapes simples pour constituer votre équipe tech en Afrique.</p>
           </FadeIn>
 
@@ -126,40 +175,54 @@ export default function LandingPage() {
         </section>
 
         {/* --- STATS SECTION --- */}
-        <section id="stats" className="py-14 md:py-22 bg-white">
-          <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8">
-            <FadeIn delay={100} className="text-center group cursor-default">
-              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4 inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">50+</p>
-              <p className="text-[#6B6B6B] font-medium group-hover:text-[#1A1A1A] transition-colors duration-300">Développeurs vérifiés</p>
-            </FadeIn>
-            <FadeIn delay={300} className="text-center group cursor-default">
-              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4 inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">3</p>
-              <p className="text-[#6B6B6B] font-medium group-hover:text-[#1A1A1A] transition-colors duration-300">Marchés africains</p>
-            </FadeIn>
-            <FadeIn delay={500} className="text-center group cursor-default">
-              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4 tracking-tighter inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">&lt;72h</p>
-              <p className="text-[#6B6B6B] font-medium group-hover:text-[#1A1A1A] transition-colors duration-300">Temps de matching</p>
-            </FadeIn>
-            <FadeIn delay={700} className="text-center group cursor-default">
-              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4 inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">98%</p>
-              <p className="text-[#6B6B6B] font-medium group-hover:text-[#1A1A1A] transition-colors duration-300">Taux de satisfaction</p>
-            </FadeIn>
+        <section id="stats" className="py-14 md:py-24 px-4">
+          <div className="max-w-7xl mx-auto bg-[#1A1A1A] rounded-[2.5rem] md:rounded-[3.5rem] p-12 md:p-20 relative overflow-hidden shadow-2xl">
+            {/* Décoration d'arrière-plan (lueur subtile) */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-full max-h-lg bg-[#7f39ef] opacity-20 blur-[120px] rounded-full pointer-events-none" />
+            
+            <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-0 md:divide-x divide-white/10">
+              <FadeIn delay={100} className="text-center group cursor-default px-4">
+                <p className="text-4xl md:text-6xl font-black text-white leading-none mb-3 inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-500">50<span className="text-[#7f39ef]">++</span></p>
+                <p className="text-[#AEAEAE] font-medium group-hover:text-white transition-colors duration-300 uppercase tracking-widest text-xs md:text-sm">Développeurs vérifiés</p>
+              </FadeIn>
+              <FadeIn delay={300} className="text-center group cursor-default px-4">
+                <p className="text-4xl md:text-6xl font-black text-white leading-none mb-3 inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-500">03</p>
+                <p className="text-[#AEAEAE] font-medium group-hover:text-white transition-colors duration-300 uppercase tracking-widest text-xs md:text-sm">Marchés africains</p>
+              </FadeIn>
+              <FadeIn delay={500} className="text-center group cursor-default px-4">
+                <p className="text-4xl md:text-6xl font-black text-white leading-none mb-3 tracking-tighter inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-500"><span className="text-[#7f39ef] opacity-80">&lt;</span>72h</p>
+                <p className="text-[#AEAEAE] font-medium group-hover:text-white transition-colors duration-300 uppercase tracking-widest text-xs md:text-sm">Temps de matching</p>
+              </FadeIn>
+              <FadeIn delay={700} className="text-center group cursor-default px-4">
+                <p className="text-4xl md:text-6xl font-black text-white leading-none mb-3 inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-500">98<span className="text-[#7f39ef]">%</span></p>
+                <p className="text-[#AEAEAE] font-medium group-hover:text-white transition-colors duration-300 uppercase tracking-widest text-xs md:text-sm">Taux de satisfaction</p>
+              </FadeIn>
+            </div>
           </div>
         </section>
 
         {/* --- CTA SECTION --- */}
-        <section id="cta" className="py-24 px-4">
-          <FadeIn delay={200} className="max-w-4xl mx-auto bg-white rounded-[2.5rem] p-12 md:p-24 border border-[#F0F0F0] text-center shadow-elevated shadow-accent/25 relative overflow-hidden">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight text-[#1A1A1A]">Prêt à scaler votre équipe ?</h2>
-            <p className="text-[#6B6B6B] text-md md:text-lg mb-12 max-w-xl mx-auto">
+        <section id="cta" className="py-24 md:py-32 px-4 relative overflow-hidden">
+          {/* Formes d'arrière-plan abstraites */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-[#F3EEFF] rounded-full blur-3xl opacity-70 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-[#E0D4FF] rounded-full blur-3xl opacity-50 pointer-events-none" />
+          
+          <FadeIn delay={200} className="max-w-5xl mx-auto text-center relative z-10">
+            <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 tracking-tight text-[#1A1A1A] leading-[1.1]">
+              Prêt à scaler <br className="hidden md:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7f39ef] to-[#c026d3]">votre équipe ?</span>
+            </h2>
+            <p className="text-[#6B6B6B] text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
               Rejoignez les entreprises qui construisent avec les meilleurs talents africains.
             </p>
-            <Link href="#">
-              <Button variant="gradient" size="lg" className="rounded-full px-12 group hover:scale-105 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                Demander une démo
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="#">
+                <Button variant="gradient" size="lg" className="rounded-full px-12 py-6 text-lg group hover:scale-105 hover:shadow-2xl hover:shadow-[#7f39ef]/25 hover:-translate-y-1 transition-all duration-300">
+                  Demander une démo
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
+                </Button>
+              </Link>
+            </div>
           </FadeIn>
         </section>
       </main>
