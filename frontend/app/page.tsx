@@ -71,45 +71,54 @@ export default function LandingPage() {
             <p className="text-[#6B6B6B] text-lg">Trois étapes simples pour constituer votre équipe tech en Afrique.</p>
           </FadeIn>
 
-          <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="max-w-5xl mx-auto px-4 flex flex-col gap-16 md:gap-24 relative mt-12">
+            {/* Ligne de connexion verticale subtile */}
+            <div className="hidden md:block absolute left-1/2 top-10 bottom-10 w-px bg-gradient-to-b from-transparent via-[#7C3AED]/20 to-transparent -translate-x-1/2" />
+
             {/* Step 1 */}
-            <FadeIn delay={200}>
-              <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group hover:-translate-y-2 duration-300 h-full">
-                <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors group-hover:scale-110 duration-300 mx-auto">
-                  <Search className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
+            <FadeIn delay={200} className="relative flex flex-col md:flex-row items-center gap-8 md:gap-16 group">
+              <div className="md:w-1/2 flex justify-center md:justify-end relative">
+                <div className="relative flex items-center justify-center">
+                  <span className="text-[10rem] md:text-[12rem] leading-none font-black text-transparent bg-clip-text bg-gradient-to-br from-[#F5F5F5] to-[#EAEAEA] group-hover:from-[#F3EEFF] group-hover:to-[#E0D4FF] transition-all duration-700 select-none md:-mr-4">01</span>
                 </div>
-                <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 1</p>
-                <h3 className="text-2xl font-bold mb-4 text-[#1A1A1A]">Match</h3>
-                <p className="text-[#6B6B6B] leading-relaxed">
-                  Décrivez votre besoin. Notre algorithme identifie les meilleurs profils en Afrique francophone.
+              </div>
+              <div className="md:w-1/2 text-center md:text-left z-10">
+                <div className="inline-block px-4 py-1.5 rounded-full bg-[#F3EEFF] text-[#7C3AED] text-xs font-bold uppercase tracking-widest mb-4">Phase 1</div>
+                <h3 className="text-3xl md:text-4xl font-black mb-4 text-[#1A1A1A]">Le Match Idéal</h3>
+                <p className="text-[#6B6B6B] text-lg leading-relaxed">
+                  Décrivez précisément votre besoin. Notre algorithme exclusif identifie instantanément les meilleurs profils en Afrique francophone, taillés pour votre culture d'entreprise.
                 </p>
               </div>
             </FadeIn>
 
             {/* Step 2 */}
-            <FadeIn delay={400}>
-              <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group hover:-translate-y-2 duration-300 h-full">
-                <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors group-hover:scale-110 duration-300 mx-auto">
-                  <ShieldCheck className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
+            <FadeIn delay={300} className="relative flex flex-col md:flex-row-reverse items-center gap-8 md:gap-16 group">
+              <div className="md:w-1/2 flex justify-center md:justify-start relative">
+                <div className="relative flex items-center justify-center">
+                  <span className="text-[10rem] md:text-[12rem] leading-none font-black text-transparent bg-clip-text bg-gradient-to-br from-[#F5F5F5] to-[#EAEAEA] group-hover:from-[#F3EEFF] group-hover:to-[#E0D4FF] transition-all duration-700 select-none md:-ml-4">02</span>
                 </div>
-                <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 2</p>
-                <h3 className="text-2xl font-bold mb-4 text-[#1A1A1A]">Test</h3>
-                <p className="text-[#6B6B6B] leading-relaxed">
-                  Chaque candidat passe un test technique rigoureux adapté à votre stack.
+              </div>
+              <div className="md:w-1/2 text-center md:text-right z-10">
+                <div className="inline-block px-4 py-1.5 rounded-full bg-[#F3EEFF] text-[#7C3AED] text-xs font-bold uppercase tracking-widest mb-4">Phase 2</div>
+                <h3 className="text-3xl md:text-4xl font-black mb-4 text-[#1A1A1A]">Tests Techniques</h3>
+                <p className="text-[#6B6B6B] text-lg leading-relaxed">
+                  Finies les mauvaises surprises. Chaque candidat sélectionné passe un test technique de haut niveau, rigoureusement adapté à votre stack technologique.
                 </p>
               </div>
             </FadeIn>
 
             {/* Step 3 */}
-            <FadeIn delay={600}>
-              <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group hover:-translate-y-2 duration-300 h-full">
-                <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors group-hover:scale-110 duration-300 mx-auto">
-                  <CheckCircle className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
+            <FadeIn delay={400} className="relative flex flex-col md:flex-row items-center gap-8 md:gap-16 group">
+              <div className="md:w-1/2 flex justify-center md:justify-end relative">
+                <div className="relative flex items-center justify-center">
+                  <span className="text-[10rem] md:text-[12rem] leading-none font-black text-transparent bg-clip-text bg-gradient-to-br from-[#F5F5F5] to-[#EAEAEA] group-hover:from-[#F3EEFF] group-hover:to-[#E0D4FF] transition-all duration-700 select-none md:-mr-4">03</span>
                 </div>
-                <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 3</p>
-                <h3 className="text-2xl font-bold mb-4 text-[#1A1A1A]">Hire</h3>
-                <p className="text-[#6B6B6B] leading-relaxed">
-                  Intégrez votre développeur en 72h. Nous gérons contrats, paie et conformité.
+              </div>
+              <div className="md:w-1/2 text-center md:text-left z-10">
+                <div className="inline-block px-4 py-1.5 rounded-full bg-[#7C3AED]/10 text-[#7C3AED] text-xs font-bold uppercase tracking-widest mb-4">Phase 3</div>
+                <h3 className="text-3xl md:text-4xl font-black mb-4 text-[#1A1A1A]">Intégration Express</h3>
+                <p className="text-[#6B6B6B] text-lg leading-relaxed">
+                  Votre nouveau développeur est prêt à coder en <span className="font-bold text-[#1A1A1A]">72h</span>. Concentrez-vous sur votre produit, nous gérons l'intégralité des contrats, de la paie et de la conformité légale.
                 </p>
               </div>
             </FadeIn>
