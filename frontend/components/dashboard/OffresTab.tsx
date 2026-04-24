@@ -533,7 +533,7 @@ export default function OffresTab() {
           {paginatedOffers.map((offer) => (
             <div 
               key={offer.id} 
-              className="bg-white rounded-[2rem] p-7 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full"
+              className="bg-white rounded-[2rem] p-5 md:p-7 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full"
             >
               <div className="flex justify-between items-start mb-5">
                 <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full">
@@ -635,13 +635,13 @@ export default function OffresTab() {
             <ChevronLeft className="w-5 h-5" />
           </button>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
             {[...Array(totalPages)].map((_, i) => (
               <button
                 key={i}
                 onClick={() => { setCurrentPage(i + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                 className={clsx(
-                  "w-10 h-10 rounded-xl font-bold text-sm transition-all shadow-sm border",
+                  "w-8 h-8 md:w-10 md:h-10 rounded-xl font-bold text-xs md:text-sm transition-all shadow-sm border",
                   currentPage === i + 1 
                     ? "bg-accent border-accent text-white shadow-lg shadow-accent/20" 
                     : "bg-white border-slate-100 text-slate-600 hover:border-slate-300"

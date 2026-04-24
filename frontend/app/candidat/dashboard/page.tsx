@@ -13,7 +13,9 @@ import {
   History, 
   Bell, 
   BookOpen, 
-  Search
+  Search,
+  Menu,
+  X
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -34,6 +36,7 @@ export default function CandidatDashboard() {
   const [latestScore, setLatestScore] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('technique');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,24 +106,45 @@ export default function CandidatDashboard() {
     : null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex">
+    <div className="min-h-screen bg-[#F8FAFC] flex relative overflow-hidden">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-72 bg-white border-r border-slate-200 flex flex-col sticky top-0 h-screen">
-        <div className="p-8">
+      <aside className={clsx(
+        "w-72 bg-white border-r border-slate-200 flex flex-col fixed lg:sticky top-0 h-[100dvh] z-50 transition-transform duration-300 ease-in-out",
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
+        <div className="p-6 lg:p-8 flex items-center justify-between">
           <img src="/logo.webp" alt="OPSIDE" className="w-32" />
+          <button 
+            className="lg:hidden p-2 -mr-2 text-slate-500 hover:bg-slate-50 rounded-xl transition-colors"
+            onClick={() => setIsSidebarOpen(false)}
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
-        <nav className="flex-1 px-4 space-y-1">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={clsx(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 group text-left",
-                activeTab === item.id 
-                  ? "bg-accent text-white shadow-lg shadow-accent/20" 
-                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-              )}
+        <div className="flex-1 overflow-y-auto px-4 py-2">
+          <nav className="space-y-1">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  setActiveTab(item.id);
+                  setIsSidebarOpen(false); // Close sidebar on mobile when tab changes
+                }}
+                className={clsx(
+                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 group text-left",
+                  activeTab === item.id 
+                    ? "bg-accent text-white shadow-lg shadow-accent/20" 
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                )}
             >
               <item.icon className={clsx(
                 "w-5 h-5",
@@ -135,8 +159,9 @@ export default function CandidatDashboard() {
             </button>
           ))}
         </nav>
+        </div>
 
-        <div className="p-4 mt-auto">
+        <div className="p-4 mt-auto border-t border-slate-100 lg:border-none">
           <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-sm overflow-hidden">
@@ -163,14 +188,19 @@ export default function CandidatDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-10 overflow-y-auto">
-        <header className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
-          <div className="text-left">
-            <h1 className="text-3xl font-black text-slate-900 mb-1">
+      <main className="flex-1 w-full min-w-0 h-[100dvh] overflow-y-auto">
+        <div className="p-4 md:p-10 w-full">
+          <header className="flex items-center gap-4 mb-8 md:mb-10">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2.5 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm transition-colors shrink-0"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <h1 className="text-2xl md:text-3xl font-black text-slate-900 truncate">
               {navItems.find(n => n.id === activeTab)?.label}
             </h1>
-          </div>
-        </header>
+          </header>
 
         {/* Tab Content */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -180,6 +210,7 @@ export default function CandidatDashboard() {
           {activeTab === 'profil' && <ProfilTab profile={profile} user={user} />}
           {activeTab === 'notifications' && <NotificationsTab />}
           {activeTab === 'aide' && <AideTab />}
+        </div>
         </div>
       </main>
     </div>
