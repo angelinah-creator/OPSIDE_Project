@@ -47,12 +47,12 @@ export default function LandingPage() {
         <section className="py-12 border-y border-[#F0F0F0]">
           <div className="max-w-7xl mx-auto px-4 text-center">
             <p className="text-sm font-medium text-[#AEAEAE] uppercase tracking-widest mb-10">Ils nous font confiance</p>
-            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-40 grayscale">
-              <span className="text-2xl font-bold italic tracking-tighter">TechCorp</span>
-              <span className="text-2xl font-bold tracking-tight">InnovateLab</span>
-              <span className="text-2xl font-black">DataFlow</span>
-              <span className="text-2xl font-semibold tracking-wide">CloudSync</span>
-              <span className="text-2xl font-mono">CodeBase</span>
+            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20">
+              <span className="text-2xl font-bold italic tracking-tighter opacity-40 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-110 transition-all duration-300 cursor-pointer">TechCorp</span>
+              <span className="text-2xl font-bold tracking-tight opacity-40 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-110 transition-all duration-300 cursor-pointer">InnovateLab</span>
+              <span className="text-2xl font-black opacity-40 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-110 transition-all duration-300 cursor-pointer">DataFlow</span>
+              <span className="text-2xl font-semibold tracking-wide opacity-40 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-110 transition-all duration-300 cursor-pointer">CloudSync</span>
+              <span className="text-2xl font-mono opacity-40 grayscale hover:grayscale-0 hover:opacity-100 hover:scale-110 transition-all duration-300 cursor-pointer">CodeBase</span>
             </div>
           </div>
         </section>
@@ -106,21 +106,21 @@ export default function LandingPage() {
         {/* --- STATS SECTION --- */}
         <section id="stats" className="py-14 md:py-22 bg-white">
           <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-8">
-            <div className="text-center">
-              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4">50+</p>
-              <p className="text-[#6B6B6B] font-medium">Développeurs vérifiés</p>
+            <div className="text-center group cursor-default">
+              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4 inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">50+</p>
+              <p className="text-[#6B6B6B] font-medium group-hover:text-[#1A1A1A] transition-colors duration-300">Développeurs vérifiés</p>
             </div>
-            <div className="text-center">
-              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4">3</p>
-              <p className="text-[#6B6B6B] font-medium">Marchés africains</p>
+            <div className="text-center group cursor-default">
+              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4 inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">3</p>
+              <p className="text-[#6B6B6B] font-medium group-hover:text-[#1A1A1A] transition-colors duration-300">Marchés africains</p>
             </div>
-            <div className="text-center">
-              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4 tracking-tighter">&lt;72h</p>
-              <p className="text-[#6B6B6B] font-medium">Temps de matching</p>
+            <div className="text-center group cursor-default">
+              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4 tracking-tighter inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">&lt;72h</p>
+              <p className="text-[#6B6B6B] font-medium group-hover:text-[#1A1A1A] transition-colors duration-300">Temps de matching</p>
             </div>
-            <div className="text-center">
-              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4">98%</p>
-              <p className="text-[#6B6B6B] font-medium">Taux de satisfaction</p>
+            <div className="text-center group cursor-default">
+              <p className="text-3xl md:text-5xl font-black text-[#7f39ef] leading-none mb-4 inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-300">98%</p>
+              <p className="text-[#6B6B6B] font-medium group-hover:text-[#1A1A1A] transition-colors duration-300">Taux de satisfaction</p>
             </div>
           </div>
         </section>

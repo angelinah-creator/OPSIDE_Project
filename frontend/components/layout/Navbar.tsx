@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import Logo from '@/components/ui/Logo';
 import Button from '@/components/ui/Button';
 
 export default function Navbar() {
@@ -47,7 +46,6 @@ export default function Navbar() {
 
           {/* Right Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            {!user ? (
               <>
                 <Link href="/auth/login">
                   <Button variant="ghost" size="sm" className="font-medium">Se connecter</Button>
@@ -56,16 +54,6 @@ export default function Navbar() {
                   <Button variant="gradient" size="sm" className="text-[#1A1A1A] border-none shadow-none font-medium">S'inscrire</Button>
                 </Link>
               </>
-            ) : (
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-[#6B6B6B]">
-                  {user.first_name || user.email}
-                </span>
-                <Link href={dashboardUrl}>
-                  <Button variant="gradient" size="sm" className="font-medium">Accéder au Dashboard</Button>
-                </Link>
-              </div>
-            )}
           </div>
 
           {/* Mobile menu button */}
