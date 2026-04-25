@@ -113,4 +113,8 @@ export class UploadService {
   async deleteFile(publicId: string): Promise<void> {
     await cloudinary.uploader.destroy(publicId);
   }
+
+  async deleteVideo(publicId: string): Promise<void> {
+    await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
+  }
 }

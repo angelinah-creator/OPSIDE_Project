@@ -356,3 +356,15 @@ model Test {
 
   @@map("tests")
 }
+
+model Video {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  url         String
+  public_id   String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("videos")
+}

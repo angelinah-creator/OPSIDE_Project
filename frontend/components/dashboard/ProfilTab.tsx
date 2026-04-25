@@ -36,35 +36,35 @@ export default function ProfilTab({ user, profile }: ProfilTabProps) {
       <div className="lg:col-span-2 space-y-8">
         
         {/* Header Card / Basic Info */}
-        <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-accent/5 rounded-full -mr-20 -mt-20 blur-3xl" />
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 md:w-40 md:h-40 bg-accent/5 rounded-full -mr-16 -mt-16 md:-mr-20 md:-mt-20 blur-3xl" />
           
-          <button className="absolute top-6 right-6 p-2 rounded-xl bg-slate-50 text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm z-20">
+          <button className="absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-xl bg-slate-50 text-slate-400 lg:opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm z-20">
             <Pencil className="w-4 h-4" />
           </button>
           
-          <div className="flex flex-col md:flex-row items-center gap-8 mb-10 pb-10 border-b border-slate-50 relative z-10">
+          <div className="flex flex-col sm:flex-row items-center gap-6 md:gap-8 mb-8 md:mb-10 pb-8 md:pb-10 border-b border-slate-50 relative z-10">
             <div className="relative shrink-0">
-              <div className="w-32 h-32 rounded-3xl bg-accent text-white flex items-center justify-center text-5xl font-black overflow-hidden shadow-2xl shadow-accent/20">
+              <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-accent text-white flex items-center justify-center text-4xl md:text-5xl font-black overflow-hidden shadow-2xl shadow-accent/20">
                 {photoUrl ? (
                   <img src={photoUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
                   user?.first_name?.[0] || 'U'
                 )}
               </div>
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 border-4 border-white rounded-full" />
+              <div className="absolute -bottom-2 -right-2 w-6 h-6 md:w-8 md:h-8 bg-green-500 border-4 border-white rounded-full" />
             </div>
             
-            <div className="text-center md:text-left flex-1 min-w-0">
-              <h2 className="text-3xl font-black text-slate-900 mb-2 truncate">
+            <div className="text-center sm:text-left flex-1 min-w-0 w-full">
+              <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-1 md:mb-2 truncate">
                 {user?.first_name} {user?.last_name}
               </h2>
-              <p className="text-accent font-bold text-lg mb-4 truncate text-uppercase tracking-wide">
+              <p className="text-accent font-bold text-sm md:text-lg mb-3 md:mb-4 truncate uppercase tracking-wide">
                 {profile?.title || profile?.speciality || 'Développeur Tech'}
               </p>
-              <div className="flex flex-wrap justify-center md:justify-start gap-2">
+              <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 md:gap-2">
                 {profile?.skills?.slice(0, 5).map((s: any, i: number) => (
-                  <span key={i} className="px-3 py-1 bg-slate-50 text-slate-500 rounded-lg text-[10px] font-bold uppercase tracking-tight">
+                  <span key={i} className="px-2 md:px-3 py-1 bg-slate-50 text-slate-500 rounded-lg text-[9px] md:text-[10px] font-bold uppercase tracking-tight">
                     {s.name}
                   </span>
                 ))}
@@ -140,33 +140,33 @@ export default function ProfilTab({ user, profile }: ProfilTabProps) {
         </div>
 
         {/* Bio Section */}
-        <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm relative group">
-          <button className="absolute top-6 right-6 p-2 rounded-xl bg-slate-50 text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm">
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm relative group">
+          <button className="absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-xl bg-slate-50 text-slate-400 lg:opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm">
             <Pencil className="w-4 h-4" />
           </button>
-          <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+          <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-4 md:mb-6 flex items-center gap-2">
             À propos
           </h2>
-          <p className="text-slate-600 leading-relaxed text-base italic">
+          <p className="text-slate-600 leading-relaxed text-sm md:text-base italic">
             {profile?.bio || `Passionné par le développement tech, je mets mes ${profile?.experience_years || 0} ans d'expérience au service de projets innovants et scalables.`}
           </p>
         </div>
 
         {/* Experiences Section */}
-        <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm relative group">
-          <button className="absolute top-6 right-6 p-2 rounded-xl bg-slate-50 text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm">
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm relative group">
+          <button className="absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-xl bg-slate-50 text-slate-400 lg:opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm">
             <Pencil className="w-4 h-4" />
           </button>
-          <h2 className="text-xl font-bold text-slate-900 mb-8 flex items-center gap-3">
-            <Briefcase className="w-6 h-6 text-accent" /> Expériences professionnelles
+          <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-6 md:mb-8 flex items-center gap-2 md:gap-3">
+            <Briefcase className="w-5 h-5 md:w-6 md:h-6 text-accent" /> Expériences professionnelles
           </h2>
           
-          <div className="space-y-10 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
+          <div className="space-y-8 md:space-y-10 relative before:absolute before:left-[15px] md:before:left-[19px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
             {profile?.experiences?.length > 0 ? (
               profile.experiences.map((exp: any, i: number) => (
-                <div key={i} className="relative pl-12 flex flex-col md:flex-row gap-4 md:gap-8 group/item">
-                  <div className="absolute left-0 top-1 w-10 h-10 rounded-full bg-white border-4 border-slate-100 flex items-center justify-center z-10 group-hover/item:border-accent transition-colors">
-                    <div className="w-2 h-2 rounded-full bg-slate-200 group-hover/item:bg-accent transition-colors" />
+                <div key={i} className="relative pl-10 md:pl-12 flex flex-col md:flex-row gap-3 md:gap-8 group/item">
+                  <div className="absolute left-0 top-1 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white border-4 border-slate-100 flex items-center justify-center z-10 group-hover/item:border-accent transition-colors">
+                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-slate-200 group-hover/item:bg-accent transition-colors" />
                   </div>
                   
                   <div className="flex-1">
@@ -197,20 +197,20 @@ export default function ProfilTab({ user, profile }: ProfilTabProps) {
         </div>
 
         {/* Educations Section */}
-        <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm relative group">
-          <button className="absolute top-6 right-6 p-2 rounded-xl bg-slate-50 text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm">
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm relative group">
+          <button className="absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-xl bg-slate-50 text-slate-400 lg:opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm">
             <Pencil className="w-4 h-4" />
           </button>
-          <h2 className="text-xl font-bold text-slate-900 mb-8 flex items-center gap-3">
-            <GraduationCap className="w-6 h-6 text-accent" /> Formations académiques
+          <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-6 md:mb-8 flex items-center gap-2 md:gap-3">
+            <GraduationCap className="w-5 h-5 md:w-6 md:h-6 text-accent" /> Formations académiques
           </h2>
           
-          <div className="space-y-10 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
+          <div className="space-y-8 md:space-y-10 relative before:absolute before:left-[15px] md:before:left-[19px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
             {profile?.educations?.length > 0 ? (
               profile.educations.map((edu: any, i: number) => (
-                <div key={i} className="relative pl-12 flex flex-col md:flex-row gap-4 md:gap-8 group/item">
-                  <div className="absolute left-0 top-1 w-10 h-10 rounded-full bg-white border-4 border-slate-100 flex items-center justify-center z-10 group-hover/item:border-accent transition-colors">
-                    <div className="w-2 h-2 rounded-full bg-slate-200 group-hover/item:bg-accent transition-colors" />
+                <div key={i} className="relative pl-10 md:pl-12 flex flex-col md:flex-row gap-3 md:gap-8 group/item">
+                  <div className="absolute left-0 top-1 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white border-4 border-slate-100 flex items-center justify-center z-10 group-hover/item:border-accent transition-colors">
+                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-slate-200 group-hover/item:bg-accent transition-colors" />
                   </div>
                   
                   <div className="flex-1">
@@ -264,26 +264,6 @@ export default function ProfilTab({ user, profile }: ProfilTabProps) {
             {!profile?.linkedin_url && !profile?.portfolio_url && (
               <p className="text-xs text-slate-400 text-center italic">Aucun lien ajouté</p>
             )}
-          </div>
-        </div>
-
-        {/* Documents */}
-        <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm relative group">
-          <button className="absolute top-6 right-6 p-2 rounded-xl bg-slate-50 text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm">
-            <Pencil className="w-4 h-4" />
-          </button>
-          <h3 className="font-bold text-slate-900 mb-6 uppercase text-xs tracking-widest">Documents</h3>
-          <div className="space-y-4">
-            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between hover:border-accent transition-colors cursor-pointer group/doc">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 font-black text-xs shrink-0">PDF</div>
-                <div className="min-w-0">
-                  <p className="text-sm font-bold text-slate-900 truncate">CV_{user?.last_name || 'Candidat'}.pdf</p>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase truncate">Mis à jour récemment</p>
-                </div>
-              </div>
-              <ExternalLink className="w-4 h-4 text-slate-300 group-hover/doc:text-accent" />
-            </div>
           </div>
         </div>
 

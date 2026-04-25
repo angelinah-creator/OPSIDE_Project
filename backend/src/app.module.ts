@@ -13,6 +13,7 @@ import { TestModule } from './test/test.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { validateEnvironment } from './config/validate-environment';
+import { VideosModule } from './videos/videos.module';
 
 validateEnvironment();
 
@@ -37,6 +38,7 @@ validateEnvironment();
     UploadModule,
     MailModule,
     TestModule,
+    VideosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

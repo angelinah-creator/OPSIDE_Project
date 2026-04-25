@@ -1,64 +1,99 @@
 'use client';
 
-import { MessageSquare, Search, Code2, ExternalLink, BookOpen, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { videoApi } from '@/lib/video-service';
+import { Play, X } from 'lucide-react';
+
+interface Video {
+  id: string;
+  title: string;
+  description?: string;
+  url: string;
+  created_at: string;
+}
 
 export default function AideTab() {
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [watchVideoUrl, setWatchVideoUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const data = await videoApi.getAll();
+        setVideos(data);
+      } catch (error) {
+        console.error('Error fetching videos', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVideos();
+  }, []);
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('fr-FR', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="animate-pulse grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1,2,3].map(i => <div key={i} className="h-64 bg-slate-100 rounded-[2rem]" />)}
+      </div>
+    );
+  }
+
+  if (videos.length === 0) {
+    return (
+      <div className="bg-white p-10 rounded-[2rem] border border-slate-200 text-center text-slate-500">
+        Aucune vidéo d'aide n'est disponible pour le moment.
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
-      <div className="space-y-8">
-        <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
-          <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-            <MessageSquare className="w-6 h-6 text-accent" /> Conseils Entretien
-          </h2>
-          <div className="space-y-6">
-            {[
-              { q: 'Comment présenter son test ?', d: 'Expliquez vos choix d\'architecture et les compromis faits durant le test technique.' },
-              { q: 'Questions soft skills', d: 'Préparez des exemples concrets de collaboration et de résolution de conflits.' },
-              { q: 'Négociation salariale', d: 'Connaissez votre valeur marché basée sur vos scores OPSIDE.' }
-            ].map((item, i) => (
-              <div key={i} className="group">
-                <h3 className="font-bold text-slate-800 mb-2 group-hover:text-accent transition-colors flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 bg-accent rounded-full" /> {item.q}
-                </h3>
-                <p className="text-sm text-slate-500 leading-relaxed">{item.d}</p>
+    <div className="text-left">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {videos.map(vid => (
+          <div key={vid.id} className="bg-white border border-slate-100 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full group">
+            <div className="relative bg-slate-900 aspect-video flex items-center justify-center cursor-pointer"
+                 onClick={() => setWatchVideoUrl(vid.url)}>
+              <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                <Play className="w-6 h-6 text-white ml-1" />
               </div>
-            ))}
+            </div>
+            <div className="p-6 md:p-8 flex-1 flex flex-col">
+              <h3 className="font-bold text-slate-900 mb-2 text-lg leading-tight group-hover:text-accent transition-colors">{vid.title}</h3>
+              <p className="text-sm text-slate-500 mb-6 flex-1 line-clamp-3">{vid.description}</p>
+              <div className="pt-4 border-t border-slate-50 mt-auto">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{formatDate(vid.created_at)}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Watch Modal */}
+      {watchVideoUrl && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md">
+          <button 
+            onClick={() => setWatchVideoUrl(null)} 
+            className="absolute top-6 right-6 text-white/50 hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <div className="w-full max-w-5xl aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl">
+            <video 
+              src={watchVideoUrl} 
+              controls 
+              autoPlay 
+              className="w-full h-full"
+            />
           </div>
         </div>
-
-        <div className="bg-accent rounded-3xl p-8 text-white shadow-xl shadow-accent/20">
-          <h3 className="text-lg font-bold mb-4">Besoin d'un coach ?</h3>
-          <p className="text-white/80 text-sm mb-6">Prenez rendez-vous avec un expert pour une simulation d'entretien technique.</p>
-          <button className="w-full bg-white text-accent py-3 rounded-xl font-bold text-sm hover:shadow-lg transition-all">
-            Réserver une séance (Privilège)
-          </button>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm h-fit">
-        <h2 className="text-xl font-bold text-slate-900 mb-6 font-bold">Ressources Utiles</h2>
-        <div className="divide-y divide-slate-50">
-          {[
-            { t: 'Guide React 19 & Next.js', duration: '12 min', icon: Search },
-            { t: 'Top 50 Questions Algorithmes', duration: '25 min', icon: Code2 },
-            { t: 'Réussir son Live Coding', duration: '15 min', icon: ExternalLink },
-            { t: 'Le guide du Clean Code', duration: '10 min', icon: BookOpen },
-          ].map((r, i) => (
-            <div key={i} className="py-4 flex items-center justify-between group cursor-pointer hover:bg-slate-50 px-2 rounded-lg transition-colors">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-accent/10 group-hover:text-accent transition-colors">
-                  <r.icon className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-900">{r.t}</p>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase">{r.duration} de lecture</p>
-                </div>
-              </div>
-              <ChevronRight className="w-5 h-5 text-slate-300 group-hover:translate-x-1 transition-all" />
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
     </div>
   );
 }
