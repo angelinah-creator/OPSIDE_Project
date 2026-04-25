@@ -26,7 +26,7 @@ export default function LandingPage() {
             {/* Subtitle */}
             <FadeIn delay={300}>
               <p className="text-md md:text-lg text-[#6B6B6B] max-w-2xl mx-auto mb-10 leading-relaxed">
-                OPSIDE connecte les entreprises aux talents tech d'Afrique francophone. 
+                OPSIDE connecte les entreprises aux talents tech d'Afrique francophone.
                 Matching, tests techniques, contrats et paie — tout est géré.
               </p>
             </FadeIn>
@@ -179,7 +179,7 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto bg-[#1A1A1A] rounded-[2.5rem] md:rounded-[3.5rem] p-12 md:p-20 relative overflow-hidden shadow-2xl">
             {/* Décoration d'arrière-plan (lueur subtile) */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-full max-h-lg bg-[#7f39ef] opacity-20 blur-[120px] rounded-full pointer-events-none" />
-            
+
             <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-0 md:divide-x divide-white/10">
               <FadeIn delay={100} className="text-center group cursor-default px-4">
                 <p className="text-4xl md:text-6xl font-black text-white leading-none mb-3 inline-block group-hover:scale-110 group-hover:-translate-y-1 transition-transform duration-500">50<span className="text-[#7f39ef]">++</span></p>
@@ -206,20 +206,20 @@ export default function LandingPage() {
           {/* Formes d'arrière-plan abstraites */}
           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-[#F3EEFF] rounded-full blur-3xl opacity-70 pointer-events-none" />
           <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-[#E0D4FF] rounded-full blur-3xl opacity-50 pointer-events-none" />
-          
+
           <FadeIn delay={200} className="max-w-5xl mx-auto text-center relative z-10">
             <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-6 tracking-tight text-[#1A1A1A] leading-[1.1]">
               Prêt à scaler <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7f39ef] to-[#c026d3]">votre équipe ?</span>
+              <span className="text-[#7f39ef]">votre équipe ?</span>
             </h2>
             <p className="text-[#6B6B6B] text-lg md:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
               Rejoignez les entreprises qui construisent avec les meilleurs talents africains.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="#">
-                <Button variant="gradient" size="lg" className="rounded-full px-12 py-6 text-lg group hover:scale-105 hover:shadow-2xl hover:shadow-[#7f39ef]/25 hover:-translate-y-1 transition-all duration-300">
-                  Demander une démo
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform duration-300" />
+                <Button variant="gradient" size="lg" className="rounded-full px-10 flex gap-2 group hover:scale-105 hover:shadow-xl transition-all duration-300">
+                    Demander une démo
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>
