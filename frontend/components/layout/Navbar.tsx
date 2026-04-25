@@ -37,11 +37,9 @@ export default function Navbar() {
             <Link href="/#stats" className="text-sm font-medium text-[#1A1A1A] hover:text-[#7C3AED] transition-colors">
               Chiffres
             </Link>
-            {user && (
-              <Link href={dashboardUrl} className="text-sm font-medium text-[#7C3AED] hover:text-[#6D28D9] transition-colors">
-                Mon Dashboard
-              </Link>
-            )}
+            <Link href={dashboardUrl} className="text-sm font-medium text-[#1A1A1A] hover:text-[#7C3AED] transition-colors">
+              Dashboard
+            </Link>
           </nav>
 
           {/* Right Buttons */}
@@ -79,7 +77,6 @@ export default function Navbar() {
           )}
           <hr className="border-[#F0F0F0]" />
           <div className="flex flex-col gap-3">
-            {!user ? (
               <>
                 <Link href="/auth/login" onClick={() => setOpen(false)}>
                   <Button variant="ghost" className="w-full justify-center">Se connecter</Button>
@@ -88,11 +85,6 @@ export default function Navbar() {
                   <Button variant="secondary" className="w-full justify-center">S'inscrire</Button>
                 </Link>
               </>
-            ) : (
-              <Link href={dashboardUrl} onClick={() => setOpen(false)}>
-                <Button variant="gradient" className="w-full justify-center">Accéder au Dashboard</Button>
-              </Link>
-            )}
           </div>
         </div>
       )}
