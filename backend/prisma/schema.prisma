@@ -189,6 +189,7 @@ model CandidateProfile {
   status             CandidateStatus  @default(open_to_work)
   linkedin_url       String?
   portfolio_url      String?
+  github_url         String?
   photo_url          String?
   profile_completed  Boolean          @default(false)
   created_at         DateTime         @default(now())

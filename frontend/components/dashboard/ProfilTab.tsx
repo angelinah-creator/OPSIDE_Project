@@ -5,7 +5,8 @@ import {
   ExternalLink, Mail, Phone, MapPin, Calendar, DollarSign, 
   Briefcase, GraduationCap, Pencil, Save, X, Plus, Trash2, 
   Camera, ImagePlus, ChevronLeft, ChevronRight, Check,
-  Globe
+  // Github,
+  Info
 } from 'lucide-react';
 import { candidateApi } from '@/lib/candidate-service';
 import Input from '@/components/ui/Input';
@@ -89,7 +90,7 @@ function MediaGallery({ medias, onDelete, editMode, onOpen }: {
   const visible = medias.filter(m => m.media_type === 'image' || m.media_type === 'video');
   if (!visible.length) return null;
   return (
-    <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+    <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 mt-3">
       {visible.map((m: any, idx: number) => (
         <div
           key={m.id}
@@ -124,7 +125,7 @@ function MediaGallery({ medias, onDelete, editMode, onOpen }: {
 function MediaPreviewRow({ previews, onRemove }: { previews: MediaPreview[]; onRemove: (i: number) => void }) {
   if (!previews.length) return null;
   return (
-    <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+    <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 mt-3">
       {previews.map((m, i) => (
         <div key={i} className="relative shrink-0 w-44 h-32 rounded-xl overflow-hidden bg-background border border-border group">
           {m.file.type.startsWith('image/')
@@ -183,16 +184,20 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
   const [gallery, setGallery] = useState<{ items: { url: string, type: string }[], index: number } | null>(null);
 
   // States for Editing
-  const [editProfile, setEditProfile] = useState(false);
+  const [editHero, setEditHero] = useState(false);
   const [heroForm, setHeroForm] = useState({ first_name: '', last_name: '', title: '' });
-  const [pf, setPf] = useState<any>({});
+
+  const [editInfo, setEditInfo] = useState(false);
+  const [infoForm, setInfoForm] = useState<any>({});
+
+  const [editSkills, setEditSkills] = useState(false);
   const [skillIds, setSkillIds] = useState<string[]>([]);
 
   const [editBio, setEditBio] = useState(false);
   const [bioForm, setBioForm] = useState('');
 
   const [editSocial, setEditSocial] = useState(false);
-  const [socialForm, setSocialForm] = useState({ linkedin_url: '', portfolio_url: '' });
+  const [socialForm, setSocialForm] = useState({ linkedin_url: '', portfolio_url: '', github_url: '' });
 
   // Exp & Edu
   const [editingExpId, setEditingExpId] = useState<string | null>(null);
@@ -243,39 +248,64 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     } catch { setError('Erreur suppression photo.'); }
   };
 
-  const startEditProfileInfo = () => {
-    setEditProfile(true);
+  // Hero
+  const startEditHero = () => {
+    setEditHero(true);
     setHeroForm({
       first_name: user?.first_name || '',
       last_name: user?.last_name || '',
       title: profile?.title || '',
     });
-    setPf({
+  };
+
+  const saveHero = async () => {
+    setSaving(true); setError('');
+    try {
+      await candidateApi.updateUserNames({ first_name: heroForm.first_name, last_name: heroForm.last_name });
+      await candidateApi.updateProfile({ title: heroForm.title });
+      await refresh();
+      setEditHero(false);
+      flash('Profil mis à jour !');
+    } catch { setError('Erreur mise à jour profil.'); } finally { setSaving(false); }
+  };
+
+  // Info
+  const startEditInfo = () => {
+    setEditInfo(true);
+    setInfoForm({
       country: profile?.country || '', city: profile?.city || '', speciality: profile?.speciality || '',
       experience_years: profile?.experience_years || '', daily_rate: profile?.daily_rate || '',
       currency: profile?.currency || 'EUR', availability: profile?.availability || 'immediate',
       phone: profile?.phone || ''
     });
-    setSkillIds(profile?.candidate_skills?.map((cs: any) => cs.skill.id) || []);
   };
 
-  const saveProfileInfo = async () => {
+  const saveInfo = async () => {
     setSaving(true); setError('');
     try {
-      await candidateApi.updateUserNames({ first_name: heroForm.first_name, last_name: heroForm.last_name });
       await candidateApi.updateProfile({
-        title: heroForm.title,
-        ...pf,
-        experience_years: Number(pf.experience_years),
-        daily_rate: Number(pf.daily_rate),
-        skill_ids: skillIds
+        ...infoForm,
+        experience_years: Number(infoForm.experience_years),
+        daily_rate: Number(infoForm.daily_rate)
       });
       await refresh();
-      setEditProfile(false);
-      flash('Profil mis à jour !');
-    } catch { setError('Erreur mise à jour profil.'); } finally { setSaving(false); }
+      setEditInfo(false);
+      flash('Informations mises à jour !');
+    } catch { setError('Erreur mise à jour infos.'); } finally { setSaving(false); }
   };
 
+  // Skills
+  const saveSkills = async () => {
+    setSaving(true); setError('');
+    try {
+      await candidateApi.updateProfile({ skill_ids: skillIds });
+      await refresh();
+      setEditSkills(false);
+      flash('Compétences mises à jour !');
+    } catch { setError('Erreur.'); } finally { setSaving(false); }
+  };
+
+  // Bio
   const saveBio = async () => {
     setSaving(true); setError('');
     try {
@@ -286,14 +316,19 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     } catch { setError('Erreur.'); } finally { setSaving(false); }
   };
 
+  // Social
   const saveSocial = async () => {
     setSaving(true); setError('');
     try {
-      await candidateApi.updateProfile({ linkedin_url: socialForm.linkedin_url, portfolio_url: socialForm.portfolio_url });
+      await candidateApi.updateProfile({ 
+        linkedin_url: socialForm.linkedin_url || undefined, 
+        portfolio_url: socialForm.portfolio_url || undefined,
+        github_url: socialForm.github_url || undefined 
+      });
       await refresh();
       setEditSocial(false);
       flash('Liens mis à jour !');
-    } catch { setError('Erreur.'); } finally { setSaving(false); }
+    } catch { setError('Erreur de mise à jour des liens.'); } finally { setSaving(false); }
   };
 
   // ── Experiences ──
@@ -344,19 +379,45 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
   // ── Educations ──
   const startEditEdu = (edu: any) => {
     setEditingEduId(edu.id); setEduNewMedia([]);
+    
+    // Déterminer le level pour l'édition (si autre)
+    let formLevel = edu.level;
+    let customLevel = '';
+    if (edu.level && edu.level !== 'bac' && edu.level !== 'bac_plus_2' && edu.level !== 'bac_plus_3' && edu.level !== 'bac_plus_5' && edu.level !== 'bac_plus_8') {
+      if (!LEVELS.find(l => l.value === edu.level)) {
+        formLevel = 'autre';
+        customLevel = edu.level;
+      }
+    }
+    
+    // Si la valeur reçue dans level était déjà 'autre', custom_level pourrait être dans custom_level (selon modèle BDD).
+    if (edu.level === 'autre' && edu.custom_level) {
+      customLevel = edu.custom_level;
+    }
+
     setEduForm({
-      school: edu.school, degree: edu.degree, field: edu.field || '', level: edu.level || 'bac_plus_3',
+      school: edu.school, degree: edu.degree, field: edu.field || '', level: formLevel || 'bac_plus_3',
+      custom_level: customLevel,
       description: edu.description || '', start_month: String(edu.start_month || ''), start_year: String(edu.start_year || ''),
       end_month: edu.end_month ? String(edu.end_month) : '', end_year: edu.end_year ? String(edu.end_year) : '',
       is_current: edu.is_current || false, skill_ids: edu.education_skills?.map((es: any) => es.skill.id) || [],
+      is_self_taught: edu.degree === 'Autodidacte' // Simple heuristique si le backend n'a pas de bool is_self_taught
     });
   };
 
   const saveEdu = async (id: string) => {
     setSaving(true); setError('');
     try {
+      const levelToSend = (eduForm.is_self_taught || eduForm.level === 'autre') ? 'autre' : eduForm.level;
+      const customLevelToSend = (!eduForm.is_self_taught && eduForm.level === 'autre') ? eduForm.custom_level : undefined;
+      const degreeToSend = eduForm.is_self_taught ? 'Autodidacte' : eduForm.degree;
+
       await candidateApi.updateEducation(id, {
-        ...eduForm, start_month: Number(eduForm.start_month), start_year: Number(eduForm.start_year),
+        ...eduForm, 
+        degree: degreeToSend,
+        level: levelToSend,
+        custom_level: customLevelToSend,
+        start_month: Number(eduForm.start_month), start_year: Number(eduForm.start_year),
         end_month: eduForm.end_month ? Number(eduForm.end_month) : undefined, end_year: eduForm.end_year ? Number(eduForm.end_year) : undefined,
       });
       for (const m of eduNewMedia) await candidateApi.uploadEducationMedia(id, m.file).catch(() => {});
@@ -370,11 +431,19 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
   };
 
   const addNewEdu = async () => {
-    if (!newEduForm.school || !newEduForm.degree || !newEduForm.start_year) return;
+    if (!newEduForm.school || (!newEduForm.is_self_taught && (!newEduForm.degree || !newEduForm.start_year))) return;
     setSaving(true); setError('');
     try {
+      const levelToSend = (newEduForm.is_self_taught || newEduForm.level === 'autre') ? 'autre' : newEduForm.level;
+      const customLevelToSend = (!newEduForm.is_self_taught && newEduForm.level === 'autre') ? newEduForm.custom_level : undefined;
+      const degreeToSend = newEduForm.is_self_taught ? 'Autodidacte' : newEduForm.degree;
+
       const res = await candidateApi.createEducation({
-        ...newEduForm, start_month: Number(newEduForm.start_month), start_year: Number(newEduForm.start_year),
+        ...newEduForm, 
+        degree: degreeToSend,
+        level: levelToSend,
+        custom_level: customLevelToSend,
+        start_month: Number(newEduForm.start_month), start_year: Number(newEduForm.start_year),
         end_month: newEduForm.end_month ? Number(newEduForm.end_month) : undefined, end_year: newEduForm.end_year ? Number(newEduForm.end_year) : undefined,
         skill_ids: newEduForm.skill_ids || [],
       });
@@ -431,17 +500,17 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
 
       <div className="lg:col-span-2 space-y-8">
         
-        {/* Header Card / Basic Info */}
+        {/* Header Card (Simplifié : Photo, Nom, Titre) */}
         <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm relative overflow-visible group">
           <div className="absolute top-0 right-0 w-32 h-32 md:w-40 md:h-40 bg-accent/5 rounded-full -mr-16 -mt-16 md:-mr-20 md:-mt-20 blur-3xl pointer-events-none" />
           
-          {!editProfile && (
-            <button onClick={startEditProfileInfo} className="absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-xl bg-slate-50 text-slate-400 lg:opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm z-20">
+          {!editHero && (
+            <button onClick={startEditHero} className="absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-xl bg-slate-50 text-slate-400 lg:opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm z-20">
               <Pencil className="w-4 h-4" />
             </button>
           )}
 
-          {editProfile ? (
+          {editHero ? (
             <div className="space-y-6 relative z-10">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-slate-900">Éditer le profil</h2>
@@ -451,143 +520,56 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
                 <Input label="Nom" value={heroForm.last_name} onChange={e => setHeroForm(f => ({ ...f, last_name: e.target.value }))} />
               </div>
               <Input label="Titre professionnel" placeholder="ex: Développeur React.js | Next.js | Vue.js..." value={heroForm.title} onChange={e => setHeroForm(f => ({ ...f, title: e.target.value }))} />
-              
-              <div className="grid grid-cols-2 gap-4">
-                <CountrySelect label="Pays" options={COUNTRIES} value={pf.country} onChange={v => setPf((p: any) => ({ ...p, country: v }))} />
-                <Input label="Ville" value={pf.city} onChange={e => setPf((p: any) => ({ ...p, city: e.target.value }))} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Select label="Spécialité" options={SPECIALITIES} value={pf.speciality} onChange={e => setPf((p: any) => ({ ...p, speciality: e.target.value }))} />
-                <Input label="Années d'expérience" type="number" value={pf.experience_years} onChange={e => setPf((p: any) => ({ ...p, experience_years: e.target.value }))} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Select label="Disponibilité" options={AVAILABILITY} value={pf.availability} onChange={e => setPf((p: any) => ({ ...p, availability: e.target.value }))} />
-                <Input label="Taux journalier" type="number" value={pf.daily_rate} onChange={e => setPf((p: any) => ({ ...p, daily_rate: e.target.value }))} suffix={pf.country ? COUNTRY_TO_CURRENCY[pf.country] : undefined} />
-              </div>
-              <Input label="Téléphone" value={pf.phone} onChange={e => setPf((p: any) => ({ ...p, phone: e.target.value }))} />
-              
-              <div>
-                <label className="block text-xs font-medium text-muted mb-1">Compétences</label>
-                <SkillSelector selectedIds={skillIds} onChange={setSkillIds} />
-              </div>
 
               <div className="flex gap-3 pt-4 border-t border-slate-100">
-                <Button variant="secondary" className="flex-1" onClick={() => setEditProfile(false)}>Annuler</Button>
-                <Button className="flex-1" onClick={saveProfileInfo} loading={saving}><Save className="w-4 h-4 mr-2" /> Sauvegarder</Button>
+                <Button variant="secondary" className="flex-1" onClick={() => setEditHero(false)}>Annuler</Button>
+                <Button className="flex-1" onClick={saveHero} loading={saving}><Save className="w-4 h-4 mr-2" /> Sauvegarder</Button>
               </div>
             </div>
           ) : (
-            <>
-              <div className="flex flex-col sm:flex-row items-center gap-6 md:gap-8 mb-8 md:mb-10 pb-8 md:pb-10 border-b border-slate-50 relative z-10">
-                <div className="relative shrink-0">
-                  <div 
-                    onClick={() => photoUrl && setGallery({ items: [{ url: photoUrl, type: 'photo' }], index: 0 })}
-                    className={`w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-accent text-white flex items-center justify-center text-4xl md:text-5xl font-black overflow-hidden shadow-2xl shadow-accent/20 ${photoUrl ? 'cursor-pointer' : ''}`}
-                  >
-                    {photoUrl ? (
-                      <img src={photoUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      user?.first_name?.[0] || 'U'
-                    )}
-                  </div>
-                  <div className="absolute -bottom-2 -right-2 w-6 h-6 md:w-8 md:h-8 bg-green-500 border-4 border-white rounded-full" />
-                  
-                  {/* Camera button */}
-                  <div className="absolute -bottom-2 -left-2 z-30">
-                    <button onClick={(e) => { e.stopPropagation(); setPhotoDropdown(d => !d); }} className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-lg hover:bg-slate-800 transition-colors">
-                      <Camera className="w-3.5 h-3.5" />
-                    </button>
-                    {photoDropdown && (
-                      <div className="absolute top-10 left-0 bg-white rounded-xl border border-border shadow-xl overflow-hidden w-44">
-                        <button onClick={() => { photoInputRef.current?.click(); setPhotoDropdown(false); }} className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-slate-50 transition-colors flex items-center gap-2">
-                          <Camera className="w-4 h-4 text-accent" /> Modifier
-                        </button>
-                        {photoUrl && (
-                          <button onClick={handleDeletePhoto} className="w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2 border-t border-border">
-                            <Trash2 className="w-4 h-4" /> Supprimer
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+            <div className="flex flex-col sm:flex-row items-center gap-6 md:gap-8 relative z-10">
+              <div className="relative shrink-0">
+                <div 
+                  onClick={() => photoUrl && setGallery({ items: [{ url: photoUrl, type: 'photo' }], index: 0 })}
+                  className={`w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-accent text-white flex items-center justify-center text-4xl md:text-5xl font-black overflow-hidden shadow-2xl shadow-accent/20 ${photoUrl ? 'cursor-pointer' : ''}`}
+                >
+                  {photoUrl ? (
+                    <img src={photoUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    user?.first_name?.[0] || 'U'
+                  )}
                 </div>
                 
-                <div className="text-center sm:text-left flex-1 min-w-0 w-full">
-                  <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-1 md:mb-2 truncate">
-                    {user?.first_name} {user?.last_name}
-                  </h2>
-                  <p className="text-accent font-bold text-sm md:text-lg mb-3 md:mb-4 truncate uppercase tracking-wide">
-                    {profile?.title || profile?.speciality || 'Développeur Tech'}
-                  </p>
-                  <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 md:gap-2">
-                    {profileSkills.slice(0, 8).map((s: any, i: number) => (
-                      <span key={i} className="px-2 md:px-3 py-1 bg-slate-50 text-slate-500 rounded-lg text-[9px] md:text-[10px] font-bold uppercase tracking-tight">
-                        {s.name}
-                      </span>
-                    ))}
-                  </div>
+                {/* Camera button */}
+                <div className="absolute -bottom-2 -left-2 z-30">
+                  <button onClick={(e) => { e.stopPropagation(); setPhotoDropdown(d => !d); }} className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-lg hover:bg-slate-800 transition-colors">
+                    <Camera className="w-3.5 h-3.5" />
+                  </button>
+                  {photoDropdown && (
+                    <div className="absolute top-10 left-0 bg-white rounded-xl border border-border shadow-xl overflow-hidden w-44">
+                      <button onClick={() => { photoInputRef.current?.click(); setPhotoDropdown(false); }} className="w-full text-left px-4 py-3 text-sm text-foreground hover:bg-slate-50 transition-colors flex items-center gap-2">
+                        <Camera className="w-4 h-4 text-black" /> Modifier
+                      </button>
+                      {photoUrl && (
+                        <button onClick={handleDeletePhoto} className="w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2 border-t border-border">
+                          <Trash2 className="w-4 h-4" /> Supprimer
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
+                <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12 relative z-10">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><Mail className="w-5 h-5" /></div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Email</p>
-                      <p className="text-sm font-bold text-slate-900 truncate">{user?.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><Phone className="w-5 h-5" /></div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Téléphone</p>
-                      <p className="text-sm font-bold text-slate-900">{profile?.phone || 'Non renseigné'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
-                      {profile?.country && COUNTRY_LABELS[profile.country] ? (
-                        <img src={`https://flagcdn.com/w40/${COUNTRY_LABELS[profile.country].flag}.png`} alt="" className="w-5 object-cover rounded-sm" />
-                      ) : <MapPin className="w-5 h-5" />}
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Localisation</p>
-                      <p className="text-sm font-bold text-slate-900">{profile?.city ? `${profile.city}, ` : ''}{profile?.country ? COUNTRY_LABELS[profile.country]?.label || profile.country : 'Non renseigné'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><Briefcase className="w-5 h-5" /></div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Expérience</p>
-                      <p className="text-sm font-bold text-slate-900">{profile?.experience_years || 0} ans</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><DollarSign className="w-5 h-5" /></div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Taux Journalier</p>
-                      <p className="text-sm font-bold text-slate-900">
-                        {profile?.daily_rate ? `${profile.daily_rate} ${profile.currency || '€'}` : 'Non défini'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><Calendar className="w-5 h-5" /></div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Disponibilité</p>
-                      <p className="text-sm font-bold text-green-600">
-                        {AVAIL_LABEL[profile?.availability] || profile?.availability || 'Immédiate'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              
+              <div className="text-center sm:text-left flex-1 min-w-0 w-full">
+                <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-1 md:mb-2 truncate">
+                  {user?.first_name} {user?.last_name}
+                </h2>
+                <p className="text-accent font-bold text-sm md:text-lg truncate uppercase tracking-wide">
+                  {profile?.title || profile?.speciality || 'Développeur Tech'}
+                </p>
               </div>
-            </>
+            </div>
           )}
         </div>
 
@@ -609,9 +591,149 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
               </div>
             </div>
           ) : (
-            <p className="text-slate-600 leading-relaxed text-sm md:text-base italic">
+            <p className="text-slate-600 leading-relaxed text-sm md:text-base italic whitespace-pre-wrap">
               {profile?.bio || `Passionné par le développement tech, je mets mes ${profile?.experience_years || 0} ans d'expérience au service de projets innovants et scalables.`}
             </p>
+          )}
+        </div>
+
+        {/* Informations Section */}
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm relative group">
+          {!editInfo && (
+            <button onClick={startEditInfo} className="absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-xl bg-slate-50 text-slate-400 lg:opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm z-20">
+              <Pencil className="w-4 h-4" />
+            </button>
+          )}
+          <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+           Informations
+          </h2>
+
+          {editInfo ? (
+            <div className="space-y-6 relative z-10">
+              <div className="grid grid-cols-2 gap-4">
+                <CountrySelect label="Pays" options={COUNTRIES} value={infoForm.country} onChange={v => setInfoForm((p: any) => ({ ...p, country: v }))} />
+                <Input label="Ville" value={infoForm.city} onChange={e => setInfoForm((p: any) => ({ ...p, city: e.target.value }))} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Select label="Spécialité" options={SPECIALITIES} value={infoForm.speciality} onChange={e => setInfoForm((p: any) => ({ ...p, speciality: e.target.value }))} />
+                <Input label="Années d'expérience" type="number" value={infoForm.experience_years} onChange={e => setInfoForm((p: any) => ({ ...p, experience_years: e.target.value }))} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Select label="Disponibilité" options={AVAILABILITY} value={infoForm.availability} onChange={e => setInfoForm((p: any) => ({ ...p, availability: e.target.value }))} />
+                <Input label="Taux journalier" type="number" value={infoForm.daily_rate} onChange={e => setInfoForm((p: any) => ({ ...p, daily_rate: e.target.value }))} suffix={infoForm.country ? COUNTRY_TO_CURRENCY[infoForm.country] : undefined} />
+              </div>
+              <Input label="Téléphone" value={infoForm.phone} onChange={e => setInfoForm((p: any) => ({ ...p, phone: e.target.value }))} />
+              
+              <div className="flex gap-3 pt-4 border-t border-slate-100">
+                <Button variant="secondary" className="flex-1" onClick={() => setEditInfo(false)}>Annuler</Button>
+                <Button className="flex-1" onClick={saveInfo} loading={saving}><Save className="w-4 h-4 mr-2" /> Sauvegarder</Button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-12 relative z-10">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><Mail className="w-5 h-5" /></div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Email</p>
+                    <p className="text-sm font-bold text-slate-900 truncate">{user?.email}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><Phone className="w-5 h-5" /></div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Téléphone</p>
+                    <p className="text-sm font-bold text-slate-900">{profile?.phone || 'Non renseigné'}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                    {profile?.country && COUNTRY_LABELS[profile.country] ? (
+                      <img src={`https://flagcdn.com/w40/${COUNTRY_LABELS[profile.country].flag}.png`} alt="" className="w-5 object-cover rounded-sm" />
+                    ) : <MapPin className="w-5 h-5" />}
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Localisation</p>
+                    <p className="text-sm font-bold text-slate-900">{profile?.city ? `${profile.city}, ` : ''}{profile?.country ? COUNTRY_LABELS[profile.country]?.label || profile.country : 'Non renseigné'}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><Briefcase className="w-5 h-5" /></div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Expérience</p>
+                    <p className="text-sm font-bold text-slate-900">{profile?.experience_years || 0} ans</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><DollarSign className="w-5 h-5" /></div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Taux Journalier</p>
+                    <p className="text-sm font-bold text-slate-900">
+                      {profile?.daily_rate ? `${profile.daily_rate} ${profile.currency || '€'}` : 'Non défini'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400"><Calendar className="w-5 h-5" /></div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-0.5">Disponibilité</p>
+                    <p className="text-sm font-bold text-green-600">
+                      {AVAIL_LABEL[profile?.availability] || profile?.availability || 'Immédiate'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Compétences Section */}
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm relative group">
+          {!editSkills && (
+            <button onClick={() => { setEditSkills(true); setSkillIds(profile?.candidate_skills?.map((cs:any)=>cs.skill.id)||[]); }} className="absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-xl bg-slate-50 text-slate-400 lg:opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm z-20">
+              <Pencil className="w-4 h-4" />
+            </button>
+          )}
+          <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">Compétences</h2>
+
+          {editSkills ? (
+            <div className="space-y-4">
+              <SkillSelector selectedIds={skillIds} onChange={setSkillIds} />
+              <div className="flex gap-3 pt-4 border-t border-slate-100">
+                <Button variant="secondary" className="flex-1" onClick={() => setEditSkills(false)}>Annuler</Button>
+                <Button className="flex-1" onClick={saveSkills} loading={saving}><Save className="w-4 h-4 mr-2" /> Sauvegarder</Button>
+              </div>
+            </div>
+          ) : profileSkills.length > 0 ? (
+            <div className="space-y-6">
+              {Object.entries(
+                profileSkills.reduce((acc: any, skill: any) => {
+                  const cat = skill.category || 'other';
+                  if (!acc[cat]) acc[cat] = [];
+                  acc[cat].push(skill);
+                  return acc;
+                }, {})
+              ).map(([category, skills]: [string, any]) => (
+                <div key={category}>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    {category}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {skills.map((s: any) => (
+                      <span key={s.id} className="px-3 py-1.5 bg-slate-50 text-slate-600 rounded-xl text-xs font-bold border border-slate-100">
+                        {s.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-slate-400 text-sm italic">Aucune compétence renseignée.</p>
           )}
         </div>
 
@@ -621,7 +743,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
             <Plus className="w-4 h-4" /> Ajouter
           </button>
           <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-8 md:mb-10 flex items-center gap-2 md:gap-3">
-            <Briefcase className="w-5 h-5 md:w-6 md:h-6 text-accent" /> Expériences
+            Expériences
           </h2>
           
           <div className="space-y-8 md:space-y-10 relative before:absolute before:left-[15px] md:before:left-[19px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
@@ -757,12 +879,12 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
         </div>
 
         {/* Educations Section */}
-        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm relative group">
+        <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm relative group">  
           <button onClick={() => { setAddingEdu(true); setNewEduForm({}); setNewEduMedia([]); }} className="absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-xl bg-slate-50 text-accent transition-all hover:bg-accent hover:text-white shadow-sm flex items-center gap-2 pr-4 font-bold text-xs uppercase tracking-wider">
             <Plus className="w-4 h-4" /> Ajouter
           </button>
           <h2 className="text-lg md:text-xl font-bold text-slate-900 mb-6 md:mb-8 flex items-center gap-2 md:gap-3">
-            <GraduationCap className="w-5 h-5 md:w-6 md:h-6 text-accent" /> Formations académiques
+            Formations
           </h2>
           
           <div className="space-y-8 md:space-y-10 relative before:absolute before:left-[15px] md:before:left-[19px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
@@ -770,12 +892,30 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
               <div className="relative pl-10 md:pl-12">
                 <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 space-y-4">
                   <h3 className="font-semibold text-foreground">Nouvelle formation</h3>
-                  <Input label="École *" placeholder="Ex: EMIT" value={newEduForm.school || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, school: e.target.value }))} />
+
+                  <label className="flex items-center gap-2 cursor-pointer border border-slate-200 bg-white p-3 rounded-xl w-max">
+                    <input type="checkbox" checked={newEduForm.is_self_taught || false} onChange={e => setNewEduForm((f: any) => ({ ...f, is_self_taught: e.target.checked }))} className="rounded text-accent focus:ring-accent" />
+                    <span className="text-sm font-medium text-slate-700">Autodidacte</span>
+                  </label>
+
                   <div className="grid grid-cols-2 gap-4">
-                    <Input label="Diplôme *" value={newEduForm.degree || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, degree: e.target.value }))} />
-                    <Select label="Niveau" options={LEVELS} value={newEduForm.level || 'bac_plus_3'} onChange={e => setNewEduForm((f: any) => ({ ...f, level: e.target.value }))} />
+                    <Input label="École *" placeholder="Ex: EMIT" value={newEduForm.school || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, school: e.target.value }))} />
+                    {!newEduForm.is_self_taught && (
+                      <Input label="Diplôme *" value={newEduForm.degree || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, degree: e.target.value }))} />
+                    )}
                   </div>
+                  
+                  {!newEduForm.is_self_taught && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <Select label="Niveau" options={LEVELS} value={newEduForm.level || 'bac_plus_3'} onChange={e => setNewEduForm((f: any) => ({ ...f, level: e.target.value }))} />
+                      {newEduForm.level === 'autre' && (
+                        <Input label="Précisez le niveau" value={newEduForm.custom_level || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, custom_level: e.target.value }))} />
+                      )}
+                    </div>
+                  )}
+
                   <Input label="Domaine" value={newEduForm.field || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, field: e.target.value }))} />
+                  
                   <div className="grid grid-cols-2 gap-4">
                     <Select label="Mois début *" options={MONTHS} placeholder="Mois" value={newEduForm.start_month || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, start_month: e.target.value }))} />
                     <Select label="Année début *" options={years()} placeholder="Année" value={newEduForm.start_year || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, start_year: e.target.value }))} />
@@ -791,11 +931,12 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
                     </div>
                   )}
                   <Textarea label="Description" value={newEduForm.description || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, description: e.target.value }))} />
+                  <SkillSelector label="Compétences" selectedIds={newEduForm.skill_ids || []} onChange={ids => setNewEduForm((f: any) => ({ ...f, skill_ids: ids }))} />
                   <div>
                     <p className="text-sm font-medium text-foreground mb-2">Médias</p>
                     <MediaPreviewRow previews={newEduMedia} onRemove={i => setNewEduMedia(prev => prev.filter((_, idx) => idx !== i))} />
                     <label className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-600 cursor-pointer hover:border-accent hover:text-accent transition-colors shadow-sm">
-                      <ImagePlus className="w-4 h-4" /> Ajouter
+                      <ImagePlus className="w-4 h-4" /> Ajouter des médias
                       <input type="file" accept="image/*,video/*" multiple className="hidden" onChange={e => { const f = Array.from(e.target.files||[]); setNewEduMedia(p => [...p, ...f.map(x => ({file:x, previewUrl:URL.createObjectURL(x)}))]); e.target.value=''; }} />
                     </label>
                   </div>
@@ -817,12 +958,29 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
                   <div className="flex-1">
                     {editingEduId === edu.id ? (
                       <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 space-y-4">
-                        <Input label="École *" value={eduForm.school || ''} onChange={e => setEduForm((f: any) => ({ ...f, school: e.target.value }))} />
+                        <label className="flex items-center gap-2 cursor-pointer border border-slate-200 bg-white p-3 rounded-xl w-max">
+                          <input type="checkbox" checked={eduForm.is_self_taught || false} onChange={e => setEduForm((f: any) => ({ ...f, is_self_taught: e.target.checked }))} className="rounded text-accent focus:ring-accent" />
+                          <span className="text-sm font-medium text-slate-700">Autodidacte</span>
+                        </label>
+
                         <div className="grid grid-cols-2 gap-4">
-                          <Input label="Diplôme *" value={eduForm.degree || ''} onChange={e => setEduForm((f: any) => ({ ...f, degree: e.target.value }))} />
-                          <Select label="Niveau" options={LEVELS} value={eduForm.level || 'bac_plus_3'} onChange={e => setEduForm((f: any) => ({ ...f, level: e.target.value }))} />
+                          <Input label="École *" value={eduForm.school || ''} onChange={e => setEduForm((f: any) => ({ ...f, school: e.target.value }))} />
+                          {!eduForm.is_self_taught && (
+                            <Input label="Diplôme *" value={eduForm.degree || ''} onChange={e => setEduForm((f: any) => ({ ...f, degree: e.target.value }))} />
+                          )}
                         </div>
+                        
+                        {!eduForm.is_self_taught && (
+                          <div className="grid grid-cols-2 gap-4">
+                            <Select label="Niveau" options={LEVELS} value={eduForm.level || 'bac_plus_3'} onChange={e => setEduForm((f: any) => ({ ...f, level: e.target.value }))} />
+                            {eduForm.level === 'autre' && (
+                              <Input label="Précisez le niveau" value={eduForm.custom_level || ''} onChange={e => setEduForm((f: any) => ({ ...f, custom_level: e.target.value }))} />
+                            )}
+                          </div>
+                        )}
+
                         <Input label="Domaine" value={eduForm.field || ''} onChange={e => setEduForm((f: any) => ({ ...f, field: e.target.value }))} />
+                        
                         <div className="grid grid-cols-2 gap-4">
                           <Select label="Mois début" options={MONTHS} placeholder="Mois" value={eduForm.start_month || ''} onChange={e => setEduForm((f: any) => ({ ...f, start_month: e.target.value }))} />
                           <Select label="Année début" options={years()} placeholder="Année" value={eduForm.start_year || ''} onChange={e => setEduForm((f: any) => ({ ...f, start_year: e.target.value }))} />
@@ -838,6 +996,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
                           </div>
                         )}
                         <Textarea label="Description" value={eduForm.description || ''} onChange={e => setEduForm((f: any) => ({ ...f, description: e.target.value }))} />
+                        <SkillSelector label="Compétences" selectedIds={eduForm.skill_ids || []} onChange={ids => setEduForm((f: any) => ({ ...f, skill_ids: ids }))} />
                         
                         {edu.education_medias?.filter((m: any) => m.media_type === 'image' || m.media_type === 'video').length > 0 && (
                           <div>
@@ -877,6 +1036,13 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
                         </div>
                         {edu.field && <p className="text-sm font-bold text-slate-600 mb-2">{edu.field}</p>}
                         <p className="text-slate-500 text-sm leading-relaxed mb-3">{edu.description}</p>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {edu.skills?.map((s: any, si: number) => (
+                            <span key={si} className="px-2 py-0.5 bg-slate-50 text-slate-400 rounded-md text-[10px] font-medium border border-slate-100">
+                              {s.name}
+                            </span>
+                          ))}
+                        </div>
                         <MediaGallery medias={edu.education_medias || []} onOpen={(idx) => setGallery({ items: edu.education_medias.filter((mx: any) => mx.media_type === 'image' || mx.media_type === 'video').map((mx: any) => ({ url: mx.url, type: mx.media_type })), index: idx })} />
                       </>
                     )}
@@ -894,7 +1060,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
         {/* Social Links */}
         <div className="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm relative group">
           {!editSocial && (
-            <button onClick={() => { setEditSocial(true); setSocialForm({ linkedin_url: profile?.linkedin_url || '', portfolio_url: profile?.portfolio_url || '' }); }} className="absolute top-6 right-6 p-2 rounded-xl bg-slate-50 text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm">
+            <button onClick={() => { setEditSocial(true); setSocialForm({ linkedin_url: profile?.linkedin_url || '', portfolio_url: profile?.portfolio_url || '', github_url: profile?.github_url || '' }); }} className="absolute top-6 right-6 p-2 rounded-xl bg-slate-50 text-slate-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-accent hover:text-white shadow-sm">
               <Pencil className="w-4 h-4" />
             </button>
           )}
@@ -903,7 +1069,8 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
           {editSocial ? (
             <div className="space-y-4">
               <Input label="LinkedIn" type="url" value={socialForm.linkedin_url} onChange={e => setSocialForm(f => ({ ...f, linkedin_url: e.target.value }))} />
-              <Input label="Portfolio / GitHub" type="url" value={socialForm.portfolio_url} onChange={e => setSocialForm(f => ({ ...f, portfolio_url: e.target.value }))} />
+              <Input label="Portfolio" type="url" value={socialForm.portfolio_url} onChange={e => setSocialForm(f => ({ ...f, portfolio_url: e.target.value }))} />
+              <Input label="GitHub" type="url" value={socialForm.github_url} onChange={e => setSocialForm(f => ({ ...f, github_url: e.target.value }))} />
               <div className="flex gap-2 pt-2 border-t border-slate-100">
                 <Button size="sm" variant="secondary" className="flex-1" onClick={() => setEditSocial(false)}>Annuler</Button>
                 <Button size="sm" className="flex-1" onClick={saveSocial} loading={saving}><Save className="w-3.5 h-3.5 mr-2" /> Valider</Button>
@@ -927,31 +1094,22 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
                   <ExternalLink className="w-4 h-4 text-slate-300 group-hover/link:text-accent" />
                 </a>
               )}
-              {!profile?.linkedin_url && !profile?.portfolio_url && (
+              {profile?.github_url && (
+                <a href={profile.github_url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl group/link hover:bg-slate-100 transition-all">
+                  <div className="flex items-center gap-3">
+                    {/* <Github className="w-4 h-4 text-slate-600" /> */}
+                    <span className="text-sm font-bold text-slate-700">GitHub</span>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-slate-300 group-hover/link:text-accent" />
+                </a>
+              )}
+              {!profile?.linkedin_url && !profile?.portfolio_url && !profile?.github_url && (
                 <p className="text-xs text-slate-400 text-center italic">Aucun lien ajouté</p>
               )}
             </div>
           )}
         </div>
 
-        {/* Languages or Other (Small visual card) */}
-        <div className="bg-slate-900 rounded-[2rem] p-8 text-white shadow-xl relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-accent/20 rounded-full -mr-12 -mt-12 blur-2xl pointer-events-none" />
-          <h3 className="font-bold mb-6 uppercase text-[10px] tracking-[0.2em] text-white/50 relative z-10">Langues</h3>
-          <div className="space-y-4 relative z-10">
-            <div className="flex justify-between items-center text-sm font-bold">
-              <span>Français</span>
-              <span className="text-accent">Natif</span>
-            </div>
-            <div className="flex justify-between items-center text-sm font-bold">
-              <span>Anglais</span>
-              <span className="text-white/60">B2 - Avancé</span>
-            </div>
-          </div>
-          <div className="mt-8 pt-6 border-t border-white/10 relative z-10">
-            <p className="text-[10px] text-white/40 uppercase tracking-widest text-center italic">Cette section sera bientôt éditable</p>
-          </div>
-        </div>
       </div>
     </div>
   );
