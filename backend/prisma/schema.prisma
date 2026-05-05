@@ -138,6 +138,7 @@ model User {
   client         ClientProfile?
   skills         Skill[]
   tests          Test[]
+  job_offers     JobOffer[]
 
   @@map("users")
 }
@@ -165,6 +166,7 @@ model Skill {
   candidate_skills  CandidateSkill[]
   experience_skills ExperienceSkill[]
   education_skills  EducationSkill[]
+  job_offer_skills  JobOfferSkill[]
 
   owner User? @relation(fields: [owner_id], references: [id], onDelete: Cascade)
 
@@ -368,4 +370,53 @@ model Video {
   updated_at  DateTime @updatedAt
 
   @@map("videos")
+}
+
+enum JobOfferStatus {
+  draft
+  active
+  paused
+  closed
+}
+
+enum WorkType {
+  full_remote
+  hybrid
+  on_site
+}
+
+model JobOffer {
+  id                  String     @id @default(uuid())
+  client_id           String
+  title               String
+  description         String
+  speciality          Speciality
+  experience_min      Int?
+  tjm_client          Decimal
+  contract_duration   String?
+  work_type           WorkType
+  timezone_preference String?
+  start_date          DateTime?
+  status              JobOfferStatus @default(draft)
+  is_anonymous        Boolean    @default(true)
+  created_at          DateTime   @default(now())
+  updated_at          DateTime   @updatedAt
+  views_count         Int        @default(0)
+  applications_count  Int        @default(0)
+
+  client              User       @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  skills_required     JobOfferSkill[]
+
+  @@map("job_offers")
+}
+
+model JobOfferSkill {
+  job_offer_id String
+  skill_id     String
+
+  job_offer    JobOffer @relation(fields: [job_offer_id], references: [id], onDelete: Cascade)
+  skill        Skill    @relation(fields: [skill_id], references: [id], onDelete: Cascade)
+
+  @@id([job_offer_id, skill_id])
+  @@map("job_offer_skills")
 }

@@ -1,0 +1,11 @@
+import { Module } from '@nestjs/common';
+import { JobOffersController } from './job-offers.controller';
+import { JobOffersService } from './job-offers.service';
+import { AuthModule } from '../auth/auth.module';
+
+@Module({
+  imports: [AuthModule],
+  controllers: [JobOffersController],
+  providers: [JobOffersService]
+})
+export class JobOffersModule {}

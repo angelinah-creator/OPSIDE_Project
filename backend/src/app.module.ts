@@ -11,6 +11,7 @@ import { UploadModule } from './upload/upload.module';
 import { MailModule } from './mail/mail.module';
 import { TestModule } from './test/test.module';
 import { VideosModule } from './videos/videos.module';
+import { JobOffersModule } from './job-offers/job-offers.module';
 
 
 @Module({
@@ -35,6 +36,7 @@ import { VideosModule } from './videos/videos.module';
     MailModule,
     TestModule,
     VideosModule,
+    JobOffersModule,
   ],
 })
 export class AppModule {}
