@@ -23,6 +23,50 @@ export default function TakeTestPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [showConfirmSubmit, setShowConfirmSubmit] = useState(false);
+  const [cheatWarning, setCheatWarning] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleCopyPaste = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setCheatWarning("L'utilisation du copier, couper et coller est interdite pendant l'évaluation.");
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setCheatWarning("Vous avez quitté l'onglet du test. Les changements d'onglet ne sont pas autorisés et sont enregistrés.");
+      }
+    };
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      // Détecter quand la souris quitte la zone de la fenêtre (souvent pour changer d'onglet)
+      if (e.clientY <= 0 || e.relatedTarget === null) {
+        setCheatWarning("Veuillez rester sur cette page. Il est interdit de quitter la zone de test.");
+      }
+    };
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "Vous avez un test en cours. Êtes-vous sûr de vouloir quitter ?";
+      return e.returnValue;
+    };
+
+    window.addEventListener('copy', handleCopyPaste, { capture: true });
+    window.addEventListener('cut', handleCopyPaste, { capture: true });
+    window.addEventListener('paste', handleCopyPaste, { capture: true });
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    document.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('copy', handleCopyPaste, { capture: true });
+      window.removeEventListener('cut', handleCopyPaste, { capture: true });
+      window.removeEventListener('paste', handleCopyPaste, { capture: true });
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   useEffect(() => {
     /* --- MOCK MODE: Bypass API for testing --- */
@@ -226,6 +270,20 @@ export default function TakeTestPage() {
                 Confirmer
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal anti-triche */}
+      {cheatWarning && (
+        <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl border border-red-200">
+            <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-foreground mb-2">Action non autorisée</h2>
+            <p className="text-muted mb-6">{cheatWarning}</p>
+            <Button onClick={() => setCheatWarning(null)} className="w-full bg-red-500 hover:bg-red-600 border-none text-white">
+              J'ai compris
+            </Button>
           </div>
         </div>
       )}
