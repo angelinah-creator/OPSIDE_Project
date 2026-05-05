@@ -408,15 +408,8 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
   const saveEdu = async (id: string) => {
     setSaving(true); setError('');
     try {
-      const levelToSend = (eduForm.is_self_taught || eduForm.level === 'autre') ? 'autre' : eduForm.level;
-      const customLevelToSend = (!eduForm.is_self_taught && eduForm.level === 'autre') ? eduForm.custom_level : undefined;
-      const degreeToSend = eduForm.is_self_taught ? 'Autodidacte' : eduForm.degree;
-
       await candidateApi.updateEducation(id, {
         ...eduForm, 
-        degree: degreeToSend,
-        level: levelToSend,
-        custom_level: customLevelToSend,
         start_month: Number(eduForm.start_month), start_year: Number(eduForm.start_year),
         end_month: eduForm.end_month ? Number(eduForm.end_month) : undefined, end_year: eduForm.end_year ? Number(eduForm.end_year) : undefined,
       });
@@ -431,18 +424,11 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
   };
 
   const addNewEdu = async () => {
-    if (!newEduForm.school || (!newEduForm.is_self_taught && (!newEduForm.degree || !newEduForm.start_year))) return;
+    if (!newEduForm.school || !newEduForm.degree || !newEduForm.start_year) return;
     setSaving(true); setError('');
     try {
-      const levelToSend = (newEduForm.is_self_taught || newEduForm.level === 'autre') ? 'autre' : newEduForm.level;
-      const customLevelToSend = (!newEduForm.is_self_taught && newEduForm.level === 'autre') ? newEduForm.custom_level : undefined;
-      const degreeToSend = newEduForm.is_self_taught ? 'Autodidacte' : newEduForm.degree;
-
       const res = await candidateApi.createEducation({
         ...newEduForm, 
-        degree: degreeToSend,
-        level: levelToSend,
-        custom_level: customLevelToSend,
         start_month: Number(newEduForm.start_month), start_year: Number(newEduForm.start_year),
         end_month: newEduForm.end_month ? Number(newEduForm.end_month) : undefined, end_year: newEduForm.end_year ? Number(newEduForm.end_year) : undefined,
         skill_ids: newEduForm.skill_ids || [],
@@ -724,7 +710,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {skills.map((s: any) => (
-                      <span key={s.id} className="px-3 py-1.5 bg-slate-50 text-slate-600 rounded-xl text-xs font-bold border border-slate-100">
+                      <span key={s.id} className="px-3 py-1.5 bg-slate-100 text-slate-900 rounded-xl text-xs font-bold border border-slate-200">
                         {s.name}
                       </span>
                     ))}
@@ -843,26 +829,36 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
                       </div>
                     ) : (
                       <>
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
-                          <div>
+                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-2 mb-3">
+                          <div className="space-y-1">
                             <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                               {exp.title}
+                              <span className="text-xs font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-lg">
+                                {EMP_TYPES.find(t => t.value === exp.employment_type)?.label || exp.employment_type}
+                              </span>
                               <div className="flex gap-1 ml-2 opacity-0 group-hover/item:opacity-100 transition-opacity">
                                 <button onClick={() => startEditExp(exp)} className="p-1 text-slate-400 hover:text-accent bg-slate-50 rounded-md"><Pencil className="w-3.5 h-3.5" /></button>
                                 <button onClick={() => deleteExp(exp.id)} className="p-1 text-slate-400 hover:text-red-500 bg-slate-50 rounded-md"><Trash2 className="w-3.5 h-3.5" /></button>
                               </div>
                             </h3>
-                            <p className="text-accent font-semibold">{exp.company}</p>
+                            <p className="text-accent font-semibold flex items-center gap-2">
+                              {exp.company}
+                              {exp.location && (
+                                <span className="text-slate-400 font-normal text-sm flex items-center gap-1">
+                                  <MapPin className="w-3 h-3" /> {exp.location}
+                                </span>
+                              )}
+                            </p>
                           </div>
-                          <div className="bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                          <div className="bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider shrink-0">
                             {formatDate(exp.start_month, exp.start_year)} — {exp.is_current ? 'Aujourd\'hui' : formatDate(exp.end_month, exp.end_year)}
                           </div>
                         </div>
                         <p className="text-slate-500 text-sm leading-relaxed mb-4">{exp.description}</p>
                         <div className="flex flex-wrap gap-2 mb-3">
-                          {exp.skills?.map((s: any, si: number) => (
-                            <span key={si} className="px-2 py-0.5 bg-slate-50 text-slate-400 rounded-md text-[10px] font-medium border border-slate-100">
-                              {s.name}
+                          {exp.experience_skills?.map((es: any, si: number) => (
+                            <span key={si} className="px-2 py-1 bg-slate-100 text-slate-900 rounded-md text-[10px] font-bold border border-slate-200">
+                              {es.skill.name}
                             </span>
                           ))}
                         </div>
@@ -893,26 +889,17 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
                 <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 space-y-4">
                   <h3 className="font-semibold text-foreground">Nouvelle formation</h3>
 
-                  <label className="flex items-center gap-2 cursor-pointer border border-slate-200 bg-white p-3 rounded-xl w-max">
-                    <input type="checkbox" checked={newEduForm.is_self_taught || false} onChange={e => setNewEduForm((f: any) => ({ ...f, is_self_taught: e.target.checked }))} className="rounded text-accent focus:ring-accent" />
-                    <span className="text-sm font-medium text-slate-700">Autodidacte</span>
-                  </label>
-
                   <div className="grid grid-cols-2 gap-4">
                     <Input label="École *" placeholder="Ex: EMIT" value={newEduForm.school || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, school: e.target.value }))} />
-                    {!newEduForm.is_self_taught && (
-                      <Input label="Diplôme *" value={newEduForm.degree || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, degree: e.target.value }))} />
-                    )}
+                    <Input label="Diplôme *" value={newEduForm.degree || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, degree: e.target.value }))} />
                   </div>
                   
-                  {!newEduForm.is_self_taught && (
-                    <div className="grid grid-cols-2 gap-4">
-                      <Select label="Niveau" options={LEVELS} value={newEduForm.level || 'bac_plus_3'} onChange={e => setNewEduForm((f: any) => ({ ...f, level: e.target.value }))} />
-                      {newEduForm.level === 'autre' && (
-                        <Input label="Précisez le niveau" value={newEduForm.custom_level || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, custom_level: e.target.value }))} />
-                      )}
-                    </div>
-                  )}
+                  <div className="grid grid-cols-2 gap-4">
+                    <Select label="Niveau" options={LEVELS} value={newEduForm.level || 'bac_plus_3'} onChange={e => setNewEduForm((f: any) => ({ ...f, level: e.target.value }))} />
+                    {newEduForm.level === 'autre' && (
+                      <Input label="Précisez le niveau" value={newEduForm.custom_level || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, custom_level: e.target.value }))} />
+                    )}
+                  </div>
 
                   <Input label="Domaine" value={newEduForm.field || ''} onChange={e => setNewEduForm((f: any) => ({ ...f, field: e.target.value }))} />
                   
@@ -958,26 +945,17 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
                   <div className="flex-1">
                     {editingEduId === edu.id ? (
                       <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 space-y-4">
-                        <label className="flex items-center gap-2 cursor-pointer border border-slate-200 bg-white p-3 rounded-xl w-max">
-                          <input type="checkbox" checked={eduForm.is_self_taught || false} onChange={e => setEduForm((f: any) => ({ ...f, is_self_taught: e.target.checked }))} className="rounded text-accent focus:ring-accent" />
-                          <span className="text-sm font-medium text-slate-700">Autodidacte</span>
-                        </label>
-
                         <div className="grid grid-cols-2 gap-4">
                           <Input label="École *" value={eduForm.school || ''} onChange={e => setEduForm((f: any) => ({ ...f, school: e.target.value }))} />
-                          {!eduForm.is_self_taught && (
-                            <Input label="Diplôme *" value={eduForm.degree || ''} onChange={e => setEduForm((f: any) => ({ ...f, degree: e.target.value }))} />
-                          )}
+                          <Input label="Diplôme *" value={eduForm.degree || ''} onChange={e => setEduForm((f: any) => ({ ...f, degree: e.target.value }))} />
                         </div>
                         
-                        {!eduForm.is_self_taught && (
-                          <div className="grid grid-cols-2 gap-4">
-                            <Select label="Niveau" options={LEVELS} value={eduForm.level || 'bac_plus_3'} onChange={e => setEduForm((f: any) => ({ ...f, level: e.target.value }))} />
-                            {eduForm.level === 'autre' && (
-                              <Input label="Précisez le niveau" value={eduForm.custom_level || ''} onChange={e => setEduForm((f: any) => ({ ...f, custom_level: e.target.value }))} />
-                            )}
-                          </div>
-                        )}
+                        <div className="grid grid-cols-2 gap-4">
+                          <Select label="Niveau" options={LEVELS} value={eduForm.level || 'bac_plus_3'} onChange={e => setEduForm((f: any) => ({ ...f, level: e.target.value }))} />
+                          {eduForm.level === 'autre' && (
+                            <Input label="Précisez le niveau" value={eduForm.custom_level || ''} onChange={e => setEduForm((f: any) => ({ ...f, custom_level: e.target.value }))} />
+                          )}
+                        </div>
 
                         <Input label="Domaine" value={eduForm.field || ''} onChange={e => setEduForm((f: any) => ({ ...f, field: e.target.value }))} />
                         
@@ -1037,9 +1015,9 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
                         {edu.field && <p className="text-sm font-bold text-slate-600 mb-2">{edu.field}</p>}
                         <p className="text-slate-500 text-sm leading-relaxed mb-3">{edu.description}</p>
                         <div className="flex flex-wrap gap-2 mb-3">
-                          {edu.skills?.map((s: any, si: number) => (
-                            <span key={si} className="px-2 py-0.5 bg-slate-50 text-slate-400 rounded-md text-[10px] font-medium border border-slate-100">
-                              {s.name}
+                          {edu.education_skills?.map((es: any, si: number) => (
+                            <span key={si} className="px-2 py-1 bg-slate-100 text-slate-900 rounded-md text-[10px] font-bold border border-slate-200">
+                              {es.skill.name}
                             </span>
                           ))}
                         </div>
