@@ -5,6 +5,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   children: React.ReactNode;
+  href?: string;
+  target?: string;
+  rel?: string;
 }
 
 export default function Button({
@@ -14,6 +17,7 @@ export default function Button({
   children,
   className = '',
   disabled,
+  href,
   ...props
 }: ButtonProps) {
   const base = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
@@ -34,9 +38,19 @@ export default function Button({
     lg: 'px-8 py-3.5 text-base',
   };
 
+  const combinedClassName = `${base} ${variants[variant]} ${sizes[size]} ${className}`;
+
+  if (href) {
+    return (
+      <a href={href} className={combinedClassName} {...(props as any)}>
+        {children}
+      </a>
+    );
+  }
+
   return (
     <button
-      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
+      className={combinedClassName}
       disabled={disabled || loading}
       {...props}
     >

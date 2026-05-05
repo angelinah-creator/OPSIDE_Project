@@ -26,7 +26,7 @@ export default function LandingPage() {
             {/* Subtitle */}
             <FadeIn delay={300}>
               <p className="text-md md:text-lg text-[#6B6B6B] max-w-2xl mx-auto mb-10 leading-relaxed">
-                OPSIDE connecte les entreprises aux talents tech d'Afrique francophone.
+                OPSIDE connecte les entreprises aux talents tech d'Afrique.
                 Matching, tests techniques, contrats et paie — tout est géré.
               </p>
             </FadeIn>
@@ -34,15 +34,15 @@ export default function LandingPage() {
             {/* Buttons */}
             <FadeIn delay={500}>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="#cta">
+                <Link href="/auth/register/client">
                   <Button variant="gradient" size="lg" className="rounded-full px-10 flex gap-2 group hover:scale-105 hover:shadow-xl transition-all duration-300">
-                    Demander une démo
+                    Je suis une entreprise
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Link href="/">
+                <Link href="/auth/register/candidat">
                   <Button variant="ghost" size="lg" className="rounded-full px-10 bg-[#F5F5F5] hover:bg-[#EAEAEA] text-[#1A1A1A] hover:scale-105 transition-all duration-300">
-                    Voir les talents
+                    Je suis un candidat
                   </Button>
                 </Link>
               </div>
@@ -64,55 +64,7 @@ export default function LandingPage() {
           </FadeIn>
         </section>
 
-        {/* --- HOW IT WORKS SECTION --- */}
-        {/* <section id="how-it-works" className="py-24 md:py-32 bg-[#FAFAFA]">
-          <FadeIn delay={100} className="max-w-4xl mx-auto px-4 text-center mb-10 md:mb-18">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3 tracking-tight text-[#1A1A1A]">Comment ça marche</h2>
-            <p className="text-[#6B6B6B] text-lg">Trois étapes simples pour constituer votre équipe tech en Afrique.</p>
-          </FadeIn>
-
-          <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <FadeIn delay={200}>
-              <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group hover:-translate-y-2 duration-300 h-full">
-                <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors group-hover:scale-110 duration-300 mx-auto">
-                  <Search className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
-                </div>
-                <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 1</p>
-                <h3 className="text-2xl font-bold mb-4 text-[#1A1A1A]">Match</h3>
-                <p className="text-[#6B6B6B] leading-relaxed">
-                  Décrivez votre besoin. Notre algorithme identifie les meilleurs profils en Afrique francophone.
-                </p>
-              </div>
-            </FadeIn>
-
-            <FadeIn delay={400}>
-              <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group hover:-translate-y-2 duration-300 h-full">
-                <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors group-hover:scale-110 duration-300 mx-auto">
-                  <ShieldCheck className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
-                </div>
-                <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 2</p>
-                <h3 className="text-2xl font-bold mb-4 text-[#1A1A1A]">Test</h3>
-                <p className="text-[#6B6B6B] leading-relaxed">
-                  Chaque candidat passe un test technique rigoureux adapté à votre stack.
-                </p>
-              </div>
-            </FadeIn>
-
-            <FadeIn delay={600}>
-              <div className="bg-white p-10 rounded-3xl border border-[#F0F0F0] hover:shadow-elevated transition-all group hover:-translate-y-2 duration-300 h-full">
-                <div className="w-12 h-12 rounded-xl bg-[#F3EEFF] flex items-center justify-center mb-8 group-hover:bg-[#7C3AED] transition-colors group-hover:scale-110 duration-300 mx-auto">
-                  <CheckCircle className="w-6 h-6 text-[#7C3AED] group-hover:text-white transition-colors" />
-                </div>
-                <p className="text-[#7C3AED] text-sm font-bold uppercase tracking-widest mb-2">Etape 3</p>
-                <h3 className="text-2xl font-bold mb-4 text-[#1A1A1A]">Hire</h3>
-                <p className="text-[#6B6B6B] leading-relaxed">
-                  Intégrez votre développeur en 72h. Nous gérons contrats, paie et conformité.
-                </p>
-              </div>
-            </FadeIn>
-          </div>
-        </section> */}
-
+        
         {/* --- HOW IT WORKS SECTION --- */}
         <section id="how-it-works" className="py-24 md:py-32 bg-[#FAFAFA]">
           <FadeIn delay={100} className="max-w-4xl mx-auto px-4 text-center mb-10 md:mb-18">
@@ -216,12 +168,17 @@ export default function LandingPage() {
               Rejoignez les entreprises qui construisent avec les meilleurs talents africains.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="#">
-                <Button variant="gradient" size="lg" className="rounded-full px-10 flex gap-2 group hover:scale-105 hover:shadow-xl transition-all duration-300">
-                    Demander une démo
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+              <Button 
+                href="https://mail.google.com/mail/?view=cm&fs=1&to=hello@opsideworks.com" 
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="gradient" 
+                size="lg" 
+                className="rounded-full px-10 flex gap-2 group hover:scale-105 hover:shadow-xl transition-all duration-300"
+              >
+                Demander une démo
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </div>
           </FadeIn>
         </section>

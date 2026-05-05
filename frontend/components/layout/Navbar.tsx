@@ -44,14 +44,14 @@ export default function Navbar() {
 
           {/* Right Buttons */}
           <div className="hidden md:flex items-center gap-4">
-              <>
-                <Link href="/auth/login">
-                  <Button variant="ghost" size="sm" className="font-medium">Se connecter</Button>
-                </Link>
-                <Link href="/auth/register">
-                  <Button variant="gradient" size="sm" className="text-[#1A1A1A] border-none shadow-none font-medium">S'inscrire</Button>
-                </Link>
-              </>
+            <>
+              <Link href="/auth/login">
+                <Button variant="ghost" size="sm" className="font-medium">Se connecter</Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button variant="gradient" size="sm" className="text-[#1A1A1A] border-none shadow-none font-medium">S'inscrire</Button>
+              </Link>
+            </>
           </div>
 
           {/* Mobile menu button */}
@@ -77,14 +77,14 @@ export default function Navbar() {
           )}
           <hr className="border-[#F0F0F0]" />
           <div className="flex flex-col gap-3">
-              <>
-                <Link href="/auth/login" onClick={() => setOpen(false)}>
-                  <Button variant="ghost" className="w-full justify-center">Se connecter</Button>
-                </Link>
-                <Link href="/auth/register" onClick={() => setOpen(false)}>
-                  <Button variant="secondary" className="w-full justify-center">S'inscrire</Button>
-                </Link>
-              </>
+            <>
+              <Link href="/auth/login" onClick={() => setOpen(false)}>
+                <Button variant="ghost" className="w-full justify-center">Se connecter</Button>
+              </Link>
+              <Link href="/auth/register" onClick={() => setOpen(false)}>
+                <Button variant="secondary" className="w-full justify-center">S'inscrire</Button>
+              </Link>
+            </>
           </div>
         </div>
       )}
