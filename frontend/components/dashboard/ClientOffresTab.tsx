@@ -112,6 +112,7 @@ export default function ClientOffresTab() {
         title: form.title,
         description: form.description,
         speciality: form.speciality === 'other' ? 'other' : form.speciality,
+        custom_speciality: form.speciality === 'other' ? form.custom_speciality : undefined,
         skills: skillNames,
         experience_min: form.experience_min ? Number(form.experience_min) : undefined,
         tjm_client: Number(form.tjm_client),

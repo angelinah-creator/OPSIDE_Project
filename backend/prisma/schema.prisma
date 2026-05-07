@@ -397,6 +397,7 @@ model JobOffer {
   work_type           WorkType
   timezone_preference String?
   start_date          DateTime?
+  custom_speciality   String?
   status              JobOfferStatus @default(draft)
   is_anonymous        Boolean    @default(true)
   created_at          DateTime   @default(now())

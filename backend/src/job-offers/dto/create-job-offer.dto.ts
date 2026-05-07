@@ -43,6 +43,10 @@ export class CreateJobOfferDto {
   @IsOptional()
   start_date?: string;
 
+  @IsString()
+  @IsOptional()
+  custom_speciality?: string;
+
   @IsEnum(JobOfferStatus)
   @IsOptional()
   status?: JobOfferStatus;

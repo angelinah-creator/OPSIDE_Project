@@ -36,6 +36,20 @@ export class AllExceptionsFilter implements ExceptionFilter {
       }
     }
 
+    if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
+      console.error('INTERNAL_SERVER_ERROR:', exception);
+      // Log to a file we can read
+      try {
+        const fs = require('fs');
+        const path = require('path');
+        const logPath = path.join(process.cwd(), 'error.log');
+        const logMessage = `[${new Date().toISOString()}] ${request.method} ${request.url}\n${exception instanceof Error ? exception.stack : JSON.stringify(exception)}\n\n`;
+        fs.appendFileSync(logPath, logMessage);
+      } catch (e) {
+        console.error('Failed to write to error.log', e);
+      }
+    }
+
     response.status(status).json({
       success: false,
       statusCode: status,

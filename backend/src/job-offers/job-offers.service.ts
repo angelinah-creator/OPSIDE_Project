@@ -12,44 +12,54 @@ export class JobOffersService {
   constructor(private prisma: PrismaService) {}
 
   async create(userId: string, dto: CreateJobOfferDto) {
-    const { skills, ...offerData } = dto;
+    console.log('Creating job offer for user:', userId, 'with data:', dto);
+    try {
+      const { skills, ...offerData } = dto;
 
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user || user.role !== 'client') {
-      throw new ForbiddenException('Seuls les clients peuvent créer une offre');
-    }
-
-    const resolvedSkills: any[] = [];
-    if (skills && skills.length > 0) {
-      for (const skillName of skills) {
-        let skill = await this.prisma.skill.findFirst({ where: { name: { equals: skillName, mode: 'insensitive' } } });
-        if (!skill) {
-           skill = await this.prisma.skill.create({
-             data: { name: skillName, category: 'other', is_custom: true }
-           });
-        }
-        resolvedSkills.push(skill);
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (!user || user.role !== 'client') {
+        throw new ForbiddenException('Seuls les clients peuvent créer une offre');
       }
-    }
 
-    const offer = await this.prisma.jobOffer.create({
-      data: {
-        ...offerData,
-        client_id: userId,
-        skills_required: {
-          create: resolvedSkills.map(s => ({
-            skill: { connect: { id: s.id } }
-          }))
-        }
-      },
-      include: {
-        skills_required: {
-          include: { skill: true }
+      const resolvedSkills: any[] = [];
+      if (skills && skills.length > 0) {
+        for (const skillName of skills) {
+          let skill = await this.prisma.skill.findFirst({
+            where: { name: { equals: skillName, mode: 'insensitive' } },
+          });
+          if (!skill) {
+            skill = await this.prisma.skill.create({
+              data: { name: skillName, category: 'other', is_custom: true },
+            });
+          }
+          resolvedSkills.push(skill);
         }
       }
-    });
 
-    return { message: 'Offre créée avec succès', offer };
+      const offer = await this.prisma.jobOffer.create({
+        data: {
+          ...offerData,
+          start_date: offerData.start_date ? new Date(offerData.start_date) : null,
+          custom_speciality: offerData.speciality === 'other' ? (dto as any).custom_speciality : null,
+          client_id: userId,
+          skills_required: {
+            create: resolvedSkills.map((s) => ({
+              skill: { connect: { id: s.id } },
+            })),
+          },
+        },
+        include: {
+          skills_required: {
+            include: { skill: true },
+          },
+        },
+      });
+
+      return { message: 'Offre créée avec succès', offer };
+    } catch (error) {
+      console.error('Error creating job offer:', error);
+      throw error;
+    }
   }
 
   async findAllForCandidates() {
@@ -118,16 +128,30 @@ export class JobOffersService {
 
     const { skills, ...offerData } = dto;
     
+    const updateData: any = {
+      ...offerData,
+    };
+
+    if (offerData.start_date) {
+      updateData.start_date = new Date(offerData.start_date);
+    }
+
+    if (offerData.speciality) {
+      updateData.custom_speciality = offerData.speciality === 'other' ? (dto as any).custom_speciality : null;
+    }
+
     if (skills) {
       await this.prisma.jobOfferSkill.deleteMany({ where: { job_offer_id: id } });
       
       const resolvedSkills: any[] = [];
       for (const skillName of skills) {
-        let skill = await this.prisma.skill.findFirst({ where: { name: { equals: skillName, mode: 'insensitive' } } });
+        let skill = await this.prisma.skill.findFirst({
+          where: { name: { equals: skillName, mode: 'insensitive' } },
+        });
         if (!skill) {
-           skill = await this.prisma.skill.create({
-             data: { name: skillName, category: 'other', is_custom: true }
-           });
+          skill = await this.prisma.skill.create({
+            data: { name: skillName, category: 'other', is_custom: true },
+          });
         }
         resolvedSkills.push(skill);
       }
@@ -135,18 +159,18 @@ export class JobOffersService {
       await this.prisma.jobOffer.update({
         where: { id },
         data: {
-          ...offerData,
+          ...updateData,
           skills_required: {
-            create: resolvedSkills.map(s => ({
-              skill: { connect: { id: s.id } }
-            }))
-          }
-        }
+            create: resolvedSkills.map((s) => ({
+              skill: { connect: { id: s.id } },
+            })),
+          },
+        },
       });
     } else {
       await this.prisma.jobOffer.update({
         where: { id },
-        data: offerData
+        data: updateData,
       });
     }
 
