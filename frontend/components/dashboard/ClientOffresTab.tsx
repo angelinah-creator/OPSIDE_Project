@@ -1,14 +1,37 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
-  PlusCircle, Briefcase, Eye, Users, Clock, Trash2,
-  ChevronRight, Calendar, MapPin, DollarSign, AlertCircle
+  PlusCircle, Briefcase, Eye, Users, Trash2,
+  ChevronRight, AlertCircle, DollarSign
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import SkillSelector from '@/components/ui/SkillSelector';
+import Modal from '@/components/ui/Modal';
 import { jobOfferApi } from '@/lib/job-offer-service';
 import { skillApi, Skill } from '@/lib/skill-service';
+
+/**
+ * Formate une date de publication de manière relative ou absolue
+ */
+function formatPublicationDate(dateString: string | Date): string {
+  if (!dateString) return '';
+  
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+  const diffInDays = Math.floor(diffInHours / 24);
+
+  if (diffInHours < 24) {
+    if (diffInHours <= 0) return "publié à l'instant";
+    return `publié il y a ${diffInHours}h`;
+  } else if (diffInDays < 7) {
+    return `publié il y a ${diffInDays}j`;
+  } else {
+    return `publié le ${date.toLocaleDateString('fr-FR')}`;
+  }
+}
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   draft:  { label: 'Brouillon', color: 'bg-slate-100 text-slate-600' },
@@ -45,6 +68,7 @@ interface FormData {
   contract_duration: string;
   work_type: string;
   start_date: string;
+  status?: string;
 }
 
 const EMPTY_FORM: FormData = {
@@ -58,6 +82,7 @@ const EMPTY_FORM: FormData = {
   contract_duration: '',
   work_type: 'full_remote',
   start_date: '',
+  status: 'active'
 };
 
 export default function ClientOffresTab() {
@@ -68,6 +93,8 @@ export default function ClientOffresTab() {
   const [saving, setSaving] = useState(false);
   const [allSkills, setAllSkills] = useState<Skill[]>([]);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
+  const [editingOffer, setEditingOffer] = useState<any | null>(null);
+  const [offerToDelete, setOfferToDelete] = useState<string | null>(null);
 
   const fetchOffers = async () => {
     try {
@@ -86,11 +113,9 @@ export default function ClientOffresTab() {
     skillApi.getSkills().then(setAllSkills).catch(() => {});
   }, []);
 
-  const handleNumericInput = (val: string) => {
-    // Strip leading zeros, allow empty
-    const stripped = val.replace(/^0+(\d)/, '$1');
-    return stripped;
-  };
+  const sortedOffers = useMemo(() => {
+    return [...offers].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [offers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,7 +126,6 @@ export default function ClientOffresTab() {
       return;
     }
 
-    // Map selected IDs -> skill names for the backend
     const skillNames = allSkills
       .filter(s => form.selectedSkillIds.includes(s.id))
       .map(s => s.name);
@@ -112,52 +136,75 @@ export default function ClientOffresTab() {
         title: form.title,
         description: form.description,
         speciality: form.speciality === 'other' ? 'other' : form.speciality,
-        custom_speciality: form.speciality === 'other' ? form.custom_speciality : undefined,
         skills: skillNames,
         experience_min: form.experience_min ? Number(form.experience_min) : undefined,
         tjm_client: Number(form.tjm_client),
         contract_duration: form.contract_duration || undefined,
         work_type: form.work_type,
         start_date: form.start_date || undefined,
-        status: 'active',
+        status: form.status || 'active',
       };
 
-      await jobOfferApi.createJobOffer(payload);
+      if (editingOffer) {
+        await jobOfferApi.updateJobOffer(editingOffer.id, payload);
+      } else {
+        await jobOfferApi.createJobOffer(payload);
+      }
+      
       setShowForm(false);
+      setEditingOffer(null);
       setForm(EMPTY_FORM);
       fetchOffers();
     } catch (err: any) {
-      setFormError(err.response?.data?.message || "Erreur lors de la création de l'offre.");
+      setFormError(err.response?.data?.message || "Erreur lors de l'enregistrement de l'offre.");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleClose = async (id: string) => {
-    if (confirm('Voulez-vous vraiment clôturer cette offre ?')) {
-      try {
-        await jobOfferApi.closeJobOffer(id);
-        fetchOffers();
-      } catch (err) {
-        console.error(err);
-      }
+  const handleEdit = (offer: any) => {
+    // Map existing offer to form data
+    const offerSkillsIds = allSkills
+      .filter(s => offer.skills.includes(s.name))
+      .map(s => s.id);
+
+    setForm({
+      title: offer.title,
+      description: offer.description,
+      speciality: offer.speciality,
+      custom_speciality: offer.custom_speciality || '',
+      selectedSkillIds: offerSkillsIds,
+      experience_min: String(offer.experience_min || ''),
+      tjm_client: String(offer.tjm_client),
+      contract_duration: offer.contract_duration || '',
+      work_type: offer.work_type,
+      start_date: offer.start_date ? new Date(offer.start_date).toISOString().split('T')[0] : '',
+      status: offer.status
+    });
+    setEditingOffer(offer);
+    setShowForm(true);
+  };
+
+  const confirmClose = async () => {
+    if (!offerToDelete) return;
+    try {
+      await jobOfferApi.closeJobOffer(offerToDelete);
+      setOfferToDelete(null);
+      fetchOffers();
+    } catch (err) {
+      console.error(err);
     }
   };
 
   // ─── Form View ───
   if (showForm) {
     return (
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-        <div className="flex items-center gap-4 mb-8">
-          <button
-            onClick={() => { setShowForm(false); setForm(EMPTY_FORM); setFormError(''); }}
-            className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors font-medium"
-          >
-            <ChevronRight className="w-4 h-4 rotate-180" /> Retour
-          </button>
-          <h2 className="text-xl font-black text-slate-900">Créer une offre d'emploi</h2>
-        </div>
-
+      <Modal 
+        isOpen={showForm} 
+        onClose={() => { setShowForm(false); setEditingOffer(null); setForm(EMPTY_FORM); setFormError(''); }}
+        title={editingOffer ? "Modifier l'offre" : "Créer une offre d'emploi"}
+        size="lg"
+      >
         <form onSubmit={handleSubmit} className="space-y-6 w-full">
 
           {formError && (
@@ -168,21 +215,53 @@ export default function ClientOffresTab() {
           )}
 
           {/* Section: Poste */}
-          <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm space-y-5">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Poste</h3>
+          <div className="bg-slate-50/50 rounded-3xl p-8 border border-slate-100 space-y-5">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Poste & Statut</h3>
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-800 mb-1.5">
-                Titre du poste <span className="text-red-400">*</span>
-              </label>
-              <input
-                required
-                type="text"
-                placeholder="Ex: Développeur React Senior"
-                className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all"
-                value={form.title}
-                onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+                  Titre du poste <span className="text-red-400">*</span>
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="Ex: Développeur React Senior"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-white text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all"
+                  value={form.title}
+                  onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+                  Statut de l'offre <span className="text-red-400">*</span>
+                </label>
+                <select
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-white text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all appearance-none"
+                  value={form.status}
+                  onChange={e => setForm(f => ({ ...f, status: e.target.value as any }))}
+                >
+                  {Object.entries(STATUS_LABELS).map(([key, val]) => (
+                    <option key={key} value={key}>{val.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+                  Type de travail <span className="text-red-400">*</span>
+                </label>
+                <select
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-white text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all appearance-none"
+                  value={form.work_type}
+                  onChange={e => setForm(f => ({ ...f, work_type: e.target.value }))}
+                >
+                  <option value="full_remote">Full Remote</option>
+                  <option value="hybrid">Hybride</option>
+                  <option value="on_site">Sur site</option>
+                </select>
+              </div>
             </div>
 
             <div>
@@ -193,42 +272,25 @@ export default function ClientOffresTab() {
                 required
                 rows={5}
                 placeholder="Décrivez la mission, le contexte, les attentes..."
-                className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all resize-none"
+                className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-white text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all resize-none"
                 value={form.description}
                 onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-1.5">
-                  Spécialité <span className="text-red-400">*</span>
-                </label>
-                <select
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all appearance-none"
-                  value={form.speciality}
-                  onChange={e => setForm(f => ({ ...f, speciality: e.target.value }))}
-                >
-                  {SPECIALITIES.map(s => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-1.5">
-                  Type de travail <span className="text-red-400">*</span>
-                </label>
-                <select
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all appearance-none"
-                  value={form.work_type}
-                  onChange={e => setForm(f => ({ ...f, work_type: e.target.value }))}
-                >
-                  <option value="full_remote">Full Remote</option>
-                  <option value="hybrid">Hybride</option>
-                  <option value="on_site">Sur site</option>
-                </select>
-              </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-800 mb-1.5">
+                Spécialité <span className="text-red-400">*</span>
+              </label>
+              <select
+                className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-white text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all appearance-none"
+                value={form.speciality}
+                onChange={e => setForm(f => ({ ...f, speciality: e.target.value }))}
+              >
+                {SPECIALITIES.map(s => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </select>
             </div>
 
             {form.speciality === 'other' && (
@@ -240,7 +302,7 @@ export default function ClientOffresTab() {
                   required
                   type="text"
                   placeholder="Ex: Blockchain, Cybersécurité, AR/VR..."
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-white text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all"
                   value={form.custom_speciality}
                   onChange={e => setForm(f => ({ ...f, custom_speciality: e.target.value }))}
                 />
@@ -249,7 +311,7 @@ export default function ClientOffresTab() {
           </div>
 
           {/* Section: Compétences */}
-          <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+          <div className="bg-slate-50/50 rounded-3xl p-8 border border-slate-100">
             <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-5">Compétences requises</h3>
             <SkillSelector
               label="Sélectionnez les compétences"
@@ -259,7 +321,7 @@ export default function ClientOffresTab() {
           </div>
 
           {/* Section: Conditions */}
-          <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm space-y-5">
+          <div className="bg-slate-50/50 rounded-3xl p-8 border border-slate-100 space-y-5">
             <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400">Conditions</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -274,9 +336,9 @@ export default function ClientOffresTab() {
                     inputMode="numeric"
                     pattern="[0-9]*"
                     placeholder="Ex: 550"
-                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all pr-14"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-white text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all pr-14"
                     value={form.tjm_client}
-                    onChange={e => setForm(f => ({ ...f, tjm_client: handleNumericInput(e.target.value.replace(/\D/g, '')) }))}
+                    onChange={e => setForm(f => ({ ...f, tjm_client: e.target.value.replace(/\D/g, '') }))}
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">€/j</span>
                 </div>
@@ -291,9 +353,9 @@ export default function ClientOffresTab() {
                   inputMode="numeric"
                   pattern="[0-9]*"
                   placeholder="Ex: 3"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-white text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all"
                   value={form.experience_min}
-                  onChange={e => setForm(f => ({ ...f, experience_min: handleNumericInput(e.target.value.replace(/\D/g, '')) }))}
+                  onChange={e => setForm(f => ({ ...f, experience_min: e.target.value.replace(/\D/g, '') }))}
                 />
               </div>
             </div>
@@ -304,7 +366,7 @@ export default function ClientOffresTab() {
                 <input
                   type="text"
                   placeholder="Ex: 6 mois, 12 mois, Long terme"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-white text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all"
                   value={form.contract_duration}
                   onChange={e => setForm(f => ({ ...f, contract_duration: e.target.value }))}
                 />
@@ -315,7 +377,7 @@ export default function ClientOffresTab() {
               <label className="block text-sm font-semibold text-slate-800 mb-1.5">Date de début souhaitée</label>
               <input
                 type="date"
-                className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-slate-50 text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all"
+                className="w-full px-4 py-3 border border-slate-200 rounded-2xl bg-white text-sm focus:outline-none focus:border-accent focus:ring-4 focus:ring-accent/5 transition-all"
                 value={form.start_date}
                 onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))}
               />
@@ -323,20 +385,20 @@ export default function ClientOffresTab() {
           </div>
 
           {/* Submit */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 sticky bottom-0 bg-white pt-4 pb-2">
             <button
               type="button"
-              onClick={() => { setShowForm(false); setForm(EMPTY_FORM); setFormError(''); }}
+              onClick={() => { setShowForm(false); setEditingOffer(null); setForm(EMPTY_FORM); setFormError(''); }}
               className="px-6 py-3 rounded-2xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50 transition-all"
             >
               Annuler
             </button>
             <Button type="submit" loading={saving} className="flex-1 py-3 rounded-2xl">
-              Publier l'offre
+              {editingOffer ? "Enregistrer les modifications" : "Publier l'offre"}
             </Button>
           </div>
         </form>
-      </div>
+      </Modal>
     );
   }
 
@@ -357,12 +419,44 @@ export default function ClientOffresTab() {
         </button>
       </div>
 
+      {/* Confirmation Modal for Closing */}
+      <Modal 
+        isOpen={!!offerToDelete} 
+        onClose={() => setOfferToDelete(null)}
+        title="Clôturer l'offre"
+        size="sm"
+      >
+        <div className="text-center space-y-6">
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">
+            <Trash2 className="w-8 h-8" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-slate-900">Voulez-vous vraiment clôturer cette offre ?</h3>
+            <p className="text-sm text-slate-500 mt-2">Cette action est irréversible et l'offre ne sera plus visible par les candidats.</p>
+          </div>
+          <div className="flex gap-3">
+            <button 
+              onClick={() => setOfferToDelete(null)}
+              className="flex-1 px-4 py-3 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all"
+            >
+              Annuler
+            </button>
+            <button 
+              onClick={confirmClose}
+              className="flex-1 px-4 py-3 bg-red-500 text-white rounded-2xl text-sm font-bold hover:bg-red-600 transition-all shadow-lg shadow-red-200"
+            >
+              Clôturer
+            </button>
+          </div>
+        </div>
+      </Modal>
+
       {isLoading ? (
         <div className="py-16 flex items-center justify-center">
           <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin" />
         </div>
       ) : offers.length === 0 ? (
-        <div className="bg-white rounded-3xl p-16 text-center border border-dashed border-slate-200">
+        <div className="bg-white rounded-[2.5rem] p-16 text-center border border-dashed border-slate-200">
           <Briefcase className="w-12 h-12 text-slate-200 mx-auto mb-4" />
           <h3 className="text-lg font-bold text-slate-900">Aucune offre publiée</h3>
           <p className="text-sm text-slate-400 mt-2 mb-6">Créez votre première offre pour trouver les meilleurs talents.</p>
@@ -374,27 +468,26 @@ export default function ClientOffresTab() {
           </button>
         </div>
       ) : (
-        <div className="space-y-3">
-          {offers.map(offer => {
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sortedOffers.map(offer => {
             const status = STATUS_LABELS[offer.status] || STATUS_LABELS.draft;
             return (
-              <div key={offer.id} className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all">
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1 flex-wrap">
-                      <h3 className="text-base font-bold text-slate-900 truncate">{offer.title}</h3>
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${status.color}`}>{status.label}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-400 font-medium flex-wrap">
-                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {new Date(offer.created_at).toLocaleDateString('fr-FR')}</span>
-                      <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {WORK_TYPE_LABELS[offer.work_type] || offer.work_type}</span>
-                      {offer.contract_duration && <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> {offer.contract_duration}</span>}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
+              <div 
+                key={offer.id} 
+                onClick={() => handleEdit(offer)}
+                className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col"
+              >
+                <div className="flex items-start justify-between mb-5">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full">
+                    {formatPublicationDate(offer.created_at)}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${status.color}`}>
+                      {status.label}
+                    </span>
                     <button
-                      onClick={() => handleClose(offer.id)}
-                      className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                      onClick={(e) => { e.stopPropagation(); setOfferToDelete(offer.id); }}
+                      className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                       title="Clôturer l'offre"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -402,27 +495,44 @@ export default function ClientOffresTab() {
                   </div>
                 </div>
 
-                <p className="text-sm text-slate-500 line-clamp-2 mb-4">{offer.description}</p>
+                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-accent transition-colors line-clamp-1">{offer.title}</h3>
+                <p className="text-sm text-slate-500 line-clamp-2 mb-6 grow">{offer.description}</p>
 
+                <div className="space-y-3 mb-6 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
+                  <div className="flex items-center justify-between text-[11px] font-medium">
+                    <span className="text-slate-400">Type de travail</span>
+                    <span className="text-slate-900 font-bold">{WORK_TYPE_LABELS[offer.work_type] || offer.work_type}</span>
+                  </div>
+                  {offer.contract_duration && (
+                    <div className="flex items-center justify-between text-[11px] font-medium">
+                      <span className="text-slate-400">Durée de contrat</span>
+                      <span className="text-slate-900 font-bold">{offer.contract_duration}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between text-[11px] font-medium">
+                    <span className="text-slate-400">TJM</span>
+                    <span className="text-slate-900 font-bold">{offer.tjm_client}€/j</span>
+                  </div>
+                </div>
+
+                {/* Skills Section */}
                 {offer.skills && offer.skills.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {offer.skills.slice(0, 6).map((skill: string) => (
-                      <span key={skill} className="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg text-[10px] font-bold uppercase tracking-tight">{skill}</span>
+                  <div className="flex flex-wrap gap-1.5 mb-6">
+                    {offer.skills.map((skill: string) => (
+                      <span key={skill} className="px-2 py-1 bg-slate-50 border border-slate-200 text-slate-500 rounded-lg text-[9px] font-bold uppercase tracking-tight">
+                        {skill}
+                      </span>
                     ))}
-                    {offer.skills.length > 6 && (
-                      <span className="px-2.5 py-1 bg-slate-50 border border-slate-200 text-slate-400 rounded-lg text-[10px] font-bold">+{offer.skills.length - 6}</span>
-                    )}
                   </div>
                 )}
 
                 <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                  <div className="flex items-center gap-4 text-xs text-slate-500 font-medium">
-                    <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5" /> {offer.views_count} vue(s)</span>
-                    <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {offer.applications_count} candidature(s)</span>
+                  <div className="flex items-center gap-3 text-[10px] text-slate-400 font-bold uppercase tracking-tight">
+                    <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5" /> {offer.views_count}</span>
+                    <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {offer.applications_count}</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-sm font-black text-slate-900">
-                    <DollarSign className="w-4 h-4 text-slate-400" />
-                    {offer.tjm_client}€ <span className="text-xs text-slate-400 font-normal">/jour</span>
+                  <div className="text-[10px] font-black text-accent uppercase tracking-widest flex items-center gap-1">
+                    Modifier <ChevronRight className="w-3 h-3" />
                   </div>
                 </div>
               </div>

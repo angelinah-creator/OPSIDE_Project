@@ -5,19 +5,37 @@ import { jobOfferApi } from '@/lib/job-offer-service';
 import clsx from 'clsx';
 import { 
   ChevronRight, 
-  Clock, 
   DollarSign, 
-  Calendar, 
-  Globe, 
   Search, 
   ChevronLeft,
   ChevronRight as ChevronRightIcon,
   TrendingUp,
-  MapPin,
   RotateCcw,
   Send
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
+
+/**
+ * Formate une date de publication de manière relative ou absolue
+ */
+function formatPublicationDate(dateString: string | Date): string {
+  if (!dateString) return '';
+  
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  const now = new Date();
+  const diffInMs = now.getTime() - date.getTime();
+  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+  const diffInDays = Math.floor(diffInHours / 24);
+
+  if (diffInHours < 24) {
+    if (diffInHours <= 0) return "publié à l'instant";
+    return `publié il y a ${diffInHours}h`;
+  } else if (diffInDays < 7) {
+    return `publié il y a ${diffInDays}j`;
+  } else {
+    return `publié le ${date.toLocaleDateString('fr-FR')}`;
+  }
+}
 
 interface Offer {
   id: string;
@@ -72,7 +90,7 @@ export default function OffresTab() {
           timezone: offer.timezone_preference || 'Non précisé',
           minExperience: `${offer.experience_min} ans`,
           experienceValue: offer.experience_min || 0,
-          publishedAt: new Date(offer.created_at).toLocaleDateString(),
+          publishedAt: formatPublicationDate(offer.created_at),
           createdAt: new Date(offer.created_at).getTime()
         }));
         setOffersData(mapped);
@@ -101,7 +119,7 @@ export default function OffresTab() {
         return matchesSearch && matchesExp && matchesTjm && matchesDuration && matchesWorkType;
       })
       .sort((a, b) => b.createdAt - a.createdAt); // Most recent first
-  }, [searchQuery, filters]);
+  }, [searchQuery, filters, offersData]);
 
   const totalPages = Math.ceil(filteredOffers.length / ITEMS_PER_PAGE);
   const paginatedOffers = filteredOffers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
@@ -234,8 +252,7 @@ export default function OffresTab() {
               className="bg-white rounded-[2rem] p-5 md:p-7 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full"
             >
               <div className="flex justify-between items-start mb-5">
-                <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full">
-                  <Clock className="w-3.5 h-3.5" />
+                <div className="text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full uppercase tracking-tight">
                   {offer.publishedAt}
                 </div>
               </div>
@@ -244,57 +261,46 @@ export default function OffresTab() {
                 {offer.title}
               </h3>
               
-              <p className="text-sm text-slate-500 mb-6 line-clamp-2 leading-relaxed flex-grow">
+              <p className="text-sm text-slate-500 mb-6 line-clamp-2 leading-relaxed grow">
                 {offer.description}
               </p>
               
               {/* Detailed Meta Grid */}
               <div className="grid grid-cols-1 gap-3 mb-6 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
                 <div className="flex items-center justify-between text-slate-600">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-slate-400" />
-                    <span className="text-xs font-medium text-slate-400">TJM estimé</span>
-                  </div>
+                  <span className="text-xs font-medium text-slate-400">TJM estimé</span>
                   <span className="text-xs font-bold text-slate-900">{offer.tjm}</span>
                 </div>
                 
                 <div className="flex items-center justify-between text-slate-600">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-slate-400" />
-                    <span className="text-xs font-medium text-slate-400">Durée</span>
-                  </div>
+                  <span className="text-xs font-medium text-slate-400">Durée de contrat</span>
                   <span className="text-xs font-bold text-slate-900">{offer.duration}</span>
                 </div>
 
                 <div className="flex items-center justify-between text-slate-600">
-                  <div className="flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-slate-400" />
-                    <span className="text-xs font-medium text-slate-400">Type de travail</span>
-                  </div>
+                  <span className="text-xs font-medium text-slate-400">Type de travail</span>
                   <span className="text-xs font-bold text-slate-900">{offer.workType}</span>
                 </div>
 
                 <div className="flex items-center justify-between text-slate-600">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-slate-400" />
-                    <span className="text-xs font-medium text-slate-400">Expérience min.</span>
-                  </div>
+                  <span className="text-xs font-medium text-slate-400">Expérience min.</span>
                   <span className="text-xs font-bold text-slate-900">{offer.minExperience}</span>
                 </div>
               </div>
 
-              {/* Skills */}
-              <div className="flex flex-wrap gap-1.5 mb-6">
-                {offer.skills.map(skill => (
-                  <span key={skill} className="px-2.5 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg text-[10px] font-bold uppercase tracking-tight">
-                    {skill}
-                  </span>
-                ))}
-              </div>
+              {/* Skills Section */}
+              {offer.skills && offer.skills.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-6">
+                  {offer.skills.map(skill => (
+                    <span key={skill} className="px-2.5 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg text-[10px] font-bold uppercase tracking-tight">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              )}
               
               <div className="flex items-center justify-between pt-5 border-t border-slate-50 mt-auto gap-4">
                 <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-widest min-w-0">
-                  <MapPin className="w-3.5 h-3.5 shrink-0" />
                   <span className="truncate">{offer.timezone}</span>
                 </div>
                 <Button 
