@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -14,6 +15,11 @@ interface ModalProps {
 
 export default function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -31,7 +37,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const sizeClasses = {
     sm: 'max-w-md',
@@ -41,8 +47,11 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
     full: 'max-w-[95vw] h-[90vh]',
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+      {/* Background overlay click-to-close */}
+      <div className="absolute inset-0 -z-10" onClick={onClose} />
+      
       <div 
         ref={modalRef}
         className={clsx(
@@ -68,4 +77,6 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

@@ -20,12 +20,12 @@ import {
 import clsx from 'clsx';
 
 // Tab Components
-import TechniqueTab from '@/components/dashboard/TechniqueTab';
-import OffresTab from '@/components/dashboard/OffresTab';
-import HistoriqueTab from '@/components/dashboard/HistoriqueTab';
-import ProfilTab from '@/components/dashboard/ProfilTab';
-import NotificationsTab from '@/components/dashboard/NotificationsTab';
-import AideTab from '@/components/dashboard/AideTab';
+import TechniqueTab from '@/components/dashboard/candidate/TechniqueTab';
+import OffresTab from '@/components/dashboard/candidate/OffresTab';
+import HistoriqueTab from '@/components/dashboard/candidate/HistoriqueTab';
+import ProfilTab from '@/components/dashboard/candidate/ProfilTab';
+import NotificationsTab from '@/components/dashboard/candidate/NotificationsTab';
+import AideTab from '@/components/dashboard/candidate/AideTab';
 
 type TabType = 'technique' | 'offres' | 'historique' | 'profil' | 'notifications' | 'aide';
 

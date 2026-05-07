@@ -15,8 +15,8 @@ import {
   X,
 } from 'lucide-react'
 import clsx from 'clsx'
-import ClientOffresTab from '@/components/dashboard/ClientOffresTab'
-import ClientProfilTab from '@/components/dashboard/ClientProfilTab'
+import ClientOffresTab from '@/components/dashboard/client/ClientOffresTab'
+import ClientProfilTab from '@/components/dashboard/client/ClientProfilTab'
 
 type TabType = 'dashboard' | 'candidatures' | 'notifications' | 'offres' | 'profil'
 
