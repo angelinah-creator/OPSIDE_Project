@@ -172,9 +172,7 @@ export default function CandidatDashboard() {
                 )}
               </div>
               <div className="flex-1 min-w-0 text-left">
-                <p className="text-sm font-bold text-slate-900 truncate">{user?.first_name} {user?.last_name}</p>
-                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
-              </div>
+                <p className="text-sm font-bold text-slate-900 truncate">{user?.first_name} {user?.last_name}</p>              </div>
             </div>
             <button 
               onClick={handleLogout}

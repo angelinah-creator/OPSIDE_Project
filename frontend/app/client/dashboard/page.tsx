@@ -144,14 +144,17 @@ export default function ClientDashboard() {
         <div className="p-4 mt-auto border-t border-slate-100 lg:border-none">
           <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-sm">
-                {initials}
+              <div className="w-10 h-10 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-sm overflow-hidden">
+                {profile?.logo_url ? (
+                  <img src={profile.logo_url} alt={profile.company_name} className="w-full h-full object-contain p-1 bg-white" />
+                ) : (
+                  initials
+                )}
               </div>
               <div className="flex-1 min-w-0 text-left">
                 <p className="text-sm font-bold text-slate-900 truncate">
                   {profile?.company_name || `${user?.first_name} ${user?.last_name}`}
                 </p>
-                <p className="text-xs text-slate-500 truncate">{user?.email}</p>
               </div>
             </div>
             <button
