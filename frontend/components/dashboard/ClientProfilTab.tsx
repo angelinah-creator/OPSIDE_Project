@@ -333,13 +333,6 @@ export default function ClientProfilTab({ profile: initialProfile, user, onProfi
             </div>
           </div>
         </div>
-
-        <div className="bg-accent/5 rounded-[2rem] p-6 border border-accent/10">
-          <h3 className="text-sm font-bold text-accent mb-2">💡 Conseil</h3>
-          <p className="text-xs text-slate-600 leading-relaxed">
-            Les offres publiées sont anonymes. Les candidats ne voient pas le nom de votre entreprise tant qu'ils ne sont pas sélectionnés.
-          </p>
-        </div>
       </div>
     </div>
   );

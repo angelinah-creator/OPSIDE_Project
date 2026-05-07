@@ -530,7 +530,7 @@ export default function ClientOffresTab() {
                     </div>
 
                     <div className="flex items-start justify-between">
-                      <h3 className="text-xl font-bold text-slate-900 group-hover:text-accent transition-colors">{offer.title}</h3>
+                      <h3 className="text-xl font-bold text-slate-900">{offer.title}</h3>
                       <button
                         onClick={(e) => { e.stopPropagation(); setOfferToDelete(offer.id); }}
                         className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all md:hidden"
