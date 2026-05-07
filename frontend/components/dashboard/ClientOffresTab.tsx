@@ -3,13 +3,17 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
   PlusCircle, Briefcase, Eye, Users, Trash2,
-  ChevronRight, AlertCircle, DollarSign
+  ChevronRight, AlertCircle, DollarSign, ChevronLeft,
+  ChevronRight as ChevronRightIcon
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import SkillSelector from '@/components/ui/SkillSelector';
 import Modal from '@/components/ui/Modal';
+import clsx from 'clsx';
 import { jobOfferApi } from '@/lib/job-offer-service';
 import { skillApi, Skill } from '@/lib/skill-service';
+
+const ITEMS_PER_PAGE = 6;
 
 /**
  * Formate une date de publication de manière relative ou absolue
@@ -95,6 +99,7 @@ export default function ClientOffresTab() {
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [editingOffer, setEditingOffer] = useState<any | null>(null);
   const [offerToDelete, setOfferToDelete] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchOffers = async () => {
     try {
@@ -116,6 +121,12 @@ export default function ClientOffresTab() {
   const sortedOffers = useMemo(() => {
     return [...offers].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }, [offers]);
+
+  const paginatedOffers = useMemo(() => {
+    return sortedOffers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  }, [sortedOffers, currentPage]);
+
+  const totalPages = Math.ceil(sortedOffers.length / ITEMS_PER_PAGE);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -468,76 +479,116 @@ export default function ClientOffresTab() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sortedOffers.map(offer => {
-            const status = STATUS_LABELS[offer.status] || STATUS_LABELS.draft;
-            return (
-              <div 
-                key={offer.id} 
-                onClick={() => handleEdit(offer)}
-                className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col"
-              >
-                <div className="flex items-start justify-between mb-5">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full">
-                    {formatPublicationDate(offer.created_at)}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${status.color}`}>
-                      {status.label}
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginatedOffers.map(offer => {
+              const status = STATUS_LABELS[offer.status] || STATUS_LABELS.draft;
+              return (
+                <div 
+                  key={offer.id} 
+                  onClick={() => handleEdit(offer)}
+                  className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col"
+                >
+                  <div className="flex items-start justify-between mb-5">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full">
+                      {formatPublicationDate(offer.created_at)}
                     </span>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setOfferToDelete(offer.id); }}
-                      className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                      title="Clôturer l'offre"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${status.color}`}>
+                        {status.label}
+                      </span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setOfferToDelete(offer.id); }}
+                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                        title="Clôturer l'offre"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                </div>
 
-                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-accent transition-colors line-clamp-1">{offer.title}</h3>
-                <p className="text-sm text-slate-500 line-clamp-2 mb-6 grow">{offer.description}</p>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-accent transition-colors line-clamp-1">{offer.title}</h3>
+                  <p className="text-sm text-slate-500 line-clamp-2 mb-6 grow">{offer.description}</p>
 
-                <div className="space-y-3 mb-6 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                  <div className="flex items-center justify-between text-[11px] font-medium">
-                    <span className="text-slate-400">Type de travail</span>
-                    <span className="text-slate-900 font-bold">{WORK_TYPE_LABELS[offer.work_type] || offer.work_type}</span>
-                  </div>
-                  {offer.contract_duration && (
+                  <div className="space-y-3 mb-6 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
                     <div className="flex items-center justify-between text-[11px] font-medium">
-                      <span className="text-slate-400">Durée de contrat</span>
-                      <span className="text-slate-900 font-bold">{offer.contract_duration}</span>
+                      <span className="text-slate-400">Type de travail</span>
+                      <span className="text-slate-900 font-bold">{WORK_TYPE_LABELS[offer.work_type] || offer.work_type}</span>
+                    </div>
+                    {offer.contract_duration && (
+                      <div className="flex items-center justify-between text-[11px] font-medium">
+                        <span className="text-slate-400">Durée de contrat</span>
+                        <span className="text-slate-900 font-bold">{offer.contract_duration}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between text-[11px] font-medium">
+                      <span className="text-slate-400">TJM</span>
+                      <span className="text-slate-900 font-bold">{offer.tjm_client}€/j</span>
+                    </div>
+                  </div>
+
+                  {/* Skills Section */}
+                  {offer.skills && offer.skills.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-6">
+                      {offer.skills.map((skill: string) => (
+                        <span key={skill} className="px-2.5 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-[10px] font-bold uppercase tracking-tight">
+                          {skill}
+                        </span>
+                      ))}
                     </div>
                   )}
-                  <div className="flex items-center justify-between text-[11px] font-medium">
-                    <span className="text-slate-400">TJM</span>
-                    <span className="text-slate-900 font-bold">{offer.tjm_client}€/j</span>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                    <div className="flex items-center gap-3 text-[10px] text-slate-400 font-bold uppercase tracking-tight">
+                      <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" />  Candidatures {offer.applications_count}</span>
+                    </div>
+                    <div className="text-[10px] font-black text-accent uppercase tracking-widest flex items-center gap-1">
+                      Modifier <ChevronRightIcon className="w-3 h-3" />
+                    </div>
                   </div>
                 </div>
+              );
+            })}
+          </div>
 
-                {/* Skills Section */}
-                {offer.skills && offer.skills.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-6">
-                    {offer.skills.map((skill: string) => (
-                      <span key={skill} className="px-2.5 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-[10px] font-bold uppercase tracking-tight">
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                  <div className="flex items-center gap-3 text-[10px] text-slate-400 font-bold uppercase tracking-tight">
-                    <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" />  Candidatures {offer.applications_count}</span>
-                  </div>
-                  <div className="text-[10px] font-black text-accent uppercase tracking-widest flex items-center gap-1">
-                    Modifier <ChevronRight className="w-3 h-3" />
-                  </div>
-                </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-end gap-3 pt-8">
+              <button 
+                disabled={currentPage === 1}
+                onClick={() => { setCurrentPage(prev => prev - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-30 transition-all shadow-sm"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              
+              <div className="flex items-center gap-2">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setCurrentPage(i + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                    className={clsx(
+                      "w-10 h-10 rounded-xl font-bold text-sm transition-all shadow-sm border",
+                      currentPage === i + 1 
+                        ? "bg-slate-900 border-slate-900 text-white shadow-lg shadow-slate-200" 
+                        : "bg-white border-slate-100 text-slate-600 hover:border-slate-300"
+                    )}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
               </div>
-            );
-          })}
-        </div>
+
+              <button 
+                disabled={currentPage === totalPages}
+                onClick={() => { setCurrentPage(prev => prev + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-30 transition-all shadow-sm"
+              >
+                <ChevronRightIcon className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

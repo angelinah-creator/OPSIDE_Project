@@ -301,7 +301,7 @@ export default function OffresTab() {
               
               <div className="flex items-center justify-between pt-5 border-t border-slate-50 mt-auto gap-4">
                 <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-widest min-w-0">
-                  <span className="truncate">{offer.timezone}</span>
+                  <span className="truncate"></span>
                 </div>
                 <Button 
                   variant="gradient" 
