@@ -293,7 +293,7 @@ export default function OffresTab() {
                   </div>
                 </div>
 
-                <h3 className="font-bold text-slate-900 text-xl group-hover:text-accent transition-colors leading-tight">
+                <h3 className="font-bold text-slate-900 text-xl transition-colors leading-tight">
                   {offer.title}
                 </h3>
                 
