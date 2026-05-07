@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useMemo, useEffect } from 'react';
 import { jobOfferApi } from '@/lib/job-offer-service';
 import clsx from 'clsx';
@@ -11,9 +9,45 @@ import {
   ChevronRight as ChevronRightIcon,
   TrendingUp,
   RotateCcw,
-  Send
+  Send,
+  ChevronDown,
+  ChevronUp,
+  Briefcase,
+  Clock,
+  Calendar
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
+
+/**
+ * Composant pour gérer l'affichage raccourci ou complet de la description
+ */
+function ExpandableDescription({ text, limit = 250 }: { text: string; limit?: number }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const shouldCollapse = text.length > limit;
+  
+  if (!shouldCollapse) return <p className="text-sm text-slate-500 leading-relaxed grow">{text}</p>;
+
+  return (
+    <div className="grow">
+      <p className={clsx(
+        "text-sm text-slate-500 leading-relaxed transition-all",
+        !isExpanded && "line-clamp-3"
+      )}>
+        {text}
+      </p>
+      <button 
+        onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
+        className="mt-2 text-xs font-bold text-accent hover:underline flex items-center gap-1"
+      >
+        {isExpanded ? (
+          <>Voir moins <ChevronUp className="w-3 h-3" /></>
+        ) : (
+          <>Voir plus <ChevronDown className="w-3 h-3" /></>
+        )}
+      </button>
+    </div>
+  );
+}
 
 /**
  * Formate une date de publication de manière relative ou absolue
@@ -243,72 +277,72 @@ export default function OffresTab() {
         )}
       </div>
 
-      {/* Offers Grid */}
+      {/* Offers List */}
       {paginatedOffers.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {paginatedOffers.map((offer) => (
+        <div className="space-y-6">
+          {paginatedOffers.map(offer => (
             <div 
               key={offer.id} 
-              className="bg-white rounded-[2rem] p-5 md:p-7 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full"
+              className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col md:flex-row gap-8"
             >
-              <div className="flex justify-between items-start mb-5">
-                <div className="text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full uppercase tracking-tight">
-                  {offer.publishedAt}
+              {/* Left Side: Header & Description */}
+              <div className="flex-1 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="text-[10px] font-black text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full uppercase tracking-widest">
+                    {offer.publishedAt}
+                  </div>
                 </div>
+
+                <h3 className="font-bold text-slate-900 text-xl group-hover:text-accent transition-colors leading-tight">
+                  {offer.title}
+                </h3>
+                
+                <ExpandableDescription text={offer.description} />
+                
+                {/* Skills Section */}
+                {offer.skills && offer.skills.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {offer.skills.map(skill => (
+                      <span key={skill} className="px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-600 rounded-xl text-[10px] font-bold uppercase tracking-tight">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              <h3 className="font-bold text-slate-900 text-lg mb-3 group-hover:text-accent transition-colors leading-tight">
-                {offer.title}
-              </h3>
-              
-              <p className="text-sm text-slate-500 mb-6 line-clamp-2 leading-relaxed grow">
-                {offer.description}
-              </p>
-              
-              {/* Detailed Meta Grid */}
-              <div className="grid grid-cols-1 gap-3 mb-6 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                <div className="flex items-center justify-between text-slate-600">
-                  <span className="text-xs font-medium text-slate-400">TJM estimé</span>
-                  <span className="text-xs font-bold text-slate-900">{offer.tjm}</span>
+              {/* Right Side: Meta & Actions */}
+              <div className="w-full md:w-80 space-y-6 flex flex-col justify-between pt-6 md:pt-0 border-t md:border-t-0 md:border-l border-slate-100 md:pl-8">
+                <div className="space-y-3 bg-slate-50/50 p-5 rounded-2xl border border-slate-100">
+                  <div className="flex items-center justify-between text-xs font-medium">
+                    <span className="text-slate-400">TJM estimé</span>
+                    <span className="text-slate-900 font-bold">{offer.tjm}</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-xs font-medium">
+                    <span className="text-slate-400">Durée de contrat</span>
+                    <span className="text-slate-900 font-bold">{offer.duration}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs font-medium">
+                    <span className="text-slate-400">Type de travail</span>
+                    <span className="text-slate-900 font-bold">{offer.workType}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs font-medium">
+                    <span className="text-slate-400">Expérience min.</span>
+                    <span className="text-slate-900 font-bold">{offer.minExperience}</span>
+                  </div>
                 </div>
                 
-                <div className="flex items-center justify-between text-slate-600">
-                  <span className="text-xs font-medium text-slate-400">Durée de contrat</span>
-                  <span className="text-xs font-bold text-slate-900">{offer.duration}</span>
+                <div className="flex justify-end pt-4">
+                  <Button 
+                    variant="gradient" 
+                    className="px-12 rounded-2xl h-12 text-sm font-black shadow-lg shadow-accent/20 group/btn"
+                  >
+                    Postuler
+                  </Button>
                 </div>
-
-                <div className="flex items-center justify-between text-slate-600">
-                  <span className="text-xs font-medium text-slate-400">Type de travail</span>
-                  <span className="text-xs font-bold text-slate-900">{offer.workType}</span>
-                </div>
-
-                <div className="flex items-center justify-between text-slate-600">
-                  <span className="text-xs font-medium text-slate-400">Expérience min.</span>
-                  <span className="text-xs font-bold text-slate-900">{offer.minExperience}</span>
-                </div>
-              </div>
-
-              {/* Skills Section */}
-              {offer.skills && offer.skills.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-6">
-                  {offer.skills.map(skill => (
-                    <span key={skill} className="px-2.5 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-[10px] font-bold uppercase tracking-tight">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              )}
-              
-              <div className="flex items-center justify-between pt-5 border-t border-slate-50 mt-auto gap-4">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 uppercase tracking-widest min-w-0">
-                  <span className="truncate"></span>
-                </div>
-                <Button 
-                  variant="gradient" 
-                  className="rounded-xl h-10 px-4 text-xs font-black shadow-lg shadow-accent/20 group/btn"
-                >
-                  Postuler
-                </Button>
               </div>
             </div>
           ))}

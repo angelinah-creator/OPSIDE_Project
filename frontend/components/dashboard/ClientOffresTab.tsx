@@ -1,10 +1,8 @@
-'use client';
-
 import { useState, useEffect, useMemo } from 'react';
 import {
   PlusCircle, Briefcase, Eye, Users, Trash2,
   ChevronRight, AlertCircle, DollarSign, ChevronLeft,
-  ChevronRight as ChevronRightIcon
+  ChevronRight as ChevronRightIcon, ChevronDown, ChevronUp
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import SkillSelector from '@/components/ui/SkillSelector';
@@ -14,6 +12,37 @@ import { jobOfferApi } from '@/lib/job-offer-service';
 import { skillApi, Skill } from '@/lib/skill-service';
 
 const ITEMS_PER_PAGE = 6;
+
+/**
+ * Composant pour gérer l'affichage raccourci ou complet de la description
+ */
+function ExpandableDescription({ text, limit = 250 }: { text: string; limit?: number }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const shouldCollapse = text.length > limit;
+  
+  if (!shouldCollapse) return <p className="text-sm text-slate-500 leading-relaxed grow">{text}</p>;
+
+  return (
+    <div className="grow">
+      <p className={clsx(
+        "text-sm text-slate-500 leading-relaxed transition-all",
+        !isExpanded && "line-clamp-3"
+      )}>
+        {text}
+      </p>
+      <button 
+        onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
+        className="mt-2 text-xs font-bold text-accent hover:underline flex items-center gap-1"
+      >
+        {isExpanded ? (
+          <>Voir moins <ChevronUp className="w-3 h-3" /></>
+        ) : (
+          <>Voir plus <ChevronDown className="w-3 h-3" /></>
+        )}
+      </button>
+    </div>
+  );
+}
 
 /**
  * Formate une date de publication de manière relative ou absolue
@@ -480,70 +509,86 @@ export default function ClientOffresTab() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-6">
             {paginatedOffers.map(offer => {
               const status = STATUS_LABELS[offer.status] || STATUS_LABELS.draft;
               return (
                 <div 
                   key={offer.id} 
                   onClick={() => handleEdit(offer)}
-                  className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group flex flex-col"
+                  className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm hover:shadow-xl transition-all cursor-pointer group flex flex-col md:flex-row gap-8"
                 >
-                  <div className="flex items-start justify-between mb-5">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full">
-                      {formatPublicationDate(offer.created_at)}
-                    </span>
-                    <div className="flex items-center gap-2">
+                  {/* Left Side: Header & Description */}
+                  <div className="flex-1 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 px-3 py-1.5 rounded-full">
+                        {formatPublicationDate(offer.created_at)}
+                      </span>
                       <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${status.color}`}>
                         {status.label}
                       </span>
+                    </div>
+
+                    <div className="flex items-start justify-between">
+                      <h3 className="text-xl font-bold text-slate-900 group-hover:text-accent transition-colors">{offer.title}</h3>
                       <button
                         onClick={(e) => { e.stopPropagation(); setOfferToDelete(offer.id); }}
-                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                        className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all md:hidden"
                         title="Clôturer l'offre"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
-                  </div>
 
-                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-accent transition-colors line-clamp-1">{offer.title}</h3>
-                  <p className="text-sm text-slate-500 line-clamp-2 mb-6 grow">{offer.description}</p>
+                    <ExpandableDescription text={offer.description} />
 
-                  <div className="space-y-3 mb-6 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-                    <div className="flex items-center justify-between text-[11px] font-medium">
-                      <span className="text-slate-400">Type de travail</span>
-                      <span className="text-slate-900 font-bold">{WORK_TYPE_LABELS[offer.work_type] || offer.work_type}</span>
-                    </div>
-                    {offer.contract_duration && (
-                      <div className="flex items-center justify-between text-[11px] font-medium">
-                        <span className="text-slate-400">Durée de contrat</span>
-                        <span className="text-slate-900 font-bold">{offer.contract_duration}</span>
+                    {/* Skills Section */}
+                    {offer.skills && offer.skills.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pt-2">
+                        {offer.skills.map((skill: string) => (
+                          <span key={skill} className="px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-600 rounded-xl text-[10px] font-bold uppercase tracking-tight">
+                            {skill}
+                          </span>
+                        ))}
                       </div>
                     )}
-                    <div className="flex items-center justify-between text-[11px] font-medium">
-                      <span className="text-slate-400">TJM</span>
-                      <span className="text-slate-900 font-bold">{offer.tjm_client}€/j</span>
-                    </div>
                   </div>
 
-                  {/* Skills Section */}
-                  {offer.skills && offer.skills.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-6">
-                      {offer.skills.map((skill: string) => (
-                        <span key={skill} className="px-2.5 py-1.5 bg-slate-100 border border-slate-200 text-slate-700 rounded-lg text-[10px] font-bold uppercase tracking-tight">
-                          {skill}
-                        </span>
-                      ))}
+                  {/* Right Side: Meta & Actions */}
+                  <div className="w-full md:w-80 space-y-6 flex flex-col justify-between pt-6 md:pt-0 border-t md:border-t-0 md:border-l border-slate-100 md:pl-8">
+                    <div className="space-y-3 bg-slate-50/50 p-5 rounded-2xl border border-slate-100">
+                      <div className="flex items-center justify-between text-xs font-medium">
+                        <span className="text-slate-400">Type de travail</span>
+                        <span className="text-slate-900 font-bold">{WORK_TYPE_LABELS[offer.work_type] || offer.work_type}</span>
+                      </div>
+                      {offer.contract_duration && (
+                        <div className="flex items-center justify-between text-xs font-medium">
+                          <span className="text-slate-400">Durée de contrat</span>
+                          <span className="text-slate-900 font-bold">{offer.contract_duration}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between text-xs font-medium">
+                        <span className="text-slate-400">TJM</span>
+                        <span className="text-slate-900 font-bold text-accent">{offer.tjm_client}€/j</span>
+                      </div>
                     </div>
-                  )}
 
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                    <div className="flex items-center gap-3 text-[10px] text-slate-400 font-bold uppercase tracking-tight">
-                      <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" />  Candidatures {offer.applications_count}</span>
-                    </div>
-                    <div className="text-[10px] font-black text-accent uppercase tracking-widest flex items-center gap-1">
-                      Modifier <ChevronRightIcon className="w-3 h-3" />
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-xs text-slate-400 font-bold uppercase tracking-tight">
+                        <span className="flex items-center gap-2"><Users className="w-4 h-4" /> {offer.applications_count} Candidatures</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setOfferToDelete(offer.id); }}
+                          className="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all hidden md:block"
+                          title="Clôturer l'offre"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                        <div className="text-[10px] font-black text-accent uppercase tracking-widest flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                          Modifier <ChevronRightIcon className="w-3 h-3" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
