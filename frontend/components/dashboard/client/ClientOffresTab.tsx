@@ -118,10 +118,10 @@ export default function ClientOffresTab() {
     setShowForm(true);
   };
 
-  const confirmClose = async () => {
+  const confirmDelete = async () => {
     if (!offerToDelete) return;
     try {
-      await jobOfferApi.closeJobOffer(offerToDelete);
+      await jobOfferApi.deleteJobOffer(offerToDelete);
       setOfferToDelete(null);
       fetchOffers();
     } catch (err) {
@@ -154,11 +154,11 @@ export default function ClientOffresTab() {
         onSuccess={fetchOffers}
       />
 
-      {/* Confirmation Modal for Closing */}
+      {/* Confirmation Modal for Deleting */}
       <Modal 
         isOpen={!!offerToDelete} 
         onClose={() => setOfferToDelete(null)}
-        title="Clôturer l'offre"
+        title="Supprimer l'offre"
         size="sm"
       >
         <div className="text-center space-y-6">
@@ -166,8 +166,8 @@ export default function ClientOffresTab() {
             <Trash2 className="w-8 h-8" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-900">Voulez-vous vraiment clôturer cette offre ?</h3>
-            <p className="text-sm text-slate-500 mt-2">Cette action est irréversible et l'offre ne sera plus visible par les candidats.</p>
+            <h3 className="text-lg font-bold text-slate-900">Voulez-vous vraiment supprimer cette offre ?</h3>
+            <p className="text-sm text-slate-500 mt-2">Cette action est irréversible.</p>
           </div>
           <div className="flex gap-3">
             <button 
@@ -177,10 +177,10 @@ export default function ClientOffresTab() {
               Annuler
             </button>
             <button 
-              onClick={confirmClose}
+              onClick={confirmDelete}
               className="flex-1 px-4 py-3 bg-red-500 text-white rounded-2xl text-sm font-bold hover:bg-red-600 transition-all shadow-lg shadow-red-200"
             >
-              Clôturer
+              Supprimer
             </button>
           </div>
         </div>
@@ -229,7 +229,7 @@ export default function ClientOffresTab() {
                       <button
                         onClick={(e) => { e.stopPropagation(); setOfferToDelete(offer.id); }}
                         className="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all md:hidden"
-                        title="Clôturer l'offre"
+                        title="Supprimer l'offre"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -276,7 +276,7 @@ export default function ClientOffresTab() {
                         <button
                           onClick={(e) => { e.stopPropagation(); setOfferToDelete(offer.id); }}
                           className="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all hidden md:block"
-                          title="Clôturer l'offre"
+                          title="Supprimer l'offre"
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>

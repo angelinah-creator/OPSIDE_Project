@@ -187,11 +187,10 @@ export class JobOffersService {
       throw new ForbiddenException('Vous ne pouvez supprimer que vos propres offres');
     }
 
-    await this.prisma.jobOffer.update({
+    await this.prisma.jobOffer.delete({
       where: { id },
-      data: { status: 'closed' }
     });
 
-    return { message: 'Offre clôturée' };
+    return { message: 'Offre supprimée avec succès' };
   }
 }

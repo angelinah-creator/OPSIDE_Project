@@ -19,7 +19,7 @@ export const jobOfferApi = {
     return api.patch(`/job-offers/${id}`, data);
   },
 
-  closeJobOffer: async (id: string) => {
+  deleteJobOffer: async (id: string) => {
     return api.delete(`/job-offers/${id}`);
   },
 };

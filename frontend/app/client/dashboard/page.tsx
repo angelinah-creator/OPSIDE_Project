@@ -75,9 +75,9 @@ export default function ClientDashboard() {
 
   const navItems: { id: TabType; label: string; icon: any }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'offres', label: "Offres d'emploi", icon: Briefcase },
     { id: 'candidatures', label: 'Candidatures', icon: FileText },
     { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'offres', label: "Offres d'emploi", icon: Briefcase },
     { id: 'profil', label: 'Profil', icon: User },
   ]
 
