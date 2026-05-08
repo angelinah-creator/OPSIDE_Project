@@ -90,13 +90,7 @@ export default function ClientMatchesTab() {
               <div className="flex flex-col md:items-end gap-3">
                 {match.status === 'confirmed' ? (
                   <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] text-white rounded-xl font-bold text-sm shadow-lg shadow-slate-900/10 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                      <Calendar className="w-4 h-4" />
-                      Planifier l'entretien
-                    </button>
-                    <button className="p-2.5 text-slate-400 hover:text-accent hover:bg-accent/5 rounded-xl transition-all border border-transparent hover:border-accent/10">
-                      <MessageSquare className="w-5 h-5" />
-                    </button>
+                    
                   </div>
                 ) : (
                   <div className="text-right">

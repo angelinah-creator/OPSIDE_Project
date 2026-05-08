@@ -41,26 +41,35 @@ export class MatchesService {
             client: true,
           },
         },
+        job_offer: true,
       },
     });
 
     // Notification au candidat
     const companyName = match.client.client?.company_name || 'Un client';
+    const projectName = match.job_offer?.title || 'une opportunité';
+    
     await this.notificationsService.create({
       user_id: dto.candidate_id,
       type: NotificationType.sourcing_invitation,
       title: 'Nouvelle invitation reçue',
-      message: `${companyName} souhaite vous rencontrer pour une opportunité.`,
+      message: `${companyName} souhaite vous rencontrer pour le projet : ${projectName}.`,
       link: `/candidat/dashboard`,
     });
 
-    // Envoi d'email au candidat via MailService
+    // Envoi d'email au candidat
     try {
-      const candidateEmail = (await this.prisma.user.findUnique({ where: { id: dto.candidate_id } }))?.email;
-      if (candidateEmail) {
-        // Optionnel: Ajouter une méthode sendSourcingEmail plus tard, pour l'instant on se concentre sur le Match
+      const candidateUser = await this.prisma.user.findUnique({ where: { id: dto.candidate_id } });
+      if (candidateUser?.email) {
+        await this.mailService.sendSourcingInvitationEmail(
+          candidateUser.email,
+          companyName,
+          projectName
+        );
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('Failed to send sourcing invitation email:', e);
+    }
 
     return match;
   }
@@ -105,8 +114,26 @@ export class MatchesService {
         user_id: recipientId,
         type: NotificationType.match_rejected,
         title: 'Match refusé',
-        message: `${rejectorName} a décliné le match.`,
+        message: `${rejectorName} a décliné le match${match.job_offer ? ` pour le projet ${match.job_offer.title}` : ''}.`,
       });
+
+      // Email au client si le candidat refuse
+      if (role === Role.candidat) {
+        try {
+          const clientUser = await this.prisma.user.findUnique({ where: { id: match.client_id } });
+          if (clientUser?.email) {
+            const candidateName = `${match.candidate.first_name} ${match.candidate.last_name}`;
+            await this.mailService.sendMatchDecisionEmail(
+              clientUser.email,
+              candidateName,
+              'refused',
+              match.job_offer?.title
+            );
+          }
+        } catch (e) {
+          console.error('Failed to send rejection email to client:', e);
+        }
+      }
 
       return updatedMatch;
     }
@@ -134,7 +161,7 @@ export class MatchesService {
         user_id: match.candidate_id,
         type: NotificationType.match_confirmed,
         title: 'Match confirmé !',
-        message: `Félicitations ! Votre match avec ${match.client.client?.company_name} est confirmé. Vous allez recevoir un email pour l'entretien.`,
+        message: `Félicitations ! Votre match avec ${match.client.client?.company_name} est confirmé pour le projet ${match.job_offer?.title || 'sourcing'}.`,
         link: `/candidat/dashboard`,
       });
 
@@ -142,7 +169,7 @@ export class MatchesService {
         user_id: match.client_id,
         type: NotificationType.match_confirmed,
         title: 'Match confirmé !',
-        message: `Le candidat a accepté votre invitation. Vous allez recevoir un email avec les détails.`,
+        message: `Le candidat a accepté votre invitation pour le projet ${match.job_offer?.title || 'sourcing'}.`,
         link: `/client/dashboard`,
       });
 
@@ -155,7 +182,8 @@ export class MatchesService {
           await this.mailService.sendMatchConfirmationEmail(
             candidateUser.email, 
             'candidate', 
-            match.client.client?.company_name || 'le client'
+            match.client.client?.company_name || 'le client',
+            match.job_offer?.title
           );
         }
         
@@ -164,7 +192,8 @@ export class MatchesService {
           await this.mailService.sendMatchConfirmationEmail(
             clientUser.email, 
             'client', 
-            candidateName
+            candidateName,
+            match.job_offer?.title
           );
         }
       } catch (e) {

@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react'
 import { candidateApi, CandidateProfile } from '@/lib/candidate-service'
 import { matchService } from '@/lib/match-service'
 import { jobOfferApi } from '@/lib/job-offer-service'
-import { Search, User, Filter, Send, MapPin, Star, Clock } from 'lucide-react'
+import { Search, User, Filter, Send, MapPin, Star, Clock, Briefcase } from 'lucide-react'
 import { toast } from 'sonner'
 import clsx from 'clsx'
+import Modal from '@/components/ui/Modal'
 
 export default function ClientSourcingTab() {
   const [candidates, setCandidates] = useState<CandidateProfile[]>([])
@@ -15,6 +16,8 @@ export default function ClientSourcingTab() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedOfferId, setSelectedOfferId] = useState<string>('')
   const [invitingId, setInvitingId] = useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [targetCandidateId, setTargetCandidateId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchData()
@@ -36,14 +39,27 @@ export default function ClientSourcingTab() {
     }
   }
 
-  const handleInvite = async (candidateId: string) => {
+  const openInviteModal = (candidateId: string) => {
+    setTargetCandidateId(candidateId)
+    setIsModalOpen(true)
+  }
+
+  const handleInvite = async () => {
+    if (!targetCandidateId || !selectedOfferId) {
+      toast.error('Veuillez sélectionner une offre')
+      return
+    }
+
     try {
-      setInvitingId(candidateId)
+      setInvitingId(targetCandidateId)
+      setIsModalOpen(false)
       await matchService.source({
-        candidate_id: candidateId,
-        job_offer_id: selectedOfferId || undefined
+        candidate_id: targetCandidateId,
+        job_offer_id: selectedOfferId
       })
       toast.success('Invitation envoyée !')
+      setSelectedOfferId('')
+      setTargetCandidateId(null)
     } catch (error: any) {
       console.error('Error inviting candidate:', error)
       toast.error(error.response?.data?.message || 'Erreur lors de l\'envoi')
@@ -81,19 +97,6 @@ export default function ClientSourcingTab() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
             />
-          </div>
-          <div className="w-full md:w-64 relative">
-            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-            <select
-              value={selectedOfferId}
-              onChange={(e) => setSelectedOfferId(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all appearance-none"
-            >
-              <option value="">Sourcing direct (pas d'offre)</option>
-              {jobOffers.map(o => (
-                <option key={o.id} value={o.id}>{o.title}</option>
-              ))}
-            </select>
           </div>
         </div>
       </div>
@@ -158,7 +161,7 @@ export default function ClientSourcingTab() {
                   </div>
 
                   <button
-                    onClick={() => handleInvite(cand.user_id)}
+                    onClick={() => openInviteModal(cand.user_id)}
                     disabled={invitingId === cand.user_id}
                     className="w-full flex items-center justify-center gap-2 py-4 bg-[#1A1A1A] text-white rounded-2xl font-bold text-sm shadow-xl shadow-slate-900/10 hover:bg-black transition-all disabled:opacity-50 disabled:scale-100 group"
                   >
@@ -177,6 +180,81 @@ export default function ClientSourcingTab() {
           ))
         )}
       </div>
+
+      {/* Invitation Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Sélectionner une offre"
+        size="sm"
+      >
+        <div className="space-y-6">
+          <p className="text-slate-500 text-sm">
+            Choisissez l'offre pour laquelle vous souhaitez inviter ce candidat.
+          </p>
+          
+          <div className="space-y-3">
+            {jobOffers.length === 0 ? (
+              <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                <Briefcase className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                <p className="text-sm font-medium text-slate-500">Vous n'avez aucune offre active.</p>
+                <a href="/client/dashboard" className="text-xs font-bold text-accent mt-2 inline-block">Créer une offre</a>
+              </div>
+            ) : (
+              jobOffers.map((offer) => (
+                <button
+                  key={offer.id}
+                  onClick={() => setSelectedOfferId(offer.id)}
+                  className={clsx(
+                    "w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left group",
+                    selectedOfferId === offer.id 
+                      ? "bg-accent/5 border-accent shadow-sm" 
+                      : "bg-white border-slate-100 hover:border-slate-200 hover:bg-slate-50"
+                  )}
+                >
+                  <div className={clsx(
+                    "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                    selectedOfferId === offer.id ? "bg-accent text-white" : "bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-slate-600"
+                  )}>
+                    <Briefcase className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={clsx(
+                      "font-bold truncate",
+                      selectedOfferId === offer.id ? "text-accent" : "text-slate-900"
+                    )}>
+                      {offer.title}
+                    </p>
+                    <p className="text-xs text-slate-400 font-medium">Postée le {new Date(offer.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <div className={clsx(
+                    "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0",
+                    selectedOfferId === offer.id ? "border-accent bg-accent" : "border-slate-200"
+                  )}>
+                    {selectedOfferId === offer.id && <div className="w-2 h-2 rounded-full bg-white" />}
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+
+          <div className="pt-4 flex gap-3">
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="flex-1 py-3 bg-slate-50 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-100 transition-all"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={handleInvite}
+              disabled={!selectedOfferId}
+              className="flex-2 px-8 py-3 bg-[#1A1A1A] text-white rounded-xl font-bold text-sm hover:bg-black transition-all disabled:opacity-50"
+            >
+              Envoyer l'invitation
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

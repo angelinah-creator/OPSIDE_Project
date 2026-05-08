@@ -9,6 +9,7 @@ import clsx from 'clsx'
 export default function CandidateMatchesTab() {
   const [matches, setMatches] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [respondingId, setRespondingId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchMatches()
@@ -28,12 +29,15 @@ export default function CandidateMatchesTab() {
 
   const handleRespond = async (id: string, action: 'confirm' | 'reject') => {
     try {
+      setRespondingId(id)
       await matchService.respond(id, action)
       toast.success(action === 'confirm' ? 'Match confirmé !' : 'Match décliné')
       fetchMatches()
     } catch (error) {
       console.error('Error responding to match:', error)
       toast.error('Erreur lors de la réponse')
+    } finally {
+      setRespondingId(null)
     }
   }
 
@@ -102,17 +106,28 @@ export default function CandidateMatchesTab() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleRespond(match.id, 'reject')}
-                      className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
+                      disabled={respondingId === match.id}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-red-50 text-red-600 border border-red-100 rounded-xl font-bold text-sm shadow-sm hover:bg-red-500 hover:text-white hover:border-red-500 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 group"
                       title="Décliner"
                     >
-                      <X className="w-5 h-5" />
+                      {respondingId === match.id ? (
+                        <div className="w-4 h-4 border-2 border-red-600/30 border-t-red-600 rounded-full animate-spin group-hover:border-white/30 group-hover:border-t-white" />
+                      ) : (
+                        <X className="w-5 h-5" />
+                      )}
+                      Pas Match
                     </button>
                     <button
                       onClick={() => handleRespond(match.id, 'confirm')}
-                      className="flex items-center gap-2 px-6 py-2.5 bg-accent text-white rounded-xl font-bold text-sm shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                      disabled={respondingId === match.id}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-accent text-white rounded-xl font-bold text-sm shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100"
                     >
-                      <Check className="w-4 h-4" />
-                      Confirmer le Match
+                      {respondingId === match.id ? (
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <Check className="w-4 h-4" />
+                      )}
+                      Match
                     </button>
                   </div>
                 ) : match.status === 'confirmed' ? (
