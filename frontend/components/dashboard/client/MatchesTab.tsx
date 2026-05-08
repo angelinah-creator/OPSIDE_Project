@@ -90,7 +90,7 @@ export default function ClientMatchesTab() {
               <div className="flex flex-col md:items-end gap-3">
                 {match.status === 'confirmed' ? (
                   <div className="flex items-center gap-2">
-                    
+                    .
                   </div>
                 ) : (
                   <div className="text-right">
