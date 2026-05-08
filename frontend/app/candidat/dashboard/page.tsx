@@ -24,10 +24,12 @@ import TechniqueTab from '@/components/dashboard/candidate/TechniqueTab';
 import OffresTab from '@/components/dashboard/candidate/OffresTab';
 import HistoriqueTab from '@/components/dashboard/candidate/HistoriqueTab';
 import ProfilTab from '@/components/dashboard/candidate/ProfilTab';
-import NotificationsTab from '@/components/dashboard/candidate/NotificationsTab';
+import MatchesTab from '@/components/dashboard/candidate/MatchesTab';
+import NotificationsTab from '@/components/dashboard/NotificationsTab';
+import { notificationService } from '@/lib/notification-service';
 import AideTab from '@/components/dashboard/candidate/AideTab';
 
-type TabType = 'technique' | 'offres' | 'historique' | 'profil' | 'notifications' | 'aide';
+type TabType = 'technique' | 'offres' | 'historique' | 'profil' | 'matches' | 'notifications' | 'aide';
 
 export default function CandidatDashboard() {
   const router = useRouter();
@@ -37,6 +39,7 @@ export default function CandidatDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('technique');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +59,8 @@ export default function CandidatDashboard() {
         // Forced mock score for UI testing if null
         setLatestScore(scoreRes.score || 85);
 
+        const count = await notificationService.getUnreadCount();
+        setUnreadNotifications(count);
       } catch (err: any) {
         if (err.response?.status === 404) {
           router.push('/candidat/onboarding');
@@ -68,6 +73,18 @@ export default function CandidatDashboard() {
     };
 
     fetchData();
+
+    // Set up polling for notifications
+    const interval = setInterval(async () => {
+      try {
+        const count = await notificationService.getUnreadCount();
+        setUnreadNotifications(count);
+      } catch (err) {
+        console.error('Error polling notifications:', err);
+      }
+    }, 15000); // Poll every 15 seconds
+
+    return () => clearInterval(interval);
   }, [router]);
 
   const handleLogout = async () => {
@@ -94,6 +111,7 @@ export default function CandidatDashboard() {
   const navItems: { id: TabType; label: string; icon: any }[] = [
     { id: 'technique', label: 'Test technique', icon: Code2 },
     { id: 'offres', label: 'Offres d\'emploi', icon: Briefcase },
+    { id: 'matches', label: 'Matches', icon: Bell },
     { id: 'historique', label: 'Historique', icon: History },
     { id: 'profil', label: 'Profil', icon: User },
     { id: 'notifications', label: 'Notifications', icon: Bell },
@@ -151,9 +169,9 @@ export default function CandidatDashboard() {
                 activeTab === item.id ? "text-white" : "text-slate-400 group-hover:text-slate-600"
               )} />
               {item.label}
-              {item.id === 'notifications' && (
-                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                  2
+              {item.id === 'notifications' && unreadNotifications > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                  {unreadNotifications}
                 </span>
               )}
             </button>
@@ -204,6 +222,7 @@ export default function CandidatDashboard() {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           {activeTab === 'technique' && <TechniqueTab score={latestScore} profile={profile} />}
           {activeTab === 'offres' && <OffresTab />}
+          {activeTab === 'matches' && <MatchesTab />}
           {activeTab === 'historique' && <HistoriqueTab />}
           {activeTab === 'profil' && <ProfilTab profile={profile} user={user} />}
           {activeTab === 'notifications' && <NotificationsTab />}

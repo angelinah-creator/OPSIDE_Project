@@ -12,6 +12,7 @@ import {
   ParseUUIDPipe,
   HttpCode,
   HttpStatus,
+  Request,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -52,6 +53,18 @@ export class CandidateController {
   @Roles(Role.candidat, Role.client, Role.admin)
   getProfileById(@Param('id', ParseUUIDPipe) id: string) {
     return this.candidateService.getProfileById(id);
+  }
+
+  @Get('all')
+  @Roles(Role.client, Role.admin)
+  findAll() {
+    return this.candidateService.findAllProfiles();
+  }
+
+  @Get('applied-jobs')
+  @Roles(Role.candidat)
+  getAppliedJobs(@CurrentUser('id') userId: string) {
+    return this.candidateService.getAppliedJobIds(userId);
   }
 
   @Patch('profile')

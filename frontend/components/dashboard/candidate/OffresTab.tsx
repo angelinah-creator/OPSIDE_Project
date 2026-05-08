@@ -1,5 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { jobOfferApi } from '@/lib/job-offer-service';
+import { candidateApi } from '@/lib/candidate-service';
+import { candidatureService } from '@/lib/candidature-service';
+import { toast } from 'sonner';
 import clsx from 'clsx';
 import { 
   ChevronRight, 
@@ -14,7 +17,8 @@ import {
   ChevronUp,
   Briefcase,
   Clock,
-  Calendar
+  Calendar,
+  X
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
@@ -96,6 +100,8 @@ export default function OffresTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState<string | null>(null);
+  const [appliedJobIds, setAppliedJobIds] = useState<string[]>([]);
   
   // Filter States
   const [filters, setFilters] = useState({
@@ -105,36 +111,47 @@ export default function OffresTab() {
     workType: 'all'
   });
 
+  const fetchOffers = async () => {
+    try {
+      setIsLoading(true);
+      const res = await jobOfferApi.getJobOffers();
+      const mapped = res.data.map((offer: any) => ({
+        id: offer.id,
+        title: offer.title,
+        description: offer.description,
+        fullDescription: offer.description,
+        skills: offer.skills_required?.map((s: any) => s.skill.name) || [],
+        tjm: `${offer.tjm_client}€`,
+        tjmValue: Number(offer.tjm_client),
+        duration: offer.contract_duration || 'Non précisé',
+        durationValue: parseInt(offer.contract_duration) || 0,
+        workType: offer.work_type === 'full_remote' ? 'Remote' : (offer.work_type === 'on_site' ? 'On-site' : 'Hybride'),
+        timezone: offer.timezone_preference || 'Non précisé',
+        minExperience: `${offer.experience_min} ans`,
+        experienceValue: offer.experience_min || 0,
+        publishedAt: formatPublicationDate(offer.created_at),
+        createdAt: new Date(offer.created_at).getTime()
+      }));
+      setOffersData(mapped);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchAppliedJobs = async () => {
+    try {
+      const ids = await candidateApi.getAppliedJobs();
+      setAppliedJobIds(ids);
+    } catch (error) {
+      console.error('Error fetching applied jobs:', error);
+    }
+  };
+
   useEffect(() => {
-    const loadOffers = async () => {
-      try {
-        setIsLoading(true);
-        const res = await jobOfferApi.getJobOffers();
-        const mapped = res.data.map((offer: any) => ({
-          id: offer.id,
-          title: offer.title,
-          description: offer.description,
-          fullDescription: offer.description,
-          skills: offer.skills || [],
-          tjm: `${offer.tjm_client}€`,
-          tjmValue: Number(offer.tjm_client),
-          duration: offer.contract_duration || 'Non précisé',
-          durationValue: parseInt(offer.contract_duration) || 0,
-          workType: offer.work_type === 'full_remote' ? 'Remote' : (offer.work_type === 'on_site' ? 'On-site' : 'Hybride'),
-          timezone: offer.timezone_preference || 'Non précisé',
-          minExperience: `${offer.experience_min} ans`,
-          experienceValue: offer.experience_min || 0,
-          publishedAt: formatPublicationDate(offer.created_at),
-          createdAt: new Date(offer.created_at).getTime()
-        }));
-        setOffersData(mapped);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadOffers();
+    fetchOffers();
+    fetchAppliedJobs();
   }, []);
 
   const filteredOffers = useMemo(() => {
@@ -167,6 +184,23 @@ export default function OffresTab() {
     });
     setSearchQuery('');
     setCurrentPage(1);
+  };
+
+  const handleDirectApply = async (offer: Offer) => {
+    try {
+      setIsSubmitting(offer.id);
+      await candidatureService.apply({
+        job_offer_id: offer.id,
+        message: `Candidature spontanée pour le poste de ${offer.title}`
+      });
+      toast.success(`Candidature envoyée pour le poste : ${offer.title}`);
+      setAppliedJobIds([...appliedJobIds, offer.id]);
+    } catch (error: any) {
+      console.error('Error applying:', error);
+      toast.error(error.response?.data?.message || 'Erreur lors de l\'envoi de la candidature');
+    } finally {
+      setIsSubmitting(null);
+    }
   };
 
   const hasActiveFilters = searchQuery !== '' || Object.values(filters).some(v => v !== 'all');
@@ -336,12 +370,27 @@ export default function OffresTab() {
                 </div>
                 
                 <div className="flex justify-end pt-4">
-                  <Button 
-                    variant="gradient" 
-                    className="px-12 rounded-2xl h-12 text-sm font-black shadow-lg shadow-accent/20 group/btn"
-                  >
-                    Postuler
-                  </Button>
+                  {appliedJobIds.includes(offer.id) ? (
+                    <button 
+                      disabled
+                      className="px-12 rounded-2xl h-12 text-sm font-black bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200"
+                    >
+                      Déjà postulé
+                    </button>
+                  ) : (
+                    <Button 
+                      variant="gradient" 
+                      className="px-12 rounded-2xl h-12 text-sm font-black shadow-lg shadow-accent/20 group/btn"
+                      disabled={isSubmitting === offer.id}
+                      onClick={() => handleDirectApply(offer)}
+                    >
+                      {isSubmitting === offer.id ? (
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        'Postuler'
+                      )}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

@@ -17,8 +17,13 @@ import {
 import clsx from 'clsx'
 import ClientOffresTab from '@/components/dashboard/client/ClientOffresTab'
 import ClientProfilTab from '@/components/dashboard/client/ClientProfilTab'
+import ClientCandidaturesTab from '@/components/dashboard/client/CandidaturesTab'
+import ClientSourcingTab from '@/components/dashboard/client/SourcingTab'
+import ClientMatchesTab from '@/components/dashboard/client/MatchesTab'
+import NotificationsTab from '@/components/dashboard/NotificationsTab'
+import { notificationService } from '@/lib/notification-service'
 
-type TabType = 'dashboard' | 'candidatures' | 'notifications' | 'offres' | 'profil'
+type TabType = 'dashboard' | 'candidatures' | 'sourcing' | 'matches' | 'notifications' | 'offres' | 'profil'
 
 export default function ClientDashboard() {
   const router = useRouter()
@@ -27,6 +32,7 @@ export default function ClientDashboard() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<TabType>('offres')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [unreadNotifications, setUnreadNotifications] = useState(0)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,6 +45,10 @@ export default function ClientDashboard() {
         }
         const p = await clientApi.getMyProfile()
         setProfile(p)
+        
+        // Fetch unread count
+        const count = await notificationService.getUnreadCount()
+        setUnreadNotifications(count)
       } catch (err: any) {
         if (err.response?.status === 404) {
           router.push('/client/onboarding')
@@ -50,12 +60,23 @@ export default function ClientDashboard() {
       }
     }
     fetchData()
+
+    // Set up polling for notifications
+    const interval = setInterval(async () => {
+      try {
+        const count = await notificationService.getUnreadCount()
+        setUnreadNotifications(count)
+      } catch (err) {
+        console.error('Error polling notifications:', err)
+      }
+    }, 15000) // Poll every 15 seconds
+
+    return () => clearInterval(interval)
   }, [router])
 
   const handleLogout = async () => {
     try {
-      const Cookies = (await import('js-cookie')).default
-      const rt = Cookies.get('refresh_token') || ''
+      const rt = (await import('js-cookie')).default.get('refresh_token') || ''
       await authApi.logout(rt)
     } catch { }
     clearTokens()
@@ -77,6 +98,8 @@ export default function ClientDashboard() {
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'offres', label: "Offres d'emploi", icon: Briefcase },
     { id: 'candidatures', label: 'Candidatures', icon: FileText },
+    { id: 'sourcing', label: 'Sourcing', icon: User },
+    { id: 'matches', icon: Briefcase, label: 'Matches' }, 
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'profil', label: 'Profil', icon: User },
   ]
@@ -131,9 +154,9 @@ export default function ClientDashboard() {
                   activeTab === item.id ? "text-white" : "text-slate-400 group-hover:text-slate-600"
                 )} />
                 {item.label}
-                {item.id === 'notifications' && (
-                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                    0
+                {item.id === 'notifications' && unreadNotifications > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                    {unreadNotifications}
                   </span>
                 )}
               </button>
@@ -190,16 +213,15 @@ export default function ClientDashboard() {
                 <p className="text-slate-400 font-medium">Dashboard — À venir</p>
               </div>
             )}
-            {activeTab === 'candidatures' && (
+            {activeTab === 'dashboard' && (
               <div className="bg-white rounded-3xl p-12 border border-slate-100 shadow-sm flex items-center justify-center min-h-[400px]">
-                <p className="text-slate-400 font-medium">Candidatures — À venir</p>
+                <p className="text-slate-400 font-medium">Dashboard — À venir</p>
               </div>
             )}
-            {activeTab === 'notifications' && (
-              <div className="bg-white rounded-3xl p-12 border border-slate-100 shadow-sm flex items-center justify-center min-h-[400px]">
-                <p className="text-slate-400 font-medium">Notifications — À venir</p>
-              </div>
-            )}
+            {activeTab === 'candidatures' && <ClientCandidaturesTab />}
+            {activeTab === 'sourcing' && <ClientSourcingTab />}
+            {activeTab === 'matches' && <ClientMatchesTab />}
+            {activeTab === 'notifications' && <NotificationsTab />}
             {activeTab === 'offres' && <ClientOffresTab />}
             {activeTab === 'profil' && <ClientProfilTab profile={profile} user={user} onProfileUpdate={setProfile} />}
           </div>

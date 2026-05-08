@@ -12,7 +12,9 @@ import { MailModule } from './mail/mail.module';
 import { TestModule } from './test/test.module';
 import { VideosModule } from './videos/videos.module';
 import { JobOffersModule } from './job-offers/job-offers.module';
-
+import { NotificationsModule } from './notifications/notifications.module';
+import { CandidaturesModule } from './candidatures/candidatures.module';
+import { MatchesModule } from './matches/matches.module';
 
 @Module({
   imports: [
@@ -37,6 +39,9 @@ import { JobOffersModule } from './job-offers/job-offers.module';
     TestModule,
     VideosModule,
     JobOffersModule,
+    NotificationsModule,
+    CandidaturesModule,
+    MatchesModule,
   ],
 })
 export class AppModule {}

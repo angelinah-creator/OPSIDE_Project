@@ -55,4 +55,43 @@ export class MailService {
       `,
     });
   }
+
+  async sendMatchConfirmationEmail(email: string, role: 'candidate' | 'client', partnerName: string) {
+    const subject = role === 'candidate' ? 'Match confirmé - Entretien OPSIDE' : 'Match confirmé - Nouveau candidat';
+    const message = role === 'candidate' 
+      ? `Félicitations ! Votre match avec <strong>${partnerName}</strong> est confirmé. Voici le lien de l'entretien : <a href="https://calendly.com/opside">Calendly OPSIDE</a>`
+      : `Le candidat <strong>${partnerName}</strong> a accepté votre invitation. Nous vous contacterons bientôt pour organiser l'entretien.`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #333; text-align: center;">Match Confirmé !</h2>
+          <p>${message}</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #999; text-align: center;">&copy; 2026 OPSIDE. Tous droits réservés.</p>
+        </div>
+      `,
+    });
+  }
+
+  async sendCandidatureRejectionEmail(email: string, jobTitle: string) {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: `Mise à jour de votre candidature - ${jobTitle}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #333; text-align: center;">Mise à jour de votre candidature</h2>
+          <p>Bonjour,</p>
+          <p>Nous vous remercions de l'intérêt que vous avez porté à l'offre <strong>${jobTitle}</strong>.</p>
+          <p>Après étude de votre dossier, nous avons le regret de vous informer que votre candidature n'a pas été retenue pour ce poste.</p>
+          <p>Nous conservons néanmoins votre profil dans notre base de données et n'hésiterons pas à vous recontacter si une opportunité correspondant à votre profil se présentait.</p>
+          <p>Bonne chance dans vos recherches.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #999; text-align: center;">&copy; 2026 OPSIDE. Tous droits réservés.</p>
+        </div>
+      `,
+    });
+  }
 }

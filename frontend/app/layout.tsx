@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   title: 'OPSIDE',
 };
 
+import { Toaster } from 'sonner';
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
@@ -20,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.variable} font-sans bg-[#F5F5F5] text-[#1A1A1A] antialiased`}>
         {children}
+        <Toaster position="top-right" richColors expand={true} />
       </body>
     </html>
   );
