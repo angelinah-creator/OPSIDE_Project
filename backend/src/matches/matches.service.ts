@@ -122,7 +122,7 @@ export class MatchesService {
         try {
           const clientUser = await this.prisma.user.findUnique({ where: { id: match.client_id } });
           if (clientUser?.email) {
-            const candidateName = `${match.candidate.first_name} ${match.candidate.last_name}`;
+            const candidateName = `${match.candidate.first_name || ''} ${match.candidate.last_name || ''}`.trim() || 'Un candidat';
             await this.mailService.sendMatchDecisionEmail(
               clientUser.email,
               candidateName,
@@ -157,11 +157,15 @@ export class MatchesService {
       });
 
       // Notification aux deux parties
+      const companyName = match.client.client?.company_name || 'Le client';
+      const candidateName = `${match.candidate.first_name || ''} ${match.candidate.last_name || ''}`.trim() || 'Un candidat';
+      const projectName = match.job_offer?.title || 'sourcing';
+
       await this.notificationsService.create({
         user_id: match.candidate_id,
         type: NotificationType.match_confirmed,
         title: 'Match confirmé !',
-        message: `Félicitations ! Votre match avec ${match.client.client?.company_name} est confirmé pour le projet ${match.job_offer?.title || 'sourcing'}.`,
+        message: `Félicitations ! Votre match avec ${companyName} est confirmé pour le projet ${projectName}.`,
         link: `/candidat/dashboard`,
       });
 
@@ -169,7 +173,7 @@ export class MatchesService {
         user_id: match.client_id,
         type: NotificationType.match_confirmed,
         title: 'Match confirmé !',
-        message: `Le candidat a accepté votre invitation pour le projet ${match.job_offer?.title || 'sourcing'}.`,
+        message: `Le candidat ${candidateName} a accepté votre invitation pour le projet ${projectName}.`,
         link: `/client/dashboard`,
       });
 
@@ -182,13 +186,12 @@ export class MatchesService {
           await this.mailService.sendMatchConfirmationEmail(
             candidateUser.email, 
             'candidate', 
-            match.client.client?.company_name || 'le client',
+            companyName,
             match.job_offer?.title
           );
         }
         
         if (clientUser) {
-          const candidateName = `${match.candidate.first_name} ${match.candidate.last_name}`;
           await this.mailService.sendMatchConfirmationEmail(
             clientUser.email, 
             'client', 

@@ -59,7 +59,7 @@ export class CandidaturesService {
     });
 
     // Notification au client
-    const candidateName = `${candidature.candidate.first_name} ${candidature.candidate.last_name}`;
+    const candidateName = `${candidature.candidate.first_name || ''} ${candidature.candidate.last_name || ''}`.trim() || 'Un candidat';
     await this.notificationsService.create({
       user_id: jobOffer.client_id,
       type: NotificationType.new_application,
@@ -67,6 +67,18 @@ export class CandidaturesService {
       message: `${candidateName} a postulé à votre offre : ${jobOffer.title}`,
       link: `/client/dashboard`,
     });
+
+    // Email au client
+    try {
+      await this.mailService.sendNewCandidatureEmail(
+        jobOffer.client.email,
+        candidateName,
+        jobOffer.title,
+        dto.message
+      );
+    } catch (e) {
+      console.error('Error sending new candidature email to client:', e);
+    }
 
     // Notification au candidat
     await this.notificationsService.create({
@@ -131,7 +143,15 @@ export class CandidaturesService {
     const candidature = await this.prisma.candidature.findUnique({
       where: { id },
       include: {
-        job_offer: true,
+        job_offer: {
+          include: {
+            client: {
+              include: {
+                client: true
+              }
+            }
+          }
+        },
         candidate: true,
       },
     });
@@ -178,12 +198,27 @@ export class CandidaturesService {
 
       // Email automatique de match confirmé
       try {
+        const companyName = candidature.job_offer.client.client?.company_name || 'Le client';
+        const candidateName = `${candidature.candidate.first_name || ''} ${candidature.candidate.last_name || ''}`.trim() || 'Un candidat';
+        
+        // Email au candidat
         await this.mailService.sendMatchConfirmationEmail(
           candidature.candidate.email,
           'candidate',
-          candidature.job_offer.client_id // Nom du client à récupérer idéalement
+          companyName,
+          candidature.job_offer.title
         );
-      } catch (e) {}
+
+        // Email au client
+        await this.mailService.sendMatchConfirmationEmail(
+          candidature.job_offer.client.email,
+          'client',
+          candidateName,
+          candidature.job_offer.title
+        );
+      } catch (e) {
+        console.error('Error sending match confirmation emails:', e);
+      }
     } else if (status === CandidatureStatus.rejected) {
       await this.notificationsService.create({
         user_id: candidature.candidate_id,
