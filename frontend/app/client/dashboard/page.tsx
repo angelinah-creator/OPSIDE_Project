@@ -213,11 +213,6 @@ export default function ClientDashboard() {
                 <p className="text-slate-400 font-medium">Dashboard — À venir</p>
               </div>
             )}
-            {activeTab === 'dashboard' && (
-              <div className="bg-white rounded-3xl p-12 border border-slate-100 shadow-sm flex items-center justify-center min-h-[400px]">
-                <p className="text-slate-400 font-medium">Dashboard — À venir</p>
-              </div>
-            )}
             {activeTab === 'candidatures' && <ClientCandidaturesTab />}
             {activeTab === 'sourcing' && <ClientSourcingTab />}
             {/* {activeTab === 'matches' && <ClientMatchesTab />} */}
