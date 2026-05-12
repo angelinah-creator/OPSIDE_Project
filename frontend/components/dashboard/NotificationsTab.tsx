@@ -6,6 +6,8 @@ import { Bell, Check, Trash2, ExternalLink, Mail, Briefcase, UserCheck } from 'l
 import { toast } from 'sonner'
 import Link from 'next/link'
 import clsx from 'clsx'
+import { io } from 'socket.io-client'
+import { getToken } from '@/lib/auth-service'
 
 export default function NotificationsTab() {
   const [notifications, setNotifications] = useState<any[]>([])
@@ -13,6 +15,27 @@ export default function NotificationsTab() {
 
   useEffect(() => {
     fetchNotifications()
+
+    const token = getToken()
+    if (!token) return
+
+    const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const socket = io(`${SOCKET_URL}/notifications`, {
+      auth: { token },
+      transports: ['websocket'],
+    })
+
+    socket.on('newNotification', () => {
+      fetchNotifications()
+    })
+
+    socket.on('unreadCountUpdate', () => {
+      fetchNotifications()
+    })
+
+    return () => {
+      socket.disconnect()
+    }
   }, [])
 
   const fetchNotifications = async () => {
