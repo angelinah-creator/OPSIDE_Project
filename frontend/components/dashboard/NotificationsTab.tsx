@@ -139,7 +139,7 @@ export default function NotificationsTab() {
                 {n.message}
               </p>
               
-              {n.link && (
+              {/* {n.link && (
                 <Link
                   href={n.link}
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:underline"
@@ -147,7 +147,7 @@ export default function NotificationsTab() {
                   Voir les détails
                   <ExternalLink className="w-3 h-3" />
                 </Link>
-              )}
+              )} */}
             </div>
 
             {!n.read && (

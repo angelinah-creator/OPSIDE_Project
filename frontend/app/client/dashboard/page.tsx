@@ -19,7 +19,7 @@ import ClientOffresTab from '@/components/dashboard/client/ClientOffresTab'
 import ClientProfilTab from '@/components/dashboard/client/ClientProfilTab'
 import ClientCandidaturesTab from '@/components/dashboard/client/CandidaturesTab'
 import ClientSourcingTab from '@/components/dashboard/client/SourcingTab'
-import ClientMatchesTab from '@/components/dashboard/client/MatchesTab'
+// import ClientMatchesTab from '@/components/dashboard/client/MatchesTab'
 import NotificationsTab from '@/components/dashboard/NotificationsTab'
 import { notificationService } from '@/lib/notification-service'
 
@@ -99,7 +99,7 @@ export default function ClientDashboard() {
     { id: 'offres', label: "Offres d'emploi", icon: Briefcase },
     { id: 'candidatures', label: 'Candidatures', icon: FileText },
     { id: 'sourcing', label: 'Sourcing', icon: User },
-    { id: 'matches', icon: Briefcase, label: 'Matches' }, 
+    // { id: 'matches', icon: Briefcase, label: 'Matches' }, 
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'profil', label: 'Profil', icon: User },
   ]
@@ -220,7 +220,7 @@ export default function ClientDashboard() {
             )}
             {activeTab === 'candidatures' && <ClientCandidaturesTab />}
             {activeTab === 'sourcing' && <ClientSourcingTab />}
-            {activeTab === 'matches' && <ClientMatchesTab />}
+            {/* {activeTab === 'matches' && <ClientMatchesTab />} */}
             {activeTab === 'notifications' && <NotificationsTab />}
             {activeTab === 'offres' && <ClientOffresTab />}
             {activeTab === 'profil' && <ClientProfilTab profile={profile} user={user} onProfileUpdate={setProfile} />}
