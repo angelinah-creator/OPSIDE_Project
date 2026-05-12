@@ -26,8 +26,8 @@ import HistoriqueTab from '@/components/dashboard/candidate/HistoriqueTab';
 import ProfilTab from '@/components/dashboard/candidate/ProfilTab';
 import MatchesTab from '@/components/dashboard/candidate/MatchesTab';
 import NotificationsTab from '@/components/dashboard/NotificationsTab';
-import { notificationService } from '@/lib/notification-service';
 import AideTab from '@/components/dashboard/candidate/AideTab';
+import { useNotifications } from '@/hooks/useNotifications';
 
 type TabType = 'technique' | 'offres' | 'historique' | 'profil' | 'matches' | 'notifications' | 'aide';
 
@@ -39,7 +39,7 @@ export default function CandidatDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('technique');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const { unreadCount: unreadNotifications } = useNotifications();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,9 +58,6 @@ export default function CandidatDashboard() {
         const scoreRes = await testApi.getLatestScore();
         // Forced mock score for UI testing if null
         setLatestScore(scoreRes.score || 85);
-
-        const count = await notificationService.getUnreadCount();
-        setUnreadNotifications(count);
       } catch (err: any) {
         if (err.response?.status === 404) {
           router.push('/candidat/onboarding');
@@ -73,18 +70,6 @@ export default function CandidatDashboard() {
     };
 
     fetchData();
-
-    // Set up polling for notifications
-    const interval = setInterval(async () => {
-      try {
-        const count = await notificationService.getUnreadCount();
-        setUnreadNotifications(count);
-      } catch (err) {
-        console.error('Error polling notifications:', err);
-      }
-    }, 15000); // Poll every 15 seconds
-
-    return () => clearInterval(interval);
   }, [router]);
 
   const handleLogout = async () => {

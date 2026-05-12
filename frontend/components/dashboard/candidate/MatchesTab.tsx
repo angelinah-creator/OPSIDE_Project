@@ -73,18 +73,13 @@ export default function CandidateMatchesTab() {
               <div className="flex items-start gap-4">
                 <div className={clsx(
                   "w-14 h-14 rounded-2xl flex items-center justify-center shrink-0",
-                  match.status === 'confirmed' ? "bg-green-50 text-green-600" : "bg-amber-50 text-amber-600"
+                  match.status === 'confirmed' ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
                 )}>
                   <Briefcase className="w-7 h-7" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                     Invitation de {match.client.client?.company_name || 'Client Anonyme'}
-                    {match.status === 'confirmed' && (
-                      <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        Matché
-                      </span>
-                    )}
                   </h3>
                   <p className="text-sm font-medium text-slate-600 mt-1">
                     {match.job_offer?.title || 'Sourcing Direct'}
@@ -131,14 +126,10 @@ export default function CandidateMatchesTab() {
                     </button>
                   </div>
                 ) : match.status === 'confirmed' ? (
-                  <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-2 px-6 py-2.5 bg-[#1A1A1A] text-white rounded-xl font-bold text-sm shadow-lg shadow-slate-900/10 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                      <Calendar className="w-4 h-4" />
-                      Voir l'invitation
-                    </button>
-                    <button className="p-2.5 text-slate-400 hover:text-accent hover:bg-accent/5 rounded-xl transition-all border border-transparent hover:border-accent/10">
-                      <MessageSquare className="w-5 h-5" />
-                    </button>
+                  <div className="text-right">
+                    <span className="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg border border-green-100">
+                      Matché
+                    </span>
                   </div>
                 ) : (
                   <div className="text-right">

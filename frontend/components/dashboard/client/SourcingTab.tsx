@@ -4,10 +4,17 @@ import { useEffect, useState } from 'react'
 import { candidateApi, CandidateProfile } from '@/lib/candidate-service'
 import { matchService } from '@/lib/match-service'
 import { jobOfferApi } from '@/lib/job-offer-service'
-import { Search, User, Filter, Send, MapPin, Star, Clock, Briefcase } from 'lucide-react'
+import { Search, User, Filter, Send, Clock, Briefcase, ChevronLeft, ChevronRight, Target } from 'lucide-react'
 import { toast } from 'sonner'
 import clsx from 'clsx'
 import Modal from '@/components/ui/Modal'
+
+// Unified Mock score generator (Consistent across tabs)
+export const getMockScore = (id: string) => {
+  if (!id) return 0;
+  const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return 65 + (hash % 31); // Score between 65 and 95
+};
 
 export default function ClientSourcingTab() {
   const [candidates, setCandidates] = useState<CandidateProfile[]>([])
@@ -16,8 +23,18 @@ export default function ClientSourcingTab() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedOfferId, setSelectedOfferId] = useState<string>('')
   const [invitingId, setInvitingId] = useState<string | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  const [selectedCandidate, setSelectedCandidate] = useState<CandidateProfile | null>(null)
   const [targetCandidateId, setTargetCandidateId] = useState<string | null>(null)
+
+  // Filters
+  const [techFilter, setTechFilter] = useState('')
+  const [minScore, setMinScore] = useState(0)
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 6
 
   useEffect(() => {
     fetchData()
@@ -39,9 +56,15 @@ export default function ClientSourcingTab() {
     }
   }
 
-  const openInviteModal = (candidateId: string) => {
+  const openInviteModal = (e: React.MouseEvent, candidateId: string) => {
+    e.stopPropagation()
     setTargetCandidateId(candidateId)
-    setIsModalOpen(true)
+    setIsInviteModalOpen(true)
+  }
+
+  const openDetailModal = (candidate: CandidateProfile) => {
+    setSelectedCandidate(candidate)
+    setIsDetailModalOpen(true)
   }
 
   const handleInvite = async () => {
@@ -52,7 +75,7 @@ export default function ClientSourcingTab() {
 
     try {
       setInvitingId(targetCandidateId)
-      setIsModalOpen(false)
+      setIsInviteModalOpen(false)
       await matchService.source({
         candidate_id: targetCandidateId,
         job_offer_id: selectedOfferId
@@ -68,11 +91,29 @@ export default function ClientSourcingTab() {
     }
   }
 
-  const filteredCandidates = candidates.filter(c => 
-    c.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.speciality.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.skills.some(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredCandidates = candidates.filter(c => {
+    const matchesSearch =
+      c.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.speciality.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.skills.some(s => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
+
+    const matchesTech = !techFilter || c.skills.some(s => s.name.toLowerCase().includes(techFilter.toLowerCase()))
+    const score = getMockScore(c.id)
+    const matchesScore = score >= minScore
+
+    return matchesSearch && matchesTech && matchesScore
+  })
+
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredCandidates.length / itemsPerPage)
+  const paginatedCandidates = filteredCandidates.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   )
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery, techFilter, minScore])
 
   if (loading) {
     return (
@@ -86,105 +127,178 @@ export default function ClientSourcingTab() {
   return (
     <div className="space-y-8">
       {/* Search & Filter Header */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-4">
-        <div className="flex flex-col md:flex-row gap-4">
+      <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-6">
+        <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
               type="text"
-              placeholder="Rechercher par compétence, métier, titre..."
+              placeholder="Rechercher par métier ou titre..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all"
             />
           </div>
+
+          <div className="flex flex-wrap gap-4">
+            <div className="relative min-w-[200px]">
+              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Filtrer par techno..."
+                value={techFilter}
+                onChange={(e) => setTechFilter(e.target.value)}
+                className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-sm"
+              />
+            </div>
+
+            <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 border border-slate-100 rounded-2xl">
+              <Target className="w-4 h-4 text-slate-400" />
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase leading-none mb-1">Score min</span>
+                <select
+                  value={minScore}
+                  onChange={(e) => setMinScore(parseInt(e.target.value))}
+                  className="bg-transparent border-none p-0 text-sm font-bold text-slate-900 focus:ring-0 focus:outline-none cursor-pointer"
+                >
+                  {[0, 20, 30, 40, 50, 60, 70, 80, 90].map(val => (
+                    <option key={val} value={val}>{val === 0 ? 'Tous' : `+${val}%`}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Candidates Grid */}
-      <div className="grid gap-6">
-        {filteredCandidates.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-slate-400 font-medium">Aucun candidat ne correspond à votre recherche.</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {paginatedCandidates.length === 0 ? (
+          <div className="col-span-full text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
+            <p className="text-slate-400 font-medium">Aucun candidat ne correspond à vos critères.</p>
           </div>
         ) : (
-          filteredCandidates.map((cand) => (
-            <div key={cand.id} className="bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="flex flex-col md:flex-row gap-8">
-                {/* Left Part: Profile Header */}
-                <div className="flex-1 space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center text-accent shrink-0">
-                      <User className="w-8 h-8" />
+          paginatedCandidates.map((cand) => {
+            const score = getMockScore(cand.id)
+            return (
+              <div
+                key={cand.id}
+                onClick={() => openDetailModal(cand)}
+                className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col group cursor-pointer"
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center text-accent shrink-0">
+                    <User className="w-7 h-7" />
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <div className={clsx(
+                      "px-3 py-1.5 rounded-xl font-black text-sm flex items-center gap-1.5",
+                      score >= 80 ? "bg-green-50 text-green-600" : score >= 60 ? "bg-amber-50 text-amber-600" : "bg-slate-50 text-slate-600"
+                    )}>
+                      {score}%
                     </div>
-                    <div>
-                      <h3 className="text-xl font-black text-slate-900 leading-tight capitalize">
-                        {cand.title || cand.speciality}
-                      </h3>
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
-                        <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 bg-slate-50 px-2.5 py-1 rounded-lg">
-                          <Clock className="w-4 h-4 text-slate-400" />
-                          {cand.experience_years} ans d'exp.
-                        </div>
-                        <div className="flex items-center gap-1.5 text-sm font-bold text-accent bg-accent/5 px-2.5 py-1 rounded-lg">
-                          <Star className="w-4 h-4" />
-                          {cand.daily_rate} {cand.currency}/jour
-                        </div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase mt-1">Test Score</span>
+                  </div>
+                </div>
+
+                <div className="flex-1 space-y-4">
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 leading-tight capitalize line-clamp-1">
+                      {cand.title || cand.speciality}
+                    </h3>
+                    <div className="flex items-center gap-4 mt-2">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
+                        <Clock className="w-3.5 h-3.5" />
+                        {cand.experience_years} ans d'expérience
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-accent">
+                        TJM : {cand.daily_rate} {cand.currency}
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-slate-600 text-sm leading-relaxed line-clamp-3">
+                  <p className="text-slate-500 text-xs leading-relaxed line-clamp-2 italic">
                     {cand.bio || "Ce candidat n'a pas encore rédigé de biographie."}
                   </p>
 
-                  <div className="flex flex-wrap gap-2">
-                    {cand.skills.map((skill) => (
-                      <span key={skill.id} className="text-[11px] font-bold px-3 py-1.5 bg-slate-50 text-slate-600 rounded-lg border border-slate-100">
+                  <div className="flex flex-wrap gap-1.5">
+                    {cand.skills.slice(0, 20).map((skill) => (
+                      <span key={skill.id} className="text-[10px] font-bold px-2 py-1 bg-slate-50 text-slate-500 rounded-lg border border-slate-100">
                         {skill.name}
                       </span>
                     ))}
+                    {cand.skills.length > 20 && (
+                      <span className="text-[10px] font-bold px-2 py-1 bg-slate-50 text-slate-400 rounded-lg border border-slate-100">
+                        +{cand.skills.length - 20}
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                {/* Right Part: Stats & Action */}
-                <div className="w-full md:w-64 flex flex-col justify-between gap-6 border-t md:border-t-0 md:border-l border-slate-100 pt-6 md:pt-0 md:pl-8">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400 font-medium">Disponibilité</span>
-                      <span className="font-bold text-slate-900">{cand.availability}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400 font-medium">Statut</span>
-                      <span className="text-green-600 font-bold">Actif</span>
-                    </div>
-                  </div>
-
+                <div className="mt-8 pt-6 border-t border-slate-50">
                   <button
-                    onClick={() => openInviteModal(cand.user_id)}
+                    onClick={(e) => openInviteModal(e, cand.user_id)}
                     disabled={invitingId === cand.user_id}
-                    className="w-full flex items-center justify-center gap-2 py-4 bg-[#1A1A1A] text-white rounded-2xl font-bold text-sm shadow-xl shadow-slate-900/10 hover:bg-black transition-all disabled:opacity-50 disabled:scale-100 group"
+                    className="w-full flex items-center justify-center gap-2 py-3.5 bg-[#1A1A1A] text-white rounded-xl font-bold text-sm hover:bg-black transition-all disabled:opacity-50 group"
                   >
                     {invitingId === cand.user_id ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     ) : (
                       <>
                         <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                        Inviter le candidat
+                        Inviter
                       </>
                     )}
                   </button>
                 </div>
               </div>
-            </div>
-          ))
+            )
+          })
         )}
       </div>
 
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-8">
+          <button
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+            className="p-2 rounded-xl border border-slate-100 hover:bg-slate-50 disabled:opacity-30 transition-all"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          <div className="flex items-center gap-1">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={clsx(
+                  "w-10 h-10 rounded-xl font-bold text-sm transition-all",
+                  currentPage === i + 1
+                    ? "bg-accent text-white shadow-lg shadow-accent/20"
+                    : "hover:bg-slate-50 text-slate-400"
+                )}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+            className="p-2 rounded-xl border border-slate-100 hover:bg-slate-50 disabled:opacity-30 transition-all"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+
       {/* Invitation Modal */}
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
         title="Sélectionner une offre"
         size="sm"
       >
@@ -192,7 +306,7 @@ export default function ClientSourcingTab() {
           <p className="text-slate-500 text-sm">
             Choisissez l'offre pour laquelle vous souhaitez inviter ce candidat.
           </p>
-          
+
           <div className="space-y-3">
             {jobOffers.length === 0 ? (
               <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
@@ -207,8 +321,8 @@ export default function ClientSourcingTab() {
                   onClick={() => setSelectedOfferId(offer.id)}
                   className={clsx(
                     "w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left group",
-                    selectedOfferId === offer.id 
-                      ? "bg-accent/5 border-accent shadow-sm" 
+                    selectedOfferId === offer.id
+                      ? "bg-accent/5 border-accent shadow-sm"
                       : "bg-white border-slate-100 hover:border-slate-200 hover:bg-slate-50"
                   )}
                 >
@@ -240,7 +354,7 @@ export default function ClientSourcingTab() {
 
           <div className="pt-4 flex gap-3">
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => setIsInviteModalOpen(false)}
               className="flex-1 py-3 bg-slate-50 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-100 transition-all"
             >
               Annuler
@@ -255,6 +369,76 @@ export default function ClientSourcingTab() {
           </div>
         </div>
       </Modal>
+
+      {/* Detail Modal */}
+      {selectedCandidate && (
+        <Modal
+          isOpen={isDetailModalOpen}
+          onClose={() => setIsDetailModalOpen(false)}
+          title="Détails du candidat"
+          size="lg"
+        >
+          <div className="space-y-8 pb-6">
+            <div className="flex items-center gap-6">
+              <div className="w-20 h-20 rounded-3xl bg-accent/10 flex items-center justify-center text-accent shrink-0">
+                <User className="w-10 h-10" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-slate-900 leading-tight capitalize">
+                  {selectedCandidate.title || selectedCandidate.speciality}
+                </h2>
+                <div className="flex flex-wrap items-center gap-4 mt-2">
+                  <div className="flex items-center gap-1.5 text-sm font-bold text-slate-500">
+                    <Clock className="w-4 h-4" />
+                    {selectedCandidate.experience_years} ans d'expérience
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm font-black text-accent">
+                    TJM : {selectedCandidate.daily_rate} {selectedCandidate.currency}/jour
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm font-black text-green-600 bg-green-50 px-2.5 py-1 rounded-lg">
+                    <Target className="w-4 h-4" />
+                    Score Technique: {getMockScore(selectedCandidate.id)}%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-3">
+                <div className="w-8 h-[1px] bg-slate-100" />
+                Biographie complète
+              </h3>
+              <p className="text-slate-600 leading-relaxed whitespace-pre-wrap italic bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
+                {selectedCandidate.bio || "Aucune biographie renseignée."}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-3">
+                <div className="w-8 h-[1px] bg-slate-100" />
+                Compétences ({selectedCandidate.skills.length})
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedCandidate.skills.map((skill) => (
+                  <span key={skill.id} className="px-4 py-2 bg-white text-slate-900 text-xs font-bold rounded-xl border border-slate-100 shadow-sm">
+                    {skill.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-slate-100">
+              <button
+                onClick={(e) => openInviteModal(e, selectedCandidate.user_id)}
+                className="w-full flex items-center justify-center gap-3 py-4 bg-[#1A1A1A] text-white rounded-2xl font-bold text-base hover:bg-black transition-all shadow-xl shadow-slate-900/10"
+              >
+                <Send className="w-5 h-5" />
+                Inviter ce candidat maintenant
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }

@@ -6,6 +6,8 @@ import { Bell, Check, Trash2, ExternalLink, Mail, Briefcase, UserCheck } from 'l
 import { toast } from 'sonner'
 import Link from 'next/link'
 import clsx from 'clsx'
+import { io } from 'socket.io-client'
+import { getToken } from '@/lib/auth-service'
 
 export default function NotificationsTab() {
   const [notifications, setNotifications] = useState<any[]>([])
@@ -13,6 +15,27 @@ export default function NotificationsTab() {
 
   useEffect(() => {
     fetchNotifications()
+
+    const token = getToken()
+    if (!token) return
+
+    const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+    const socket = io(`${SOCKET_URL}/notifications`, {
+      auth: { token },
+      transports: ['websocket'],
+    })
+
+    socket.on('newNotification', () => {
+      fetchNotifications()
+    })
+
+    socket.on('unreadCountUpdate', () => {
+      fetchNotifications()
+    })
+
+    return () => {
+      socket.disconnect()
+    }
   }, [])
 
   const fetchNotifications = async () => {
@@ -88,7 +111,7 @@ export default function NotificationsTab() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-bold text-slate-900">
           Notifications 
@@ -139,7 +162,7 @@ export default function NotificationsTab() {
                 {n.message}
               </p>
               
-              {n.link && (
+              {/* {n.link && (
                 <Link
                   href={n.link}
                   className="inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:underline"
@@ -147,7 +170,7 @@ export default function NotificationsTab() {
                   Voir les détails
                   <ExternalLink className="w-3 h-3" />
                 </Link>
-              )}
+              )} */}
             </div>
 
             {!n.read && (

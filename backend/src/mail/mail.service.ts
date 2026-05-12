@@ -135,4 +135,24 @@ export class MailService {
       `,
     });
   }
+
+  async sendNewCandidatureEmail(email: string, candidateName: string, jobTitle: string, message?: string) {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: `Nouvelle candidature pour : ${jobTitle}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #333; text-align: center;">Nouvelle candidature reçue</h2>
+          <p>Bonjour,</p>
+          <p>Le candidat <strong>${candidateName}</strong> vient de postuler à votre offre : <strong>${jobTitle}</strong>.</p>
+          <p>Connectez-vous à votre dashboard pour consulter son profil et prendre une décision.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${this.configService.get('FRONTEND_URL')}/client/dashboard" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Voir la candidature</a>
+          </div>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #999; text-align: center;">&copy; 2026 OPSIDE. Tous droits réservés.</p>
+        </div>
+      `,
+    });
+  }
 }

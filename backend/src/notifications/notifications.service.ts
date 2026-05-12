@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationType } from '@prisma/client';
+import { NotificationsGateway } from './notifications.gateway';
 
 @Injectable()
 export class NotificationsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsGateway: NotificationsGateway,
+  ) {}
 
   async create(data: {
     user_id: string;
@@ -13,13 +17,18 @@ export class NotificationsService {
     message: string;
     link?: string;
   }) {
-    return this.prisma.notification.create({
+    const notification = await this.prisma.notification.create({
       data: {
         ...data,
         read: false,
-        email_sent: true, // Par défaut on considère que l'email sera envoyé
+        email_sent: true,
       },
     });
+
+    // Envoyer la notification en temps réel via WebSocket
+    this.notificationsGateway.sendNotificationToUser(data.user_id, notification);
+
+    return notification;
   }
 
   async findAll(user_id: string) {
@@ -30,17 +39,21 @@ export class NotificationsService {
   }
 
   async markAsRead(id: string, user_id: string) {
-    return this.prisma.notification.updateMany({
+    const result = await this.prisma.notification.updateMany({
       where: { id, user_id },
       data: { read: true },
     });
+    this.notificationsGateway.server?.to(`user_${user_id}`).emit('unreadCountUpdate');
+    return result;
   }
 
   async markAllAsRead(user_id: string) {
-    return this.prisma.notification.updateMany({
+    const result = await this.prisma.notification.updateMany({
       where: { user_id, read: false },
       data: { read: true },
     });
+    this.notificationsGateway.server?.to(`user_${user_id}`).emit('unreadCountUpdate');
+    return result;
   }
 
   async getUnreadCount(user_id: string) {
