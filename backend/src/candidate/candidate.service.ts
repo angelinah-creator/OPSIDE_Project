@@ -131,6 +131,61 @@ export class CandidateService {
     return profile;
   }
 
+  async findAllProfiles() {
+    // Retourne tous les profils complétés de manière anonymisée
+    const profiles = await this.prisma.candidateProfile.findMany({
+      where: { 
+        profile_completed: true,
+        // Suppression du filtre status qui causait une erreur si la valeur était incorrecte
+      },
+      include: {
+        candidate_skills: { include: { skill: true } },
+        experiences: {
+          select: {
+            title: true,
+            company: true,
+            start_year: true,
+            end_year: true,
+            description: true,
+          }
+        },
+        educations: {
+          select: {
+            school: true,
+            degree: true,
+            level: true,
+          }
+        }
+      },
+      orderBy: { updated_at: 'desc' }
+    });
+
+    // Anonymisation supplémentaire (sécurité)
+    return profiles.map(p => ({
+      id: p.id,
+      user_id: p.user_id,
+      speciality: p.speciality,
+      custom_speciality: p.custom_speciality,
+      experience_years: p.experience_years,
+      daily_rate: p.daily_rate,
+      currency: p.currency,
+      availability: p.availability,
+      bio: p.bio,
+      title: p.title,
+      skills: p.candidate_skills.map(cs => cs.skill),
+      experiences: p.experiences,
+      educations: p.educations,
+    }));
+  }
+
+  async getAppliedJobIds(candidateId: string) {
+    const candidatures = await this.prisma.candidature.findMany({
+      where: { candidate_id: candidateId },
+      select: { job_offer_id: true }
+    });
+    return candidatures.map(c => c.job_offer_id);
+  }
+
   async updateProfile(userId: string, dto: UpdateCandidateProfileDto) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) {

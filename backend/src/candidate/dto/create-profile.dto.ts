@@ -65,6 +65,10 @@ export class CreateCandidateProfileDto {
   @IsUrl()
   portfolio_url?: string;
 
+  @IsOptional()
+  @IsUrl()
+  github_url?: string;
+
   @IsArray()
   @IsUUID('4', { each: true })
   skill_ids: string[];

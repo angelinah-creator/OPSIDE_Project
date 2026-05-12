@@ -73,6 +73,10 @@ export class UpdateCandidateProfileDto {
   portfolio_url?: string;
 
   @IsOptional()
+  @IsUrl()
+  github_url?: string;
+
+  @IsOptional()
   @IsArray()
   @IsUUID('4', { each: true })
   skill_ids?: string[];

@@ -55,4 +55,84 @@ export class MailService {
       `,
     });
   }
+
+  async sendMatchConfirmationEmail(email: string, role: 'candidate' | 'client', partnerName: string, projectName?: string) {
+    const subject = role === 'candidate' ? 'Match confirmé - Entretien OPSIDE' : 'Match confirmé - Nouveau candidat';
+    const message = role === 'candidate' 
+      ? `Félicitations ! Votre match avec <strong>${partnerName}</strong> est confirmé${projectName ? ` pour le projet <strong>${projectName}</strong>` : ''}. Voici le lien de l'entretien : <a href="https://calendly.com/opside">Calendly OPSIDE</a>`
+      : `Le candidat <strong>${partnerName}</strong> a accepté votre invitation${projectName ? ` pour le projet <strong>${projectName}</strong>` : ''}. Nous vous contacterons bientôt pour organiser l'entretien.`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #333; text-align: center;">Match Confirmé !</h2>
+          <p>${message}</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #999; text-align: center;">&copy; 2026 OPSIDE. Tous droits réservés.</p>
+        </div>
+      `,
+    });
+  }
+
+  async sendSourcingInvitationEmail(email: string, clientName: string, projectName: string) {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: `Invitation pour le projet : ${projectName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #333; text-align: center;">Nouvelle opportunité sur OPSIDE</h2>
+          <p>Bonjour,</p>
+          <p>L'entreprise <strong>${clientName}</strong> a été séduite par votre profil et souhaite vous inviter à découvrir leur projet : <strong>${projectName}</strong>.</p>
+          <p>Connectez-vous à votre dashboard pour accepter ou refuser cette invitation.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${this.configService.get('FRONTEND_URL')}/candidat/dashboard" style="background-color: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Voir l'invitation</a>
+          </div>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #999; text-align: center;">&copy; 2026 OPSIDE. Tous droits réservés.</p>
+        </div>
+      `,
+    });
+  }
+
+  async sendMatchDecisionEmail(email: string, partnerName: string, decision: 'accepted' | 'refused', projectName?: string) {
+    const subject = decision === 'accepted' ? 'Invitation acceptée !' : 'Invitation déclinée';
+    const message = decision === 'accepted'
+      ? `Le candidat <strong>${partnerName}</strong> a accepté votre invitation pour le projet <strong>${projectName || 'votre offre'}</strong>.`
+      : `Le candidat <strong>${partnerName}</strong> a décliné votre invitation pour le projet <strong>${projectName || 'votre offre'}</strong>.`;
+
+    await this.mailerService.sendMail({
+      to: email,
+      subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #333; text-align: center;">${subject}</h2>
+          <p>${message}</p>
+          <p>Connectez-vous à votre dashboard pour plus de détails.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #999; text-align: center;">&copy; 2026 OPSIDE. Tous droits réservés.</p>
+        </div>
+      `,
+    });
+  }
+
+  async sendCandidatureRejectionEmail(email: string, jobTitle: string) {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: `Mise à jour de votre candidature - ${jobTitle}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #333; text-align: center;">Mise à jour de votre candidature</h2>
+          <p>Bonjour,</p>
+          <p>Nous vous remercions de l'intérêt que vous avez porté à l'offre <strong>${jobTitle}</strong>.</p>
+          <p>Après étude de votre dossier, nous avons le regret de vous informer que votre candidature n'a pas été retenue pour ce poste.</p>
+          <p>Nous conservons néanmoins votre profil dans notre base de données et n'hésiterons pas à vous recontacter si une opportunité correspondant à votre profil se présentait.</p>
+          <p>Bonne chance dans vos recherches.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #999; text-align: center;">&copy; 2026 OPSIDE. Tous droits réservés.</p>
+        </div>
+      `,
+    });
+  }
 }

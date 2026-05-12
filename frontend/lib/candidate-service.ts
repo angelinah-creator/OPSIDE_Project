@@ -184,4 +184,13 @@ export const candidateApi = {
     const res = await api.delete('/candidate/profile/photo');
     return res.data;
   },
+  getAll: async () => {
+    const { data } = await api.get('/candidate/all');
+    return data;
+  },
+
+  getAppliedJobs: async () => {
+    const { data } = await api.get('/candidate/applied-jobs');
+    return data;
+  },
 };

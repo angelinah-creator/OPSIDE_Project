@@ -14,6 +14,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { validateEnvironment } from './config/validate-environment';
 import { VideosModule } from './videos/videos.module';
+import { JobOffersModule } from './job-offers/job-offers.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { CandidaturesModule } from './candidatures/candidatures.module';
+import { MatchesModule } from './matches/matches.module';
 
 validateEnvironment();
 
@@ -39,6 +43,10 @@ validateEnvironment();
     MailModule,
     TestModule,
     VideosModule,
+    JobOffersModule,
+    NotificationsModule,
+    CandidaturesModule,
+    MatchesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

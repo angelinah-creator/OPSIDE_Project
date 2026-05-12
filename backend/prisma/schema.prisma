@@ -138,6 +138,11 @@ model User {
   client         ClientProfile?
   skills         Skill[]
   tests          Test[]
+  job_offers     JobOffer[]
+  applications   Candidature[]  @relation("CandidateApplications")
+  matches        Match[]        @relation("CandidateMatches")
+  client_matches Match[]        @relation("ClientMatches")
+  notifications  Notification[]
 
   @@map("users")
 }
@@ -165,6 +170,7 @@ model Skill {
   candidate_skills  CandidateSkill[]
   experience_skills ExperienceSkill[]
   education_skills  EducationSkill[]
+  job_offer_skills  JobOfferSkill[]
 
   owner User? @relation(fields: [owner_id], references: [id], onDelete: Cascade)
 
@@ -189,6 +195,7 @@ model CandidateProfile {
   status             CandidateStatus  @default(open_to_work)
   linkedin_url       String?
   portfolio_url      String?
+  github_url         String?
   photo_url          String?
   profile_completed  Boolean          @default(false)
   created_at         DateTime         @default(now())
@@ -367,4 +374,132 @@ model Video {
   updated_at  DateTime @updatedAt
 
   @@map("videos")
+}
+
+enum JobOfferStatus {
+  draft
+  active
+  paused
+  closed
+}
+
+enum WorkType {
+  full_remote
+  hybrid
+  on_site
+}
+
+model JobOffer {
+  id                  String     @id @default(uuid())
+  client_id           String
+  title               String
+  description         String
+  speciality          Speciality
+  experience_min      Int?
+  tjm_client          Decimal
+  contract_duration   String?
+  work_type           WorkType
+  timezone_preference String?
+  start_date          DateTime?
+  custom_speciality   String?
+  status              JobOfferStatus @default(draft)
+  is_anonymous        Boolean    @default(true)
+  created_at          DateTime   @default(now())
+  updated_at          DateTime   @updatedAt
+  views_count         Int        @default(0)
+  applications_count  Int        @default(0)
+
+  client              User       @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  skills_required     JobOfferSkill[]
+  candidatures        Candidature[]
+  matches             Match[]
+
+  @@map("job_offers")
+}
+
+model JobOfferSkill {
+  job_offer_id String
+  skill_id     String
+
+  job_offer    JobOffer @relation(fields: [job_offer_id], references: [id], onDelete: Cascade)
+  skill        Skill    @relation(fields: [skill_id], references: [id], onDelete: Cascade)
+
+  @@id([job_offer_id, skill_id])
+  @@map("job_offer_skills")
+}
+
+enum CandidatureStatus {
+  pending
+  matched
+  rejected
+  withdrawn
+}
+
+enum MatchStatus {
+  pending_candidate
+  pending_client
+  confirmed
+  rejected
+}
+
+enum MatchInitiatedBy {
+  candidate
+  client
+}
+
+enum NotificationType {
+  new_application
+  match_request
+  match_confirmed
+  match_rejected
+  test_result
+  sourcing_invitation
+}
+
+model Candidature {
+  id            String            @id @default(uuid())
+  candidate_id  String
+  job_offer_id  String
+  status        CandidatureStatus @default(pending)
+  applied_at    DateTime          @default(now())
+  message       String?           @db.Text
+
+  candidate     User              @relation("CandidateApplications", fields: [candidate_id], references: [id], onDelete: Cascade)
+  job_offer     JobOffer          @relation(fields: [job_offer_id], references: [id], onDelete: Cascade)
+
+  @@map("candidatures")
+}
+
+model Match {
+  id            String           @id @default(uuid())
+  candidate_id  String
+  client_id     String
+  job_offer_id  String?
+  status        MatchStatus      @default(pending_candidate)
+  initiated_by  MatchInitiatedBy
+  matched_at    DateTime?
+  rejected_at   DateTime?
+  rejected_by   Role?
+
+  candidate     User             @relation("CandidateMatches", fields: [candidate_id], references: [id], onDelete: Cascade)
+  client        User             @relation("ClientMatches", fields: [client_id], references: [id], onDelete: Cascade)
+  job_offer     JobOffer?        @relation(fields: [job_offer_id], references: [id], onDelete: SetNull)
+
+  @@map("matches")
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  user_id     String
+  type        NotificationType
+  title       String
+  message     String           @db.Text
+  link        String?
+  read        Boolean          @default(false)
+  email_sent  Boolean          @default(true)
+  created_at  DateTime         @default(now())
+
+  user        User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
