@@ -228,12 +228,101 @@ export class MatchesService {
       include: {
         candidate: {
           include: {
-            candidate: true,
+            candidate: {
+              include: {
+                candidate_skills: { include: { skill: true } },
+                experiences: true,
+                educations: true,
+              },
+            },
           },
         },
         job_offer: true,
+        custom_test: true,
       },
       orderBy: { matched_at: 'desc' },
     });
   }
+
+  async endContract(matchId: string, clientId: string) {
+    const match = await this.prisma.match.findUnique({
+      where: { id: matchId },
+      include: {
+        candidate: true,
+        client: { include: { client: true } },
+        job_offer: true,
+      },
+    });
+
+    if (!match) throw new NotFoundException('Match introuvable.');
+    if (match.client_id !== clientId) throw new ForbiddenException('Accès refusé.');
+
+    const updated = await this.prisma.match.update({
+      where: { id: matchId },
+      data: {
+        status: MatchStatus.rejected,
+        rejected_at: new Date(),
+        rejected_by: Role.client,
+      },
+    });
+
+    const companyName = match.client.client?.company_name || 'Le client';
+    const projectName = match.job_offer?.title || 'un projet';
+
+    await this.notificationsService.create({
+      user_id: match.candidate_id,
+      type: NotificationType.match_rejected,
+      title: 'Fin de contrat',
+      message: `${companyName} a mis fin à votre collaboration sur le projet ${projectName}.`,
+      link: '/candidat/dashboard',
+    });
+
+    return updated;
+  }
+
+  async addToWorkspace(matchId: string, clientId: string) {
+    const match = await this.prisma.match.findUnique({
+      where: { id: matchId },
+      include: {
+        candidate: true,
+        client: { include: { client: true } },
+        job_offer: true,
+      },
+    });
+
+    if (!match) throw new NotFoundException('Match introuvable.');
+    if (match.client_id !== clientId) throw new ForbiddenException('Accès refusé.');
+    if (match.status !== MatchStatus.confirmed) throw new ForbiddenException('Le match doit être confirmé.');
+
+    const updated = await this.prisma.match.update({
+      where: { id: matchId },
+      data: {
+        status: MatchStatus.in_workspace,
+      },
+    });
+
+    const companyName = match.client.client?.company_name || 'Le client';
+    const projectName = match.job_offer?.title || 'un projet';
+
+    await this.notificationsService.create({
+      user_id: match.candidate_id,
+      type: NotificationType.workspace_invitation,
+      title: 'Bienvenue dans le Workspace',
+      message: `${companyName} a officiellement démarré la collaboration. Votre Workspace est débloqué !`,
+      link: '/candidat/workspace',
+    });
+
+    try {
+      await this.mailService.sendWorkspaceInvitationEmail(
+        match.candidate.email,
+        companyName,
+        projectName,
+      );
+    } catch (e) {
+      console.error('Failed to send workspace invitation email:', e);
+    }
+
+    return updated;
+  }
 }
+

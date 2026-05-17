@@ -25,4 +25,14 @@ export const matchService = {
     const { data } = await api.get('/matches/client');
     return data;
   },
+
+  endContract: async (id: string) => {
+    const { data } = await api.patch(`/matches/${id}/end-contract`);
+    return data;
+  },
+
+  addToWorkspace: async (id: string) => {
+    const { data } = await api.patch(`/matches/${id}/add-to-workspace`);
+    return data;
+  },
 };

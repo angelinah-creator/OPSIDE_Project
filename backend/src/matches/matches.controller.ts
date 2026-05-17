@@ -50,4 +50,19 @@ export class MatchesController {
   findAllForClient(@CurrentUser('id') userId: string) {
     return this.matchesService.findAllForClient(userId);
   }
+
+  @Patch(':id/end-contract')
+  @Roles(Role.client)
+  endContract(
+    @Param('id') id: string,
+    @CurrentUser('id') clientId: string,
+  ) {
+    return this.matchesService.endContract(id, clientId);
+  }
+
+  @Patch(':id/add-to-workspace')
+  @Roles(Role.client)
+  addToWorkspace(@Param('id') id: string, @CurrentUser('id') clientId: string) {
+    return this.matchesService.addToWorkspace(id, clientId);
+  }
 }
