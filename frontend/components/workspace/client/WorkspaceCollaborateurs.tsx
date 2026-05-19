@@ -183,10 +183,6 @@ export default function WorkspaceCollaborateurs() {
                     </p>
                   )}
                 </div>
-                <div className="flex items-center gap-1.5 text-xs font-black text-green-600 bg-green-50 px-2 py-1 rounded-lg shrink-0">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                  Actif
-                </div>
               </div>
 
               {/* Info grid */}
@@ -196,7 +192,7 @@ export default function WorkspaceCollaborateurs() {
                   <p className="text-xs font-black text-slate-900">{profile?.experience_years || 0} ans</p>
                 </div>
                 <div className="bg-accent/5 rounded-xl p-2.5 border border-accent/10">
-                  <p className="text-[9px] text-accent font-bold uppercase mb-0.5">Score IA</p>
+                  <p className="text-[9px] text-accent font-bold uppercase mb-0.5">Score</p>
                   <p className="text-xs font-black text-accent">{score}%</p>
                 </div>
               </div>

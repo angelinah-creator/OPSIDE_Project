@@ -42,8 +42,8 @@ export const customTestService = {
   },
 
   /** Client : envoyer directement le Calendly (sans test) */
-  sendCalendlyDirectly: async (matchId: string): Promise<{ success: boolean; message: string }> => {
-    const res = await api.post(`/custom-test/match/${matchId}/send-calendly`);
+  sendCalendlyDirectly: async (matchId: string, calendlyUrl?: string): Promise<{ success: boolean; message: string }> => {
+    const res = await api.post(`/custom-test/match/${matchId}/send-calendly`, { calendly_url: calendlyUrl });
     return res.data;
   },
 

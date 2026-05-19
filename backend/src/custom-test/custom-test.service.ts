@@ -209,12 +209,6 @@ export class CustomTestService {
         await this.mailService.sendCustomTestResultEmail(
           test.match.client.email, 'client', score, true, candidateName, projectName,
         );
-        // Lien Calendly au candidat (UNIQUEMENT ici, après test réussi)
-        await this.mailService.sendCalendlyLinkEmail(
-          test.match.candidate.email,
-          companyName,
-          projectName,
-        );
       } catch (e) {
         console.error('Failed to send test result emails:', e);
       }
@@ -363,7 +357,7 @@ export class CustomTestService {
   /**
    * Le client envoie directement le Calendly (en se fiant au score plateforme).
    */
-  async sendCalendlyDirectly(matchId: string, clientId: string) {
+  async sendCalendlyDirectly(matchId: string, clientId: string, calendlyUrl?: string) {
     const match = await this.prisma.match.findUnique({
       where: { id: matchId },
       include: {
@@ -377,6 +371,14 @@ export class CustomTestService {
     if (match.client_id !== clientId) throw new ForbiddenException('Accès refusé.');
     if (match.status !== MatchStatus.confirmed) throw new BadRequestException('Le match doit être confirmé.');
 
+    // Save the Calendly URL in the database
+    await this.prisma.match.update({
+      where: { id: matchId },
+      data: {
+        calendly_url: calendlyUrl || 'https://calendly.com/opside',
+      },
+    });
+
     const companyName = match.client.client?.company_name || 'Le client';
     const projectName = match.job_offer?.title || 'le projet';
 
@@ -384,7 +386,7 @@ export class CustomTestService {
     await this.notificationsService.create({
       user_id: match.candidate_id,
       type: NotificationType.match_confirmed,
-      title: '📅 Lien d\'entretien reçu !',
+      title: 'Lien d\'entretien reçu !',
       message: `${companyName} vous a envoyé un lien pour planifier votre entretien pour le projet ${projectName}.`,
       link: '/candidat/dashboard',
     });
@@ -395,6 +397,7 @@ export class CustomTestService {
         match.candidate.email,
         companyName,
         projectName,
+        calendlyUrl || 'https://calendly.com/opside',
       );
     } catch (e) {
       console.error('Failed to send Calendly email:', e);

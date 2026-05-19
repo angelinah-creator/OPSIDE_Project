@@ -35,6 +35,11 @@ export default function ClientCandidaturesTab() {
   const [requestingRetest, setRequestingRetest] = useState<string | null>(null)
   const [addingToWorkspace, setAddingToWorkspace] = useState<string | null>(null)
 
+  // Custom Calendly modal state
+  const [showCalendlyModal, setShowCalendlyModal] = useState(false)
+  const [calendlyUrl, setCalendlyUrl] = useState('')
+  const [selectedMatchForCalendly, setSelectedMatchForCalendly] = useState<any>(null)
+
   // Filtering & Pagination
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'matched' | 'rejected'>('all')
   const [currentPage, setCurrentPage] = useState(1)
@@ -298,7 +303,6 @@ export default function ClientCandidaturesTab() {
                   </div>
                 )}
 
-                {/* --- Validation Post-Match Actions --- */}
                 {['matched', 'rejected'].includes(cand.status) && cand.match && (
                   <div className="mt-4 space-y-3">
                     {(() => {
@@ -306,6 +310,36 @@ export default function ClientCandidaturesTab() {
                       const test = match.custom_test
                       const canRetest = test?.status === 'scored' && test?.score < test?.threshold && test?.retest_allowed && !test?.retest_used
                       const testPassed = test?.status === 'scored' && test?.score >= test?.threshold
+                      const calendlySent = !!match.calendly_url
+
+                      // If Calendly has been sent, only show the Add to Workspace button
+                      if (calendlySent) {
+                        return (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-100 rounded-xl">
+                              <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
+                              <div className="min-w-0">
+                                <p className="font-bold text-green-800 text-[10px]">Lien Calendly envoyé !</p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  setAddingToWorkspace(match.id)
+                                  await matchService.addToWorkspace(match.id)
+                                  toast.success('Candidat ajouté au Workspace !')
+                                  await fetchCandidatures()
+                                } catch { toast.error('Erreur') } finally { setAddingToWorkspace(null) }
+                              }}
+                              disabled={addingToWorkspace === match.id}
+                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:scale-[1.02] rounded-xl font-black text-xs transition-all shadow-md shadow-slate-900/20"
+                            >
+                              {addingToWorkspace === match.id ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Home className="w-4 h-4" />}
+                              Ajouter au Workspace
+                            </button>
+                          </div>
+                        )
+                      }
 
                       return (
                         <>
@@ -326,23 +360,30 @@ export default function ClientCandidaturesTab() {
                                 <span className="truncate">Envoyer Test Technique</span>
                               </button>
                               <button
-                                onClick={async () => {
-                                  try {
-                                    setSendingCalendly(match.id)
-                                    await customTestService.sendCalendlyDirectly(match.id)
-                                    toast.success('Lien Calendly envoyé au candidat !')
-                                  } catch { toast.error('Erreur') } finally { setSendingCalendly(null) }
+                                onClick={() => {
+                                  setSelectedMatchForCalendly(match)
+                                  setCalendlyUrl('https://calendly.com/opside')
+                                  setShowCalendlyModal(true)
                                 }}
-                                disabled={sendingCalendly === match.id}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2.5 bg-white border border-accent/20 hover:border-accent/40 hover:bg-accent/5 text-accent rounded-lg font-bold text-xs transition-all active:scale-[0.98] disabled:opacity-50"
+                                className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2.5 bg-white border border-accent/20 hover:border-accent/40 hover:bg-accent/5 text-accent rounded-lg font-bold text-xs transition-all active:scale-[0.98]"
                               >
                                 <span className="truncate">Envoyer Lien Entretien</span>
                               </button>
                             </div>
                           )}
 
-                          {/* Test in progress */}
-                          {test && ['sent', 'in_progress'].includes(test.status) && (
+                          {/* Test envoyé */}
+                          {test && test.status === 'sent' && (
+                            <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-100 rounded-xl">
+                              <Clock className="w-4 h-4 text-blue-500 shrink-0" />
+                              <div className="min-w-0">
+                                <p className="font-bold text-blue-800 text-[10px]">Test envoyé</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Test en cours */}
+                          {test && test.status === 'in_progress' && (
                             <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-100 rounded-xl">
                               <Clock className="w-4 h-4 text-amber-500 shrink-0" />
                               <div className="min-w-0">
@@ -363,22 +404,18 @@ export default function ClientCandidaturesTab() {
                             </div>
                           )}
 
-                          {/* Test passed OR Calendly sent directly → Show Add to Workspace */}
+                          {/* Test passed → Show Envoyer Lien Entretien button */}
                           {testPassed && (
                             <button
-                              onClick={async () => {
-                                try {
-                                  setAddingToWorkspace(match.id)
-                                  await matchService.addToWorkspace(match.id)
-                                  toast.success('Candidat ajouté au Workspace !')
-                                  await fetchCandidatures()
-                                } catch { toast.error('Erreur') } finally { setAddingToWorkspace(null) }
+                              onClick={() => {
+                                setSelectedMatchForCalendly(match)
+                                setCalendlyUrl('https://calendly.com/opside')
+                                setShowCalendlyModal(true)
                               }}
-                              disabled={addingToWorkspace === match.id}
                               className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:scale-[1.02] rounded-xl font-black text-xs transition-all shadow-md shadow-slate-900/20"
                             >
-                              {addingToWorkspace === match.id ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Home className="w-4 h-4" />}
-                              Ajouter au Workspace
+                              <Calendar className="w-4 h-4" />
+                              Envoyer Lien Entretien
                             </button>
                           )}
 
@@ -752,6 +789,56 @@ export default function ClientCandidaturesTab() {
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : <Send className="w-5 h-5" />}
               Envoyer le test au candidat
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {showCalendlyModal && selectedMatchForCalendly && (
+        <Modal isOpen={showCalendlyModal} onClose={() => setShowCalendlyModal(false)} title="Envoyer le lien d'entretien">
+          <div className="space-y-6 pt-2">
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">
+              Saisissez votre lien Calendly personnalisé (ou tout autre lien de planification d'entretien) pour l'envoyer au candidat.
+            </p>
+
+            <div className="space-y-2">
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">
+                Lien Calendly / Entretien
+              </label>
+              <input
+                type="url"
+                value={calendlyUrl}
+                onChange={e => setCalendlyUrl(e.target.value)}
+                placeholder="https://calendly.com/votre-nom"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-all"
+              />
+            </div>
+
+            <button
+              onClick={async () => {
+                if (!calendlyUrl || !calendlyUrl.trim().startsWith('http')) {
+                  toast.error('Veuillez saisir un lien valide (commençant par http:// ou https://)')
+                  return
+                }
+                try {
+                  setSendingCalendly(selectedMatchForCalendly.id)
+                  await customTestService.sendCalendlyDirectly(selectedMatchForCalendly.id, calendlyUrl)
+                  toast.success('Lien d\'entretien envoyé au candidat !')
+                  setShowCalendlyModal(false)
+                  await fetchCandidatures()
+                } catch {
+                  toast.error('Erreur lors de l\'envoi du lien')
+                } finally {
+                  setSendingCalendly(null)
+                }
+              }}
+              disabled={sendingCalendly === selectedMatchForCalendly.id}
+              className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-black text-base transition-all shadow-xl shadow-slate-900/20 disabled:opacity-50"
+            >
+              {sendingCalendly === selectedMatchForCalendly.id ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : <Send className="w-5 h-5" />}
+              Envoyer l'invitation d'entretien
             </button>
           </div>
         </Modal>

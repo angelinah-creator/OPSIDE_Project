@@ -493,6 +493,7 @@ model Match {
   matched_at    DateTime?
   rejected_at   DateTime?
   rejected_by   Role?
+  calendly_url  String?
 
   candidate     User             @relation("CandidateMatches", fields: [candidate_id], references: [id], onDelete: Cascade)
   client        User             @relation("ClientMatches", fields: [client_id], references: [id], onDelete: Cascade)

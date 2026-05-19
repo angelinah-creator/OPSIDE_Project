@@ -31,14 +31,14 @@ export class CustomTestController {
     return this.customTestService.createTest(clientId, dto);
   }
 
-  /** Client : envoie directement le Calendly (sans test custom) */
   @Post('match/:matchId/send-calendly')
   @Roles(Role.client)
   sendCalendly(
     @Param('matchId') matchId: string,
     @CurrentUser('id') clientId: string,
+    @Body('calendly_url') calendlyUrl: string,
   ) {
-    return this.customTestService.sendCalendlyDirectly(matchId, clientId);
+    return this.customTestService.sendCalendlyDirectly(matchId, clientId, calendlyUrl);
   }
 
   /** Client : ses tests envoyés */
