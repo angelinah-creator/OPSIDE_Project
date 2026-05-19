@@ -213,7 +213,7 @@ export class CustomTestService {
         console.error('Failed to send test result emails:', e);
       }
     } else {
-      // ❌ NO-GO : Score < 75%
+      //  NO-GO : Score < 75%
       // Match → rejected
       await this.prisma.match.update({
         where: { id: test.match_id },

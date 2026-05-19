@@ -231,7 +231,10 @@ export class MatchesService {
 
   async findAllForCandidate(candidateId: string) {
     return this.prisma.match.findMany({
-      where: { candidate_id: candidateId },
+      where: {
+        candidate_id: candidateId,
+        initiated_by: 'client',
+      },
       include: {
         client: {
           include: {
