@@ -156,6 +156,28 @@ export class MatchesService {
         },
       });
 
+      // --- SOURCING TO CANDIDATURE BRIDGE ---
+      // If the candidate confirmed the invitation, automatically create a Candidature record with status 'matched'.
+      // This bridges them seamlessly into the post-match validation and testing flow.
+      if (match.job_offer_id) {
+        const existingCandidature = await this.prisma.candidature.findFirst({
+          where: {
+            candidate_id: match.candidate_id,
+            job_offer_id: match.job_offer_id,
+          },
+        });
+        if (!existingCandidature) {
+          await this.prisma.candidature.create({
+            data: {
+              candidate_id: match.candidate_id,
+              job_offer_id: match.job_offer_id,
+              status: 'matched',
+              message: 'Candidat matché via sourcing',
+            },
+          });
+        }
+      }
+
       // Notification aux deux parties
       const companyName = match.client.client?.company_name || 'Le client';
       const candidateName = `${match.candidate.first_name || ''} ${match.candidate.last_name || ''}`.trim() || 'Un candidat';

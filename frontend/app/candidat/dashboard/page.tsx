@@ -105,7 +105,7 @@ export default function CandidatDashboard() {
   const navItems: { id: TabType; label: string; icon?: any; }[] = [
     { id: 'technique', label: 'Test technique', icon: Code2 },
     { id: 'offres', label: 'Offres d\'emploi', icon: Briefcase },
-    { id: 'matches', label: 'Matches', icon: Bell },
+    { id: 'matches', label: 'Invitations', icon: Bell },
     { id: 'historique', label: 'Historique', icon: History },
     { id: 'profil', label: 'Mon Profil', icon: User },
     { id: 'notifications', label: 'Notifications', icon: Bell },

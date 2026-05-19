@@ -64,7 +64,7 @@ export default function TechniqueTab({ score, profile }: TechniqueTabProps) {
         {/* Tests Clients Section */}
         <div className="mt-14 space-y-6">
           <div className="flex items-center gap-3 mb-6">
-            <h2 className="text-2xl md:text-3xl font-black text-slate-900 truncate">Tests techniques des clients</h2>
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 truncate pb-6">Tests techniques des clients</h2>
           </div>
           <CustomTestTab />
         </div>
