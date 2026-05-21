@@ -18,6 +18,7 @@ import { JobOffersModule } from './job-offers/job-offers.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { CandidaturesModule } from './candidatures/candidatures.module';
 import { MatchesModule } from './matches/matches.module';
+import { CustomTestModule } from './custom-test/custom-test.module';
 
 validateEnvironment();
 
@@ -47,6 +48,7 @@ validateEnvironment();
     NotificationsModule,
     CandidaturesModule,
     MatchesModule,
+    CustomTestModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -5,36 +5,34 @@ import { useRouter } from 'next/navigation'
 import { getUser, clearTokens, authApi } from '@/lib/auth-service'
 import { clientApi, ClientProfile } from '@/lib/client-service'
 import {
-  User,
   LogOut,
-  LayoutDashboard,
-  Briefcase,
-  Bell,
+  Home,
+  Timer,
   FileText,
+  StickyNote,
+  Users as UsersIcon,
   Menu,
   X,
+  ArrowLeft
 } from 'lucide-react'
 import clsx from 'clsx'
-import ClientOffresTab from '@/components/dashboard/client/ClientOffresTab'
-import ClientProfilTab from '@/components/dashboard/client/ClientProfilTab'
-import ClientCandidaturesTab from '@/components/dashboard/client/CandidaturesTab'
-import ClientSourcingTab from '@/components/dashboard/client/SourcingTab'
-// import ClientMatchesTab from '@/components/dashboard/client/MatchesTab'
-import NotificationsTab from '@/components/dashboard/NotificationsTab'
-import { notificationService } from '@/lib/notification-service'
-import { CheckSquare, Home, ArrowRightLeft } from 'lucide-react'
 import Link from 'next/link'
 
-type TabType = 'dashboard' | 'candidatures' | 'sourcing' | 'matches' | 'notifications' | 'offres' | 'profil'
+import WorkspaceCollaborateurs from '@/components/workspace/client/WorkspaceCollaborateurs'
+import WorkspaceClientHome from '@/components/workspace/client/WorkspaceClientHome'
+import WorkspaceClientTimeTracking from '@/components/workspace/client/WorkspaceClientTimeTracking'
+import WorkspaceClientFactures from '@/components/workspace/client/WorkspaceClientFactures'
+import WorkspaceClientNotes from '@/components/workspace/client/WorkspaceClientNotes'
 
-export default function ClientDashboard() {
+type TabType = 'workspace_home' | 'workspace_collabs' | 'workspace_time' | 'workspace_factures' | 'workspace_notes'
+
+export default function ClientWorkspace() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<ClientProfile | null>(null)
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<TabType>('offres')
+  const [activeTab, setActiveTab] = useState<TabType>('workspace_collabs')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [unreadNotifications, setUnreadNotifications] = useState(0)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,10 +45,6 @@ export default function ClientDashboard() {
         }
         const p = await clientApi.getMyProfile()
         setProfile(p)
-        
-        // Fetch unread count
-        const count = await notificationService.getUnreadCount()
-        setUnreadNotifications(count)
       } catch (err: any) {
         if (err.response?.status === 404) {
           router.push('/client/onboarding')
@@ -62,18 +56,6 @@ export default function ClientDashboard() {
       }
     }
     fetchData()
-
-    // Set up polling for notifications
-    const interval = setInterval(async () => {
-      try {
-        const count = await notificationService.getUnreadCount()
-        setUnreadNotifications(count)
-      } catch (err) {
-        console.error('Error polling notifications:', err)
-      }
-    }, 15000) // Poll every 15 seconds
-
-    return () => clearInterval(interval)
   }, [router])
 
   const handleLogout = async () => {
@@ -90,19 +72,18 @@ export default function ClientDashboard() {
       <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted text-sm font-medium">Chargement de votre espace...</p>
+          <p className="text-slate-400 font-medium">Chargement du workspace...</p>
         </div>
       </div>
     )
   }
 
-  const navItems: { id: TabType; label: string; icon?: any; }[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'offres', label: "Offres d'emploi", icon: Briefcase },
-    { id: 'candidatures', label: 'Candidatures', icon: FileText },
-    { id: 'sourcing', label: 'Sourcing', icon: User },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'profil', label: 'Profil Entreprise', icon: User },
+  const navItems: { id: TabType; label: string; icon: any }[] = [
+    { id: 'workspace_home', label: 'Vue d\'ensemble', icon: Home },
+    { id: 'workspace_collabs', label: 'Collaborateurs', icon: UsersIcon },
+    { id: 'workspace_time', label: 'Time Tracking', icon: Timer },
+    { id: 'workspace_factures', label: 'Facturation', icon: FileText },
+    { id: 'workspace_notes', label: 'Notes', icon: StickyNote },
   ]
 
   const initials = profile?.company_name
@@ -121,20 +102,31 @@ export default function ClientDashboard() {
 
       {/* Sidebar */}
       <aside className={clsx(
-        "w-72 bg-white border-r border-slate-200 flex flex-col fixed lg:sticky top-0 h-[100dvh] z-50 transition-transform duration-300 ease-in-out",
+        "w-72 bg-slate-900 flex flex-col fixed lg:sticky top-0 h-[100dvh] z-50 transition-transform duration-300 ease-in-out",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="p-6 lg:p-8 flex items-center justify-between">
-          <img src="/logo.webp" alt="OPSIDE" className="w-32" />
+          <img src="/logo-white.png" alt="OPSIDE" className="w-32 brightness-0 invert" onError={(e) => { e.currentTarget.src = '/logo.webp'; e.currentTarget.style.filter = 'brightness(0) invert(1)'; }} />
           <button
-            className="lg:hidden p-2 -mr-2 text-slate-500 hover:bg-slate-50 rounded-xl transition-colors"
+            className="lg:hidden p-2 -mr-2 text-slate-400 hover:bg-slate-800 rounded-xl transition-colors"
             onClick={() => setIsSidebarOpen(false)}
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
+        <div className="px-4 mb-6">
+           <Link
+             href="/client/dashboard"
+             className="w-full flex items-center gap-3 px-4 py-3 bg-slate-800/50 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl font-bold transition-all text-sm"
+           >
+             <ArrowLeft className="w-4 h-4" />
+             Retour au recrutement
+           </Link>
+        </div>
+
         <div className="flex-1 overflow-y-auto px-4 py-2">
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-4 mb-4">Workspace Client</p>
           <nav className="space-y-1">
             {navItems.map((item) => (
               <button
@@ -147,37 +139,21 @@ export default function ClientDashboard() {
                   "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 group text-left",
                   activeTab === item.id
                     ? "bg-accent text-white shadow-lg shadow-accent/20"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
                 )}
               >
-                {item.icon && <item.icon className={clsx(
+                <item.icon className={clsx(
                   "w-5 h-5",
-                  activeTab === item.id ? "text-white" : "text-slate-400 group-hover:text-slate-600"
-                )} />}
+                  activeTab === item.id ? "text-white" : "text-slate-500 group-hover:text-slate-300"
+                )} />
                 {item.label}
-                {item.id === 'notifications' && unreadNotifications > 0 && (
-                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[1.25rem] text-center">
-                    {unreadNotifications}
-                  </span>
-                )}
               </button>
             ))}
-          <div className="pt-4 pb-2 px-4">
-             <div className="h-px bg-slate-100 mb-4" />
-             <Link
-               href="/client/workspace"
-               className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] text-sm text-left"
-             >
-               <Home className="w-5 h-5 text-amber-400" />
-               Workspace
-               <ArrowRightLeft className="w-4 h-4 ml-auto text-slate-400" />
-             </Link>
-          </div>
           </nav>
         </div>
 
-        <div className="p-4 mt-auto border-t border-slate-100 lg:border-none">
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+        <div className="p-4 mt-auto border-t border-slate-800">
+          <div className="bg-slate-800 rounded-2xl p-4">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-accent text-white flex items-center justify-center font-bold text-sm overflow-hidden">
                 {profile?.logo_url ? (
@@ -187,14 +163,14 @@ export default function ClientDashboard() {
                 )}
               </div>
               <div className="flex-1 min-w-0 text-left">
-                <p className="text-sm font-bold text-slate-900 truncate">
+                <p className="text-sm font-bold text-white truncate">
                   {profile?.company_name || `${user?.first_name} ${user?.last_name}`}
                 </p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
             >
               <LogOut className="w-3.5 h-3.5" />
               Déconnexion
@@ -213,23 +189,21 @@ export default function ClientDashboard() {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <h1 className="text-2xl md:text-3xl font-black text-slate-900 truncate">
+            <h1 className="text-2xl md:text-3xl font-black text-slate-900 truncate flex items-center gap-3">
               {navItems.find(n => n.id === activeTab)?.label}
+              <span className="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-widest rounded-lg border border-amber-200">
+                Workspace
+              </span>
             </h1>
           </header>
 
           {/* Tab Content */}
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {activeTab === 'dashboard' && (
-              <div className="bg-white rounded-3xl p-12 border border-slate-100 shadow-sm flex items-center justify-center min-h-[400px]">
-                <p className="text-slate-400 font-medium">Dashboard — À venir</p>
-              </div>
-            )}
-            {activeTab === 'candidatures' && <ClientCandidaturesTab />}
-            {activeTab === 'sourcing' && <ClientSourcingTab />}
-            {activeTab === 'notifications' && <NotificationsTab />}
-            {activeTab === 'offres' && <ClientOffresTab />}
-            {activeTab === 'profil' && <ClientProfilTab profile={profile} user={user} onProfileUpdate={setProfile} />}
+            {activeTab === 'workspace_home' && <WorkspaceClientHome />}
+            {activeTab === 'workspace_collabs' && <WorkspaceCollaborateurs />}
+            {activeTab === 'workspace_time' && <WorkspaceClientTimeTracking />}
+            {activeTab === 'workspace_factures' && <WorkspaceClientFactures />}
+            {activeTab === 'workspace_notes' && <WorkspaceClientNotes />}
           </div>
         </div>
       </main>

@@ -111,7 +111,7 @@ export class CandidaturesService {
   }
 
   async findAllForClient(clientId: string) {
-    return this.prisma.candidature.findMany({
+    const candidatures = await this.prisma.candidature.findMany({
       where: {
         job_offer: {
           client_id: clientId,
@@ -136,6 +136,58 @@ export class CandidaturesService {
         job_offer: true,
       },
       orderBy: { applied_at: 'desc' },
+    });
+
+    // Fetch all client matches to identify sourced candidates and their test statuses
+    const matches = await this.prisma.match.findMany({
+      where: {
+        client_id: clientId,
+      },
+      include: {
+        custom_test: true,
+      },
+    });
+
+    return candidatures.map((cand) => {
+      const match = matches.find(
+        (m) =>
+          m.candidate_id === cand.candidate_id &&
+          m.job_offer_id === cand.job_offer_id
+      );
+
+      // A candidate is sourced if the match was initiated by the client.
+      const isSourced = match?.initiated_by === 'client';
+      const hasTest = !!match?.custom_test;
+      const testPassed =
+        match?.custom_test?.status === 'scored' &&
+        match?.custom_test?.score !== null &&
+        match?.custom_test?.score >= match?.custom_test?.threshold;
+
+      // Anonymization rules:
+      // - Sourced profiles start anonymous.
+      // - If a test was sent: they remain anonymous until the test is PASSED (>75%).
+      // - If NO test was sent: they are NOT anonymous (so the client can see the profile before sending Calendly link).
+      const shouldAnonymize = isSourced && hasTest && !testPassed;
+
+      if (shouldAnonymize) {
+        return {
+          ...cand,
+          candidate: {
+            ...cand.candidate,
+            first_name: 'Candidat',
+            last_name: `Sourced (#${cand.candidate.id.slice(0, 4)})`,
+            email: 'anonyme@opside.com',
+            candidate: cand.candidate.candidate
+              ? {
+                  ...cand.candidate.candidate,
+                  photo_url: null, // Mask profile picture
+                }
+              : null,
+          },
+        };
+      }
+
+      return cand;
     });
   }
 

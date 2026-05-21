@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
-import { Award, Check, Code2, Star } from 'lucide-react';
+import { Award, Check, Code2, Star, FlaskConical } from 'lucide-react';
+import CustomTestTab from './CustomTestTab';
 
 interface TechniqueTabProps {
   score: number | null;
@@ -11,8 +12,8 @@ interface TechniqueTabProps {
 
 export default function TechniqueTab({ score, profile }: TechniqueTabProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div className="lg:col-span-2 space-y-8">
+    <div className="grid grid-cols-1 gap-8">
+      <div className="space-y-8">
         {/* Score Card */}
         <div className="bg-white rounded-[2rem] md:rounded-3xl p-6 md:p-8 border border-slate-100 shadow-sm relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-4 md:p-6 opacity-5 group-hover:opacity-10 transition-opacity text-accent">
@@ -57,6 +58,15 @@ export default function TechniqueTab({ score, profile }: TechniqueTabProps) {
               </Button>
             </div>
           </div>
+        </div>
+
+        
+        {/* Tests Clients Section */}
+        <div className="mt-14 space-y-6">
+          <div className="flex items-center gap-3 mb-6">
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 truncate pb-6">Tests techniques des clients</h2>
+          </div>
+          <CustomTestTab />
         </div>
       </div>
     </div>

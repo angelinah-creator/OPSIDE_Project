@@ -112,6 +112,15 @@ enum TestType {
   client
 }
 
+enum CustomTestStatus {
+  pending
+  sent
+  in_progress
+  submitted
+  scored
+  expired
+}
+
 enum TestStatus {
   pending
   in_progress
@@ -133,13 +142,15 @@ model User {
   reset_password_token   String?
   reset_password_expires DateTime?
 
-  refresh_tokens RefreshToken[]
-  candidate      CandidateProfile?
-  client         ClientProfile?
-  skills         Skill[]
-  tests          Test[]
-  job_offers     JobOffer[]
-  applications   Candidature[]  @relation("CandidateApplications")
+  refresh_tokens         RefreshToken[]
+  candidate              CandidateProfile?
+  client                 ClientProfile?
+  skills                 Skill[]
+  tests                  Test[]
+  job_offers             JobOffer[]
+  applications           Candidature[]  @relation("CandidateApplications")
+  client_custom_tests    CustomTest[]   @relation("ClientCustomTests")
+  candidate_custom_tests CustomTest[]   @relation("CandidateCustomTests")
   matches        Match[]        @relation("CandidateMatches")
   client_matches Match[]        @relation("ClientMatches")
   notifications  Notification[]
@@ -439,6 +450,7 @@ enum MatchStatus {
   pending_candidate
   pending_client
   confirmed
+  in_workspace
   rejected
 }
 
@@ -454,6 +466,7 @@ enum NotificationType {
   match_rejected
   test_result
   sourcing_invitation
+  workspace_invitation
 }
 
 model Candidature {
@@ -480,12 +493,43 @@ model Match {
   matched_at    DateTime?
   rejected_at   DateTime?
   rejected_by   Role?
+  calendly_url  String?
 
   candidate     User             @relation("CandidateMatches", fields: [candidate_id], references: [id], onDelete: Cascade)
   client        User             @relation("ClientMatches", fields: [client_id], references: [id], onDelete: Cascade)
   job_offer     JobOffer?        @relation(fields: [job_offer_id], references: [id], onDelete: SetNull)
+  custom_test   CustomTest?
 
   @@map("matches")
+}
+
+model CustomTest {
+  id                  String           @id @default(uuid())
+  client_id           String
+  candidate_id        String
+  match_id            String           @unique
+  skills_tested       String[]
+  difficulty          String?          // junior | mid | senior
+  duration_minutes    Int
+  custom_instructions String?          @db.Text
+  threshold           Int              @default(75)
+  questions           Json?            // Généré par Claude (ou mocké)
+  answers             Json?            // Réponses du candidat
+  score               Int?             // 0-100
+  score_details       Json?
+  status              CustomTestStatus @default(pending)
+  retest_allowed      Boolean          @default(true)
+  retest_used         Boolean          @default(false)
+  started_at          DateTime?
+  submitted_at        DateTime?
+  created_at          DateTime         @default(now())
+  updated_at          DateTime         @updatedAt
+
+  client    User  @relation("ClientCustomTests", fields: [client_id], references: [id], onDelete: Cascade)
+  candidate User  @relation("CandidateCustomTests", fields: [candidate_id], references: [id], onDelete: Cascade)
+  match     Match @relation(fields: [match_id], references: [id], onDelete: Cascade)
+
+  @@map("custom_tests")
 }
 
 model Notification {

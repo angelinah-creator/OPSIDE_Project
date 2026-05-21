@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getUser, clearTokens, authApi } from '@/lib/auth-service';
 import { candidateApi } from '@/lib/candidate-service';
 import { testApi } from '@/lib/test-service';
+import { matchService } from '@/lib/match-service';
 import { 
   User, 
   LogOut, 
@@ -14,6 +15,7 @@ import {
   Bell, 
   BookOpen, 
   Search,
+  UserPlus,
   Menu,
   X
 } from 'lucide-react';
@@ -24,10 +26,13 @@ import TechniqueTab from '@/components/dashboard/candidate/TechniqueTab';
 import OffresTab from '@/components/dashboard/candidate/OffresTab';
 import HistoriqueTab from '@/components/dashboard/candidate/HistoriqueTab';
 import ProfilTab from '@/components/dashboard/candidate/ProfilTab';
-import MatchesTab from '@/components/dashboard/candidate/MatchesTab';
 import NotificationsTab from '@/components/dashboard/NotificationsTab';
 import AideTab from '@/components/dashboard/candidate/AideTab';
+import CustomTestTab from '@/components/dashboard/candidate/CustomTestTab';
+import MatchesTab from '@/components/dashboard/candidate/MatchesTab';
 import { useNotifications } from '@/hooks/useNotifications';
+import { CheckSquare, Home, ArrowRightLeft } from 'lucide-react';
+import Link from 'next/link';
 
 type TabType = 'technique' | 'offres' | 'historique' | 'profil' | 'matches' | 'notifications' | 'aide';
 
@@ -39,6 +44,7 @@ export default function CandidatDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('technique');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [workspaces, setWorkspaces] = useState<any[]>([]);
   const { unreadCount: unreadNotifications } = useNotifications();
 
   useEffect(() => {
@@ -58,6 +64,10 @@ export default function CandidatDashboard() {
         const scoreRes = await testApi.getLatestScore();
         // Forced mock score for UI testing if null
         setLatestScore(scoreRes.score || 85);
+        
+        const matchesData = await matchService.getCandidateMatches();
+        const workspacesList = matchesData.filter((m: any) => m.status === 'in_workspace');
+        setWorkspaces(workspacesList);
       } catch (err: any) {
         if (err.response?.status === 404) {
           router.push('/candidat/onboarding');
@@ -93,12 +103,12 @@ export default function CandidatDashboard() {
     );
   }
 
-  const navItems: { id: TabType; label: string; icon: any }[] = [
+  const navItems: { id: TabType; label: string; icon?: any; }[] = [
     { id: 'technique', label: 'Test technique', icon: Code2 },
     { id: 'offres', label: 'Offres d\'emploi', icon: Briefcase },
-    { id: 'matches', label: 'Matches', icon: Bell },
+    { id: 'matches', label: 'Invitations', icon: UserPlus },
     { id: 'historique', label: 'Historique', icon: History },
-    { id: 'profil', label: 'Profil', icon: User },
+    { id: 'profil', label: 'Mon Profil', icon: User },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'aide', label: 'Aide entretien', icon: BookOpen },
   ];
@@ -120,7 +130,7 @@ export default function CandidatDashboard() {
 
       {/* Sidebar */}
       <aside className={clsx(
-        "w-72 bg-white border-r border-slate-200 flex flex-col fixed lg:sticky top-0 h-[100dvh] z-50 transition-transform duration-300 ease-in-out",
+        "w-72 bg-white border-r border-slate-200 flex flex-col fixed lg:sticky top-0 h-dvh z-50 transition-transform duration-300 ease-in-out",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="p-6 lg:p-8 flex items-center justify-between">
@@ -149,18 +159,35 @@ export default function CandidatDashboard() {
                     : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                 )}
             >
-              <item.icon className={clsx(
+              {item.icon && <item.icon className={clsx(
                 "w-5 h-5",
                 activeTab === item.id ? "text-white" : "text-slate-400 group-hover:text-slate-600"
-              )} />
+              )} />}
               {item.label}
               {item.id === 'notifications' && unreadNotifications > 0 && (
-                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-5 text-center">
                   {unreadNotifications}
                 </span>
               )}
             </button>
           ))}
+          {workspaces.length > 0 && (
+            <div className="pt-4 pb-2 px-4">
+               <div className="h-px bg-slate-100 mb-4" />
+               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 px-1">Mes Workspaces</p>
+               {workspaces.map((w: any) => (
+                 <Link
+                   key={w.id}
+                   href={`/candidat/workspace/${w.id}`}
+                   className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-slate-900 to-slate-800 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] text-sm text-left mb-2"
+                 >
+                   <Home className="w-5 h-5 text-amber-400 shrink-0" />
+                   <span className="truncate">{w.client?.client?.company_name || 'Client'} espace</span>
+                   <ArrowRightLeft className="w-4 h-4 ml-auto text-slate-400 shrink-0" />
+                 </Link>
+               ))}
+            </div>
+          )}
         </nav>
         </div>
 
@@ -189,7 +216,7 @@ export default function CandidatDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 w-full min-w-0 h-[100dvh] overflow-y-auto">
+      <main className="flex-1 w-full min-w-0 h-dvh overflow-y-auto">
         <div className="p-4 md:p-10 w-full">
           <header className="flex items-center gap-4 mb-8 md:mb-10">
             <button 

@@ -2,11 +2,20 @@
 
 import { useEffect, useState } from 'react'
 import { candidatureService } from '@/lib/candidature-service'
-import { FileText, User, Briefcase, MapPin, DollarSign, Calendar, Clock, Globe, Link as LinkIcon, Download, Target, ChevronLeft, ChevronRight } from 'lucide-react'
+import { matchService } from '@/lib/match-service'
+import { customTestService, CreateCustomTestPayload } from '@/lib/custom-test-service'
+import { FileText, User, Briefcase, MapPin, DollarSign, Calendar, Clock, Globe, Link as LinkIcon, Download, Target, ChevronLeft, ChevronRight, CheckCircle, XCircle, FlaskConical, Send, RefreshCw, Plus, Minus, Home } from 'lucide-react'
 import { toast } from 'sonner'
 import clsx from 'clsx'
 import Modal from '@/components/ui/Modal'
+import SkillSelector from '@/components/ui/SkillSelector'
 import { getMockScore } from './SourcingTab'
+
+const DIFFICULTY_LABELS: Record<string, string> = {
+  junior: 'Junior (< 2 ans)',
+  mid: 'Mid (2–5 ans)',
+  senior: 'Senior (> 5 ans)',
+}
 
 export default function ClientCandidaturesTab() {
   const [candidatures, setCandidatures] = useState<any[]>([])
@@ -14,10 +23,27 @@ export default function ClientCandidaturesTab() {
   const [isUpdating, setIsUpdating] = useState<string | null>(null)
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null)
 
+  // Validation post-match state
+  const [showTestModal, setShowTestModal] = useState(false)
+  const [selectedMatchForTest, setSelectedMatchForTest] = useState<any>(null)
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
+  const [difficulty, setDifficulty] = useState<'junior' | 'mid' | 'senior'>('mid')
+  const [duration, setDuration] = useState(60)
+  const [instructions, setInstructions] = useState('')
+  const [isSendingTest, setIsSendingTest] = useState(false)
+  const [sendingCalendly, setSendingCalendly] = useState<string | null>(null)
+  const [requestingRetest, setRequestingRetest] = useState<string | null>(null)
+  const [addingToWorkspace, setAddingToWorkspace] = useState<string | null>(null)
+
+  // Custom Calendly modal state
+  const [showCalendlyModal, setShowCalendlyModal] = useState(false)
+  const [calendlyUrl, setCalendlyUrl] = useState('')
+  const [selectedMatchForCalendly, setSelectedMatchForCalendly] = useState<any>(null)
+
   // Filtering & Pagination
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'matched' | 'rejected'>('all')
   const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 8
+  const itemsPerPage = 9
 
   useEffect(() => {
     fetchCandidatures()
@@ -26,7 +52,15 @@ export default function ClientCandidaturesTab() {
   const fetchCandidatures = async () => {
     try {
       const data = await candidatureService.getClientApplications()
-      setCandidatures(data)
+      const matchesData = await matchService.getClientMatches()
+      
+      const enrichedData = data.map((cand: any) => {
+        // Include confirmed OR rejected matches (rejected happens if test failed, we still want to show retest button)
+        const match = matchesData.find((m: any) => m.candidate_id === cand.candidate_id && m.job_offer_id === cand.job_offer_id && ['confirmed', 'rejected'].includes(m.status))
+        return { ...cand, match }
+      })
+      
+      setCandidatures(enrichedData)
     } catch (error) {
       console.error('Error fetching candidatures:', error)
       toast.error('Impossible de charger les candidatures')
@@ -165,7 +199,7 @@ export default function ClientCandidaturesTab() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {paginatedCandidatures.map((cand) => {
           const score = getMockScore(cand.candidate.candidate?.id || cand.candidate.id)
           return (
@@ -203,7 +237,7 @@ export default function ClientCandidaturesTab() {
 
               <div className="flex-1 space-y-4">
                 <div>
-                  <h3 className="text-lg font-black text-slate-900 group-hover:text-accent transition-colors text-left leading-tight line-clamp-1">
+                  <h3 className="text-lg font-black text-slate-900 transition-colors text-left leading-tight line-clamp-1">
                     {cand.candidate.first_name} {cand.candidate.last_name}
                   </h3>
                   <p className="text-accent font-bold text-[10px] uppercase tracking-wider mt-0.5 truncate">
@@ -247,10 +281,10 @@ export default function ClientCandidaturesTab() {
                     <button
                       onClick={() => handleStatusUpdate(cand.id, 'rejected')}
                       disabled={!!isUpdating}
-                      className="flex-1 flex items-center justify-center py-2 bg-slate-50 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-slate-100 font-bold text-xs disabled:opacity-50"
+                      className="flex-1 flex items-center justify-center py-2.5 bg-slate-50 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-all border border-slate-200 font-bold text-sm disabled:opacity-50"
                     >
                       {isUpdating === `${cand.id}-rejected` ? (
-                        <div className="w-4 h-4 border-2 border-slate-200 border-t-slate-400 rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-slate-200 border-t-slate-400 rounded-full animate-spin" />
                       ) : (
                         'Pas Match'
                       )}
@@ -258,14 +292,177 @@ export default function ClientCandidaturesTab() {
                     <button
                       onClick={() => handleStatusUpdate(cand.id, 'matched')}
                       disabled={!!isUpdating}
-                      className="flex-1 flex items-center justify-center py-2 bg-accent text-white rounded-xl font-bold text-xs shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                      className="flex-1 flex items-center justify-center py-2.5 bg-accent text-white rounded-md font-bold text-sm shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
                     >
                       {isUpdating === `${cand.id}-matched` ? (
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
                         'Match'
                       )}
                     </button>
+                  </div>
+                )}
+
+                {['matched', 'rejected'].includes(cand.status) && cand.match && (
+                  <div className="mt-4 space-y-3">
+                    {(() => {
+                      const match = cand.match
+                      const test = match.custom_test
+                      const canRetest = test?.status === 'scored' && test?.score < test?.threshold && test?.retest_allowed && !test?.retest_used
+                      const testPassed = test?.status === 'scored' && test?.score >= test?.threshold
+                      const calendlySent = !!match.calendly_url
+
+                      // If Calendly has been sent, only show the Add to Workspace button
+                      if (calendlySent) {
+                        return (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2 px-3 py-2 bg-green-50 border border-green-100 rounded-xl">
+                              <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
+                              <div className="min-w-0">
+                                <p className="font-bold text-green-800 text-[10px]">Lien Calendly envoyé !</p>
+                              </div>
+                            </div>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  setAddingToWorkspace(match.id)
+                                  await matchService.addToWorkspace(match.id)
+                                  toast.success('Candidat ajouté au Workspace !')
+                                  await fetchCandidatures()
+                                } catch { toast.error('Erreur') } finally { setAddingToWorkspace(null) }
+                              }}
+                              disabled={addingToWorkspace === match.id}
+                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:scale-[1.02] rounded-md font-black text-sm transition-all shadow-md shadow-slate-900/20"
+                            >
+                              {addingToWorkspace === match.id ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Home className="w-5 h-5" />}
+                              Ajouter au Workspace
+                            </button>
+                          </div>
+                        )
+                      }
+
+                      return (
+                        <>
+                          {/* No test yet → show options */}
+                          {!test && (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => {
+                                  setSelectedMatchForTest({ ...match, candidate: cand.candidate, job_offer: cand.job_offer })
+                                  setSelectedSkills([])
+                                  setDifficulty('mid')
+                                  setDuration(60)
+                                  setInstructions('')
+                                  setShowTestModal(true)
+                                }}
+                                className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-md font-bold text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+                              >
+                                <span className="truncate">Envoyer Test Technique</span>
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSelectedMatchForCalendly(match)
+                                  setCalendlyUrl('https://calendly.com/opside')
+                                  setShowCalendlyModal(true)
+                                }}
+                                className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2.5 bg-white border border-accent/20 hover:border-accent/40 hover:bg-accent/5 text-accent rounded-md font-bold text-sm transition-all active:scale-[0.98]"
+                              >
+                                <span className="truncate">Envoyer Lien Entretien</span>
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Test envoyé */}
+                          {test && test.status === 'sent' && (
+                            <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-100 rounded-xl">
+                              <Clock className="w-4 h-4 text-blue-500 shrink-0" />
+                              <div className="min-w-0">
+                                <p className="font-bold text-blue-800 text-[10px]">Test envoyé</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Test en cours */}
+                          {test && test.status === 'in_progress' && (
+                            <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-100 rounded-xl">
+                              <Clock className="w-4 h-4 text-amber-500 shrink-0" />
+                              <div className="min-w-0">
+                                <p className="font-bold text-amber-800 text-[10px]">Test en cours</p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Test scored result display */}
+                          {test?.status === 'scored' && (
+                            <div className={clsx('px-3 py-2 rounded-xl mb-2 flex items-center justify-between', testPassed ? 'bg-green-50' : 'bg-red-50')}>
+                              <div className="flex items-center gap-2">
+                                {testPassed ? <CheckCircle className="w-4 h-4 text-green-600" /> : <XCircle className="w-4 h-4 text-red-600" />}
+                                <p className={clsx('font-bold text-xs', testPassed ? 'text-green-800' : 'text-red-800')}>
+                                  Score: {test.score}%
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Test passed → Show Envoyer Lien Entretien button */}
+                          {testPassed && (
+                            <button
+                              onClick={() => {
+                                setSelectedMatchForCalendly(match)
+                                setCalendlyUrl('https://calendly.com/opside')
+                                setShowCalendlyModal(true)
+                              }}
+                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:scale-[1.02] rounded-md font-black text-sm transition-all shadow-md shadow-slate-900/20"
+                            >
+                              <Calendar className="w-5 h-5" />
+                              Envoyer Lien Entretien
+                            </button>
+                          )}
+
+                          {/* Can retest */}
+                          {canRetest && (
+                            <div className="flex gap-2 mt-3">
+                              <button
+                                onClick={() => handleStatusUpdate(cand.id, 'rejected')}
+                                disabled={!!isUpdating}
+                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300 rounded-md font-bold text-sm transition-all shadow-sm disabled:opacity-50"
+                              >
+                                {isUpdating === `${cand.id}-rejected` ? (
+                                  <div className="w-4 h-4 border-2 border-red-200 border-t-red-600 rounded-full animate-spin" />
+                                ) : (
+                                  <>
+                                    <XCircle className="w-4 h-4" />
+                                    Pas Match
+                                  </>
+                                )}
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    setRequestingRetest(test.id)
+                                    await customTestService.requestRetest(test.id)
+                                    toast.success('Retest envoyé au candidat !')
+                                    await fetchCandidatures()
+                                  } catch { toast.error('Erreur') } finally { setRequestingRetest(null) }
+                                }}
+                                disabled={requestingRetest === test.id}
+                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-md font-bold text-sm transition-all shadow-md shadow-amber-500/20"
+                              >
+                                {requestingRetest === test.id ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                                Proposer un retest
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Retest already used + failed */}
+                          {test?.status === 'scored' && !testPassed && test?.retest_used && (
+                            <p className="text-[10px] text-red-600 font-bold text-center bg-red-50 py-1.5 rounded-lg border border-red-100">
+                              Retest échoué.
+                            </p>
+                          )}
+                        </>
+                      )
+                    })()}
                   </div>
                 )}
               </div>
@@ -492,6 +689,180 @@ export default function ClientCandidaturesTab() {
                 </section>
               </div>
             </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* Test Config Modal */}
+      {showTestModal && selectedMatchForTest && (
+        <Modal isOpen={showTestModal} onClose={() => setShowTestModal(false)} title="Configurer le test technique" size="xl">
+          <div className="space-y-8 pb-6">
+            {/* Skills */}
+            <div className="border border-slate-200 rounded-2xl p-4 bg-white">
+              <SkillSelector 
+                selectedIds={selectedSkills} 
+                onChange={(ids) => {
+                  if (ids.length <= 3) setSelectedSkills(ids);
+                  else toast.error('Vous ne pouvez sélectionner que 3 compétences maximum.');
+                }} 
+                label="Compétences à tester (Max 3) *" 
+              />
+              <p className="text-xs text-muted mt-2">{selectedSkills.length}/3 sélectionnées</p>
+            </div>
+
+            {/* Difficulty */}
+            <div>
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Niveau de difficulté</label>
+              <div className="grid grid-cols-3 gap-3">
+                {(['junior', 'mid', 'senior'] as const).map(lvl => (
+                  <button
+                    key={lvl}
+                    onClick={() => setDifficulty(lvl)}
+                    className={clsx(
+                      'py-3 rounded-2xl font-bold text-sm border transition-all',
+                      difficulty === lvl
+                        ? 'bg-slate-900 text-white border-slate-900'
+                        : 'bg-white text-slate-500 border-slate-200 hover:border-slate-400'
+                    )}
+                  >
+                    {DIFFICULTY_LABELS[lvl]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Duration */}
+            <div>
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">
+                Durée : <span className="text-slate-900">{duration} minutes</span>
+              </label>
+              <div className="flex items-center gap-4">
+                <button onClick={() => setDuration(d => Math.max(30, d - 15))} className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors">
+                  <Minus className="w-4 h-4" />
+                </button>
+                <input
+                  type="range" min={30} max={120} step={15} value={duration}
+                  onChange={e => setDuration(Number(e.target.value))}
+                  className="flex-1 accent-black"
+                />
+                <button onClick={() => setDuration(d => Math.min(120, d + 15))} className="w-10 h-10 rounded-xl border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors">
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="flex justify-between text-xs text-slate-400 mt-1 px-1">
+                <span>30 min</span><span>120 min</span>
+              </div>
+            </div>
+
+            {/* Instructions */}
+            <div>
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">
+                Instructions personnalisées <span className="text-slate-300">(optionnel)</span>
+              </label>
+              <textarea
+                value={instructions}
+                onChange={e => setInstructions(e.target.value)}
+                placeholder="Ex : Focus sur les hooks React, priorité aux questions de performance..."
+                rows={3}
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 resize-none transition-all"
+              />
+            </div>
+
+            {/* Threshold info */}
+            <div className="flex items-center gap-3 px-4 py-3 bg-amber-50 border border-amber-100 rounded-2xl">
+              <p className="text-amber-700 text-xs font-medium">
+                <strong>Seuil fixe : 75%</strong> — Si le candidat réussit, le lien Calendly lui sera envoyé automatiquement. En cas d'échec, le match passe en "refusé" et vous pouvez proposer un retest (1 seule fois).
+              </p>
+            </div>
+
+            {/* CTA */}
+            <button
+              onClick={async () => {
+                if (selectedSkills.length === 0) { toast.error('Sélectionnez au moins une compétence'); return }
+                try {
+                  setIsSendingTest(true)
+                  await customTestService.createTest({
+                    candidate_id: selectedMatchForTest.candidate_id,
+                    match_id: selectedMatchForTest.id,
+                    skills_tested: selectedSkills,
+                    difficulty,
+                    duration_minutes: duration,
+                    custom_instructions: instructions || undefined,
+                  } as CreateCustomTestPayload)
+                  toast.success('Test envoyé au candidat !')
+                  setShowTestModal(false)
+                  await fetchCandidatures()
+                } catch (err: any) {
+                  toast.error(err?.response?.data?.message || 'Erreur lors de l\'envoi du test')
+                } finally {
+                  setIsSendingTest(false)
+                }
+              }}
+              disabled={isSendingTest || selectedSkills.length === 0}
+              className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-black text-base transition-all shadow-xl shadow-slate-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSendingTest ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <div>
+                  Envoyer le test au candidat
+                </div>
+              )}
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {showCalendlyModal && selectedMatchForCalendly && (
+        <Modal isOpen={showCalendlyModal} onClose={() => setShowCalendlyModal(false)} title="Envoyer le lien d'entretien">
+          <div className="space-y-6 pt-2">
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">
+              Saisissez votre lien Calendly personnalisé (ou tout autre lien de planification d'entretien) pour l'envoyer au candidat.
+            </p>
+
+            <div className="space-y-2">
+              <label className="block text-xs font-black text-slate-400 uppercase tracking-widest">
+                Lien Calendly / Entretien
+              </label>
+              <input
+                type="url"
+                value={calendlyUrl}
+                onChange={e => setCalendlyUrl(e.target.value)}
+                placeholder="https://calendly.com/votre-nom"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/10 transition-all"
+              />
+            </div>
+
+            <button
+              onClick={async () => {
+                if (!calendlyUrl || !calendlyUrl.trim().startsWith('http')) {
+                  toast.error('Veuillez saisir un lien valide (commençant par http:// ou https://)')
+                  return
+                }
+                try {
+                  setSendingCalendly(selectedMatchForCalendly.id)
+                  await customTestService.sendCalendlyDirectly(selectedMatchForCalendly.id, calendlyUrl)
+                  toast.success('Lien d\'entretien envoyé au candidat !')
+                  setShowCalendlyModal(false)
+                  await fetchCandidatures()
+                } catch {
+                  toast.error('Erreur lors de l\'envoi du lien')
+                } finally {
+                  setSendingCalendly(null)
+                }
+              }}
+              disabled={sendingCalendly === selectedMatchForCalendly.id}
+              className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-black text-base transition-all shadow-xl shadow-slate-900/20 disabled:opacity-50"
+            >
+              {sendingCalendly === selectedMatchForCalendly.id ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <div >
+                  Envoyer l'invitation d'entretien
+                </div>
+              )}
+
+            </button>
           </div>
         </Modal>
       )}
