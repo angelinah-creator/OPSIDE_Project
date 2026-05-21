@@ -127,7 +127,7 @@ export default function CandidatWorkspace() {
              className="w-full flex items-center gap-3 px-4 py-3 bg-slate-800/50 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl font-bold transition-all text-sm"
            >
              <ArrowLeft className="w-4 h-4" />
-             Retour au sourcing
+             Retour au Dashboard
            </Link>
         </div>
 
