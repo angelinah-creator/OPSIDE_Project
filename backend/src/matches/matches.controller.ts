@@ -65,4 +65,14 @@ export class MatchesController {
   addToWorkspace(@Param('id') id: string, @CurrentUser('id') clientId: string) {
     return this.matchesService.addToWorkspace(id, clientId);
   }
+
+  @Get(':id')
+  findOne(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: string,
+    @CurrentUser('role') role: Role,
+  ) {
+    return this.matchesService.findOne(id, userId, role);
+  }
 }
+

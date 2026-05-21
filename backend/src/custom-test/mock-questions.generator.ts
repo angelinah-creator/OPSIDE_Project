@@ -1,7 +1,7 @@
 /**
  * Mock Question Generator for Custom Tests
  *
- * ⚠️ CE FICHIER EST PRÊT POUR L'API CLAUDE
+ *  CE FICHIER EST PRÊT POUR L'API CLAUDE
  * Quand l'API Claude sera disponible, remplacer `generateMockQuestions` par
  * un appel au service Claude avec un prompt adapté (comme dans test.service.ts).
  *
@@ -131,9 +131,21 @@ export function evaluateMockAnswers(
   answers: Record<string, any>,
 ): { score: number; details: Record<string, any> } {
   // NOTE: En production, cette fonction appellera Claude pour une vraie évaluation.
-  // Pour le mock, on simule un score réaliste entre 55 et 95.
-  
-  const baseScore = Math.floor(Math.random() * 40) + 55; // 55-95
+  // Pour le mock, on simule un score réaliste entre 55 et 95, avec des codes de triche pour les présentations.
+
+  let isCheatPass = false;
+  let isCheatFail = false;
+
+  for (const key in answers) {
+    const val = String(answers[key]).toUpperCase();
+    if (val.includes('PASS')) isCheatPass = true;
+    if (val.includes('FAIL')) isCheatFail = true;
+  }
+
+  let baseScore = Math.floor(Math.random() * 40) + 55; // 55-95
+  if (isCheatPass) baseScore = 88;
+  if (isCheatFail) baseScore = 35;
+
   const details: Record<string, any> = {};
 
   questions.forEach((q) => {

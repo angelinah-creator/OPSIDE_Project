@@ -52,6 +52,7 @@ export default function ValidationPostMatchTab() {
   const [sendingCalendly, setSendingCalendly] = useState<string | null>(null)
   const [requestingRetest, setRequestingRetest] = useState<string | null>(null)
   const [addingToWorkspace, setAddingToWorkspace] = useState<string | null>(null)
+  const [rejectingMatch, setRejectingMatch] = useState<string | null>(null)
 
   // Custom Calendly modal state
   const [showCalendlyModal, setShowCalendlyModal] = useState(false)
@@ -154,12 +155,25 @@ export default function ValidationPostMatchTab() {
     }
   }
 
+  const handleRejectMatch = async (matchId: string) => {
+    try {
+      setRejectingMatch(matchId)
+      await matchService.respond(matchId, 'reject')
+      toast.success('Match refusé.')
+      await fetchMatches()
+    } catch (err: any) {
+      toast.error('Erreur lors du refus')
+    } finally {
+      setRejectingMatch(null)
+    }
+  }
+
   const getTestStatusBadge = (test: any) => {
     if (!test) return null
     const cfg: Record<string, { label: string; cls: string }> = {
       sent: { label: 'En attente', cls: 'bg-amber-100 text-amber-700' },
       in_progress: { label: 'En cours', cls: 'bg-blue-100 text-blue-700' },
-      scored: { label: test.score >= test.threshold ? `  ${test.score}%` : `❌ ${test.score}%`, cls: test.score >= test.threshold ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' },
+      scored: { label: test.score >= test.threshold ? `  ${test.score}%` : ` ${test.score}%`, cls: test.score >= test.threshold ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' },
       expired: { label: 'Expiré', cls: 'bg-slate-100 text-slate-500' },
     }
     const c = cfg[test.status] || { label: test.status, cls: 'bg-slate-100 text-slate-500' }
@@ -250,7 +264,7 @@ export default function ValidationPostMatchTab() {
                         : <XCircle className="w-5 h-5 text-red-600" />}
                       <div>
                         <p className={clsx('font-black text-sm', testPassed ? 'text-green-800' : 'text-red-800')}>
-                          {testPassed ? 'Test validé  ' : 'Test non validé ❌'}
+                          {testPassed ? 'Test validé  ' : 'Test non validé'}
                         </p>
                         <p className="text-xs text-slate-500">Score : {test.score}% / Seuil : {test.threshold}%</p>
                       </div>
@@ -287,8 +301,7 @@ export default function ValidationPostMatchTab() {
                         >
                           {addingToWorkspace === match.id
                             ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            : <Home className="w-4 h-4" />}
-                          Ajouter au Workspace
+                            : <div className="flex items-center gap-2">Ajouter au Workspace</div>}
                         </button>
                       </div>
                     )
@@ -396,16 +409,32 @@ export default function ValidationPostMatchTab() {
 
                       {/* Can retest */}
                       {canRetest && (
-                        <button
-                          onClick={() => handleRetest(test.id)}
-                          disabled={requestingRetest === test.id}
-                          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-amber-500/20"
-                        >
-                          {requestingRetest === test.id
-                            ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            : <RefreshCw className="w-4 h-4" />}
-                          Proposer un retest (1 seule fois)
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleRejectMatch(match.id)}
+                            disabled={rejectingMatch === match.id}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300 rounded-2xl font-bold text-sm transition-all shadow-sm disabled:opacity-50"
+                          >
+                            {rejectingMatch === match.id ? (
+                              <div className="w-4 h-4 border-2 border-red-200 border-t-red-600 rounded-full animate-spin" />
+                            ) : (
+                              <>
+                                <XCircle className="w-4 h-4" />
+                                Pas Match
+                              </>
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleRetest(test.id)}
+                            disabled={requestingRetest === test.id}
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl font-bold text-sm transition-all shadow-lg shadow-amber-500/20"
+                          >
+                            {requestingRetest === test.id
+                              ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              : <RefreshCw className="w-4 h-4" />}
+                            Proposer un retest
+                          </button>
+                        </div>
                       )}
 
                       {/* Retest already used + failed */}
@@ -542,8 +571,11 @@ export default function ValidationPostMatchTab() {
             >
               {isSendingTest ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : <Send className="w-5 h-5" />}
-              Envoyer le test au candidat
+              ) : (
+                <div>
+                  Envoyer le test au candidat
+                </div>
+              )}
             </button>
           </div>
         </Modal>
@@ -592,8 +624,12 @@ export default function ValidationPostMatchTab() {
             >
               {sendingCalendly === selectedMatchForCalendly.id ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : <Send className="w-5 h-5" />}
-              Envoyer l'invitation d'entretien
+              ) : (
+                <div >
+                  Envoyer l'invitation d'entretien
+                </div>
+              )}
+
             </button>
           </div>
         </Modal>

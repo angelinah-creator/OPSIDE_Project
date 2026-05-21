@@ -75,6 +75,10 @@ export default function ClientOnboardingPage() {
         Object.entries(profileData).filter(([_, v]) => v !== '')
       )
 
+      if (cleanedData.website && typeof cleanedData.website === 'string' && !/^https?:\/\//i.test(cleanedData.website)) {
+        cleanedData.website = `https://${cleanedData.website}`;
+      }
+
       await clientApi.createProfile(cleanedData)
 
       // 2. Upload logo if any
@@ -82,8 +86,13 @@ export default function ClientOnboardingPage() {
 
       router.push('/client/dashboard')
     } catch (err: any) {
+      console.error(err.response?.data);
       const msg = err.response?.data?.message
-      setError(typeof msg === 'string' ? msg : 'Une erreur est survenue lors de la création du profil.')
+      if (Array.isArray(msg)) {
+        setError(msg.join(', '))
+      } else {
+        setError(typeof msg === 'string' ? msg : 'Une erreur est survenue lors de la création du profil.')
+      }
     } finally {
       setLoading(false)
     }

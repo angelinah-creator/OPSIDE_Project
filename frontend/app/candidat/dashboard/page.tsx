@@ -44,7 +44,7 @@ export default function CandidatDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>('technique');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [hasWorkspaceAccess, setHasWorkspaceAccess] = useState(false);
+  const [workspaces, setWorkspaces] = useState<any[]>([]);
   const { unreadCount: unreadNotifications } = useNotifications();
 
   useEffect(() => {
@@ -66,8 +66,8 @@ export default function CandidatDashboard() {
         setLatestScore(scoreRes.score || 85);
         
         const matchesData = await matchService.getCandidateMatches();
-        const hasAccess = matchesData.some((m: any) => m.status === 'in_workspace');
-        setHasWorkspaceAccess(hasAccess);
+        const workspacesList = matchesData.filter((m: any) => m.status === 'in_workspace');
+        setWorkspaces(workspacesList);
       } catch (err: any) {
         if (err.response?.status === 404) {
           router.push('/candidat/onboarding');
@@ -171,17 +171,21 @@ export default function CandidatDashboard() {
               )}
             </button>
           ))}
-          {hasWorkspaceAccess && (
+          {workspaces.length > 0 && (
             <div className="pt-4 pb-2 px-4">
                <div className="h-px bg-slate-100 mb-4" />
-               <Link
-                 href="/candidat/workspace"
-                 className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-slate-900 to-slate-800 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] text-sm text-left"
-               >
-                 <Home className="w-5 h-5 text-amber-400" />
-                 Workspace
-                 <ArrowRightLeft className="w-4 h-4 ml-auto text-slate-400" />
-               </Link>
+               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 px-1">Mes Workspaces</p>
+               {workspaces.map((w: any) => (
+                 <Link
+                   key={w.id}
+                   href={`/candidat/workspace/${w.id}`}
+                   className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-slate-900 to-slate-800 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] text-sm text-left mb-2"
+                 >
+                   <Home className="w-5 h-5 text-amber-400 shrink-0" />
+                   <span className="truncate">{w.client?.client?.company_name || 'Client'} espace</span>
+                   <ArrowRightLeft className="w-4 h-4 ml-auto text-slate-400 shrink-0" />
+                 </Link>
+               ))}
             </div>
           )}
         </nav>

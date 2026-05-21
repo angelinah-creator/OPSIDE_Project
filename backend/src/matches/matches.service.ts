@@ -233,7 +233,6 @@ export class MatchesService {
     return this.prisma.match.findMany({
       where: {
         candidate_id: candidateId,
-        initiated_by: 'client',
       },
       include: {
         client: {
@@ -349,5 +348,39 @@ export class MatchesService {
 
     return updated;
   }
+
+  async findOne(matchId: string, userId: string, role: Role) {
+    const match = await this.prisma.match.findUnique({
+      where: { id: matchId },
+      include: {
+        client: {
+          include: {
+            client: true,
+          },
+        },
+        candidate: {
+          include: {
+            candidate: true,
+          },
+        },
+        job_offer: true,
+      },
+    });
+
+    if (!match) {
+      throw new NotFoundException('Match introuvable.');
+    }
+
+    // Vérifier les permissions
+    if (role === Role.candidat && match.candidate_id !== userId) {
+      throw new ForbiddenException('Accès refusé.');
+    }
+    if (role === Role.client && match.client_id !== userId) {
+      throw new ForbiddenException('Accès refusé.');
+    }
+
+    return match;
+  }
 }
+
 

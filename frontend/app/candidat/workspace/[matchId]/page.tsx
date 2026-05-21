@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { getUser, clearTokens, authApi } from '@/lib/auth-service'
 import { candidateApi } from '@/lib/candidate-service'
+import { matchService } from '@/lib/match-service'
 import {
   LogOut,
   Home,
@@ -26,8 +27,10 @@ type TabType = 'workspace_home' | 'workspace_time' | 'workspace_factures' | 'wor
 
 export default function CandidatWorkspace() {
   const router = useRouter()
+  const params = useParams()
   const [user, setUser] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
+  const [matchDetails, setMatchDetails] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<TabType>('workspace_home')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -43,6 +46,11 @@ export default function CandidatWorkspace() {
         }
         const p = await candidateApi.getMyProfile()
         setProfile(p)
+
+        if (params.matchId) {
+          const matchData = await matchService.getMatchById(params.matchId as string)
+          setMatchDetails(matchData)
+        }
       } catch (err: any) {
         if (err.response?.status === 404) {
           router.push('/candidat/onboarding')
@@ -124,7 +132,9 @@ export default function CandidatWorkspace() {
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-2">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-4 mb-4">Workspace Talent</p>
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-4 mb-4">
+            Workspace {matchDetails?.client?.client?.company_name ? `- ${matchDetails.client.client.company_name}` : ''}
+          </p>
           <nav className="space-y-1">
             {navItems.map((item) => (
               <button
@@ -190,7 +200,7 @@ export default function CandidatWorkspace() {
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 truncate flex items-center gap-3">
               {navItems.find(n => n.id === activeTab)?.label}
               <span className="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-widest rounded-lg border border-amber-200">
-                Workspace
+                Workspace {matchDetails?.client?.client?.company_name ? `- ${matchDetails.client.client.company_name}` : ''}
               </span>
             </h1>
           </header>

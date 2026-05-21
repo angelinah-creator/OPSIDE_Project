@@ -10,7 +10,7 @@ import { CreateCustomTestDto } from './dto/create-custom-test.dto';
 import { SubmitCustomTestDto } from './dto/submit-custom-test.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { MailService } from '../mail/mail.service';
-import { NotificationType, MatchStatus } from '@prisma/client';
+import { NotificationType, MatchStatus, Prisma } from '@prisma/client';
 import { generateMockQuestions, evaluateMockAnswers } from './mock-questions.generator';
 
 @Injectable()
@@ -235,7 +235,7 @@ export class CustomTestService {
       await this.notificationsService.create({
         user_id: candidateId,
         type: NotificationType.test_result,
-        title: '❌ Test non validé',
+        title: ' Test non validé',
         message: `Vous avez obtenu ${score}% (seuil 75%) au test pour ${projectName}. Le client peut proposer un retest.`,
         link: '/candidat/dashboard',
       });
@@ -244,7 +244,7 @@ export class CustomTestService {
       await this.notificationsService.create({
         user_id: test.client_id,
         type: NotificationType.test_result,
-        title: '❌ Candidat non validé',
+        title: 'Candidat non validé',
         message: `${candidateName} a obtenu ${score}% (seuil 75%) au test pour ${projectName}. Vous pouvez proposer un retest depuis votre dashboard.`,
         link: '/client/dashboard',
       });
@@ -283,12 +283,6 @@ export class CustomTestService {
       throw new BadRequestException('Le candidat a déjà réussi le test, pas de retest nécessaire.');
     }
 
-    // Marquer retest comme utilisé sur l'ancien test
-    await this.prisma.customTest.update({
-      where: { id: testId },
-      data: { retest_used: true },
-    });
-
     // Remettre le match en "confirmed" pour permettre un nouveau test
     await this.prisma.match.update({
       where: { id: test.match_id },
@@ -306,23 +300,21 @@ export class CustomTestService {
       });
     }
 
-    // Créer le nouveau test avec les mêmes paramètres
+    // Créer de nouvelles questions pour le retest
     const newQuestions = generateMockQuestions(test.skills_tested, test.difficulty || 'mid');
 
-    const newTest = await this.prisma.customTest.create({
+    const updatedTest = await this.prisma.customTest.update({
+      where: { id: testId },
       data: {
-        client_id: clientId,
-        candidate_id: test.candidate_id,
-        match_id: test.match_id,
-        skills_tested: test.skills_tested,
-        difficulty: test.difficulty,
-        duration_minutes: test.duration_minutes,
-        custom_instructions: test.custom_instructions,
-        threshold: test.threshold,
         questions: newQuestions as any,
+        answers: Prisma.DbNull,
+        score: null,
+        score_details: Prisma.DbNull,
         status: 'sent',
+        started_at: null,
+        submitted_at: null,
         retest_allowed: false,
-        retest_used: false,
+        retest_used: true,
       },
     });
 
@@ -333,7 +325,7 @@ export class CustomTestService {
     await this.notificationsService.create({
       user_id: test.candidate_id,
       type: NotificationType.test_result,
-      title: '🔄 Retest disponible',
+      title: 'Retest disponible',
       message: `${companyName} vous propose un retest pour le projet ${projectName}. C'est votre dernière chance !`,
       link: '/candidat/dashboard',
     });
@@ -351,7 +343,7 @@ export class CustomTestService {
       console.error('Failed to send retest invitation email:', e);
     }
 
-    return newTest;
+    return updatedTest;
   }
 
   /**

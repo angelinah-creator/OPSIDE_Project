@@ -55,7 +55,7 @@ export default function CustomTestTab() {
       in_progress: { label: 'En cours', cls: 'bg-blue-100 text-blue-700' },
       scored: {
         label: score !== undefined && threshold !== undefined
-          ? score >= threshold ? `  ${score}%` : `❌ ${score}%`
+          ? score >= threshold ? `  ${score}%` : ` ${score}%`
           : 'Évalué',
         cls: score !== undefined && threshold !== undefined && score >= threshold
           ? 'bg-green-100 text-green-700'
@@ -88,7 +88,7 @@ export default function CustomTestTab() {
 
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {tests.map(test => {
             const companyName = test.match?.client?.client?.company_name || 'Un client'
             const projectName = test.match?.job_offer?.title || 'un projet'

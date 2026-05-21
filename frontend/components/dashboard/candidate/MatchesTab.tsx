@@ -73,7 +73,7 @@ export default function CandidateMatchesTab() {
               <div className="flex items-start gap-4">
                 <div className={clsx(
                   "w-14 h-14 rounded-2xl flex items-center justify-center shrink-0",
-                  match.status === 'confirmed' ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
+                  (match.status === 'confirmed' || match.status === 'in_workspace') ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
                 )}>
                   <Briefcase className="w-7 h-7" />
                 </div>
@@ -85,11 +85,11 @@ export default function CandidateMatchesTab() {
                     {match.job_offer?.title || 'Sourcing Direct'}
                   </p>
                   
-                  {match.status === 'confirmed' && (
+                  {(match.status === 'confirmed' || match.status === 'in_workspace') && (
                     <div className="mt-4 flex flex-wrap gap-4">
                       <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
                         <Calendar className="w-3.5 h-3.5" />
-                        Confirmé le {new Date(match.matched_at).toLocaleDateString()}
+                        Confirmé le {new Date(match.matched_at || match.created_at).toLocaleDateString()}
                       </div>
                     </div>
                   )}
@@ -125,7 +125,7 @@ export default function CandidateMatchesTab() {
                       Match
                     </button>
                   </div>
-                ) : match.status === 'confirmed' ? (
+                ) : (match.status === 'confirmed' || match.status === 'in_workspace') ? (
                   <div className="text-right">
                     <span className="text-xs font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-lg border border-green-100">
                       Matché

@@ -281,10 +281,10 @@ export default function ClientCandidaturesTab() {
                     <button
                       onClick={() => handleStatusUpdate(cand.id, 'rejected')}
                       disabled={!!isUpdating}
-                      className="flex-1 flex items-center justify-center py-2 bg-slate-50 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-slate-100 font-bold text-xs disabled:opacity-50"
+                      className="flex-1 flex items-center justify-center py-2.5 bg-slate-50 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-all border border-slate-200 font-bold text-sm disabled:opacity-50"
                     >
                       {isUpdating === `${cand.id}-rejected` ? (
-                        <div className="w-4 h-4 border-2 border-slate-200 border-t-slate-400 rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-slate-200 border-t-slate-400 rounded-full animate-spin" />
                       ) : (
                         'Pas Match'
                       )}
@@ -292,10 +292,10 @@ export default function ClientCandidaturesTab() {
                     <button
                       onClick={() => handleStatusUpdate(cand.id, 'matched')}
                       disabled={!!isUpdating}
-                      className="flex-1 flex items-center justify-center py-2 bg-accent text-white rounded-xl font-bold text-xs shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                      className="flex-1 flex items-center justify-center py-2.5 bg-accent text-white rounded-md font-bold text-sm shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
                     >
                       {isUpdating === `${cand.id}-matched` ? (
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
                         'Match'
                       )}
@@ -332,9 +332,9 @@ export default function ClientCandidaturesTab() {
                                 } catch { toast.error('Erreur') } finally { setAddingToWorkspace(null) }
                               }}
                               disabled={addingToWorkspace === match.id}
-                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:scale-[1.02] rounded-xl font-black text-xs transition-all shadow-md shadow-slate-900/20"
+                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:scale-[1.02] rounded-md font-black text-sm transition-all shadow-md shadow-slate-900/20"
                             >
-                              {addingToWorkspace === match.id ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Home className="w-4 h-4" />}
+                              {addingToWorkspace === match.id ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Home className="w-5 h-5" />}
                               Ajouter au Workspace
                             </button>
                           </div>
@@ -355,7 +355,7 @@ export default function ClientCandidaturesTab() {
                                   setInstructions('')
                                   setShowTestModal(true)
                                 }}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg font-bold text-xs transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
+                                className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-md font-bold text-sm transition-all shadow-sm hover:shadow-md active:scale-[0.98]"
                               >
                                 <span className="truncate">Envoyer Test Technique</span>
                               </button>
@@ -365,7 +365,7 @@ export default function ClientCandidaturesTab() {
                                   setCalendlyUrl('https://calendly.com/opside')
                                   setShowCalendlyModal(true)
                                 }}
-                                className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2.5 bg-white border border-accent/20 hover:border-accent/40 hover:bg-accent/5 text-accent rounded-lg font-bold text-xs transition-all active:scale-[0.98]"
+                                className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-2.5 bg-white border border-accent/20 hover:border-accent/40 hover:bg-accent/5 text-accent rounded-md font-bold text-sm transition-all active:scale-[0.98]"
                               >
                                 <span className="truncate">Envoyer Lien Entretien</span>
                               </button>
@@ -412,30 +412,46 @@ export default function ClientCandidaturesTab() {
                                 setCalendlyUrl('https://calendly.com/opside')
                                 setShowCalendlyModal(true)
                               }}
-                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:scale-[1.02] rounded-xl font-black text-xs transition-all shadow-md shadow-slate-900/20"
+                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white hover:scale-[1.02] rounded-md font-black text-sm transition-all shadow-md shadow-slate-900/20"
                             >
-                              <Calendar className="w-4 h-4" />
+                              <Calendar className="w-5 h-5" />
                               Envoyer Lien Entretien
                             </button>
                           )}
 
                           {/* Can retest */}
                           {canRetest && (
-                            <button
-                              onClick={async () => {
-                                try {
-                                  setRequestingRetest(test.id)
-                                  await customTestService.requestRetest(test.id)
-                                  toast.success('Retest envoyé au candidat !')
-                                  await fetchCandidatures()
-                                } catch { toast.error('Erreur') } finally { setRequestingRetest(null) }
-                              }}
-                              disabled={requestingRetest === test.id}
-                              className="w-full flex items-center justify-center gap-2 px-3 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold text-xs transition-all shadow-md shadow-amber-500/20"
-                            >
-                              {requestingRetest === test.id ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                              Proposer un retest
-                            </button>
+                            <div className="flex gap-2 mt-3">
+                              <button
+                                onClick={() => handleStatusUpdate(cand.id, 'rejected')}
+                                disabled={!!isUpdating}
+                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-white text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300 rounded-md font-bold text-sm transition-all shadow-sm disabled:opacity-50"
+                              >
+                                {isUpdating === `${cand.id}-rejected` ? (
+                                  <div className="w-4 h-4 border-2 border-red-200 border-t-red-600 rounded-full animate-spin" />
+                                ) : (
+                                  <>
+                                    <XCircle className="w-4 h-4" />
+                                    Pas Match
+                                  </>
+                                )}
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    setRequestingRetest(test.id)
+                                    await customTestService.requestRetest(test.id)
+                                    toast.success('Retest envoyé au candidat !')
+                                    await fetchCandidatures()
+                                  } catch { toast.error('Erreur') } finally { setRequestingRetest(null) }
+                                }}
+                                disabled={requestingRetest === test.id}
+                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-md font-bold text-sm transition-all shadow-md shadow-amber-500/20"
+                              >
+                                {requestingRetest === test.id ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                                Proposer un retest
+                              </button>
+                            </div>
                           )}
 
                           {/* Retest already used + failed */}
@@ -787,8 +803,11 @@ export default function ClientCandidaturesTab() {
             >
               {isSendingTest ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : <Send className="w-5 h-5" />}
-              Envoyer le test au candidat
+              ) : (
+                <div>
+                  Envoyer le test au candidat
+                </div>
+              )}
             </button>
           </div>
         </Modal>
@@ -837,8 +856,12 @@ export default function ClientCandidaturesTab() {
             >
               {sendingCalendly === selectedMatchForCalendly.id ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : <Send className="w-5 h-5" />}
-              Envoyer l'invitation d'entretien
+              ) : (
+                <div >
+                  Envoyer l'invitation d'entretien
+                </div>
+              )}
+
             </button>
           </div>
         </Modal>

@@ -121,29 +121,7 @@ export default function WorkspaceCollaborateurs() {
           </div>
           <div>
             <p className="text-2xl font-black text-slate-900">{collabs.length}</p>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Collaborateurs actifs</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-            <CheckCircle className="w-6 h-6 text-green-600" />
-          </div>
-          <div>
-            <p className="text-2xl font-black text-slate-900">
-              {collabs.filter(c => c.custom_test?.status === 'scored' && (c.custom_test?.score ?? 0) >= c.custom_test?.threshold).length}
-            </p>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tests validés</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-            <Briefcase className="w-6 h-6 text-blue-500" />
-          </div>
-          <div>
-            <p className="text-2xl font-black text-slate-900">
-              {new Set(collabs.map(c => c.job_offer?.title).filter(Boolean)).size}
-            </p>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Projets en cours</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Collaborateurs</p>
           </div>
         </div>
       </div>
