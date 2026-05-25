@@ -12,6 +12,12 @@ enum Role {
   admin
 }
 
+enum TimerStatus {
+  running
+  paused
+  stopped
+}
+
 enum UserStatus {
   active
   suspended
@@ -151,9 +157,10 @@ model User {
   applications           Candidature[]  @relation("CandidateApplications")
   client_custom_tests    CustomTest[]   @relation("ClientCustomTests")
   candidate_custom_tests CustomTest[]   @relation("CandidateCustomTests")
-  matches        Match[]        @relation("CandidateMatches")
-  client_matches Match[]        @relation("ClientMatches")
-  notifications  Notification[]
+  matches                Match[]        @relation("CandidateMatches")
+  client_matches         Match[]        @relation("ClientMatches")
+  notifications          Notification[]
+  timesheets             Timesheet[]
 
   @@map("users")
 }
@@ -499,6 +506,7 @@ model Match {
   client        User             @relation("ClientMatches", fields: [client_id], references: [id], onDelete: Cascade)
   job_offer     JobOffer?        @relation(fields: [job_offer_id], references: [id], onDelete: SetNull)
   custom_test   CustomTest?
+  timesheets    Timesheet[]
 
   @@map("matches")
 }
@@ -546,4 +554,25 @@ model Notification {
   user        User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("notifications")
+}
+
+model Timesheet {
+  id               String       @id @default(uuid())
+  user_id          String
+  match_id         String
+  description      String?      @db.Text
+  start_time       DateTime
+  end_time         DateTime?
+  duration         Int          @default(0) // en secondes
+  status           TimerStatus  @default(stopped)
+  paused_at        DateTime[]
+  resumed_at       DateTime[]
+  date             DateTime     @db.Date
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+
+  user             User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  match            Match        @relation(fields: [match_id], references: [id], onDelete: Cascade)
+
+  @@map("timesheets")
 }
