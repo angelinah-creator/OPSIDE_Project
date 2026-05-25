@@ -209,7 +209,7 @@ export default function ClientCandidaturesTab() {
               className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 flex flex-col group cursor-pointer"
             >
               <div className="flex justify-between items-start mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden border border-slate-100">
+                <div className="w-18 h-18 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 overflow-hidden border border-slate-100">
                   {cand.candidate.candidate?.photo_url ? (
                     <img 
                       src={cand.candidate.candidate.photo_url.startsWith('http') ? cand.candidate.candidate.photo_url : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${cand.candidate.candidate.photo_url}`} 
