@@ -129,7 +129,6 @@ export function TimeGrid({
           ))}
 
           {/* Ligne pointillée de l'heure actuelle (si c'est la semaine courante) */}
-          {/* Ligne pointillée de l'heure actuelle (si c'est la semaine courante) */}
           {isSameDay(weekStart, startOfWeek(nowDate, { weekStartsOn: 1 })) && (() => {
             const dayIndex = getDayIndex(nowDate.toISOString());
             return (
@@ -142,7 +141,7 @@ export function TimeGrid({
                 }}
               >
                 <div 
-                  className="absolute -top-1.5 -left-1.5 w-3 h-3 rounded-full bg-accent animate-pulse" 
+                  className="absolute -top-1.5 -left-1.5 w-3 h-3 rounded-full bg-accent" 
                 />
               </div>
             );

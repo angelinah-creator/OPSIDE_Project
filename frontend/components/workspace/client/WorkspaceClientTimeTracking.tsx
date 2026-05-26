@@ -9,7 +9,7 @@ import {
 import { fr } from 'date-fns/locale';
 import {
   ChevronLeft, ChevronRight, Users, Clock,
-  ChevronDown, Calendar,
+  ChevronDown, Calendar, CircleX
 } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -550,9 +550,8 @@ export default function WorkspaceClientTimeTracking() {
       ) : !reportData || reportData.totalDuration === 0 ? (
         <div className="bg-white rounded-[2rem] p-12 border border-slate-100 shadow-[0_2px_20px_rgb(0,0,0,0.03)] flex flex-col items-center text-center">
           <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-6 border border-slate-100">
-            <Clock className="w-8 h-8 text-slate-300" />
+            <CircleX className="w-8 h-8 text-slate-300" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900 mb-2">Aucune donnée pour cette période</h3>
           <p className="text-slate-500">Ce collaborateur n'a pas enregistré de temps sur cette période.</p>
         </div>
       ) : (

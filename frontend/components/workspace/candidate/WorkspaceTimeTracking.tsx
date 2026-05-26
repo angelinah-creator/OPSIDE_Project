@@ -1,13 +1,175 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { format, startOfWeek, addWeeks, subWeeks, isSameWeek, addDays } from 'date-fns';
+import {
+  format,
+  startOfWeek,
+  endOfWeek,
+  addWeeks,
+  subWeeks,
+  isSameWeek,
+  addDays,
+  startOfMonth,
+  endOfMonth,
+  subMonths,
+  addMonths,
+  eachDayOfInterval,
+} from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Play, Square, Pause, Calendar, Clock, Plus } from 'lucide-react';
 import { TimeGrid } from './timer/time-grid';
 import { TaskPopup } from './timer/task-popup';
 import { timesheetService, Timesheet, TimerStatus } from '@/lib/timesheet-service';
 import { toast } from 'sonner';
+
+// Composant WeekSelector pour la navigation par semaine personnalisée
+function WeekSelector({
+  isOpen,
+  onClose,
+  onSelectWeek,
+  currentWeekStart,
+  buttonRef,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSelectWeek: (weekStart: Date) => void;
+  currentWeekStart: Date;
+  buttonRef: React.RefObject<HTMLDivElement | null>;
+}) {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const popupRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, onClose, buttonRef]);
+
+  if (!isOpen) return null;
+
+  const renderCalendar = () => {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(currentMonth);
+    const startDate = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const endDate = endOfWeek(monthEnd, { weekStartsOn: 1 });
+
+    const days = eachDayOfInterval({ start: startDate, end: endDate });
+    const weeks: Date[][] = [];
+
+    for (let i = 0; i < days.length; i += 7) {
+      weeks.push(days.slice(i, i + 7));
+    }
+
+    const handleWeekClick = (week: Date[]) => {
+      const weekStart = startOfWeek(week[0], { weekStartsOn: 1 });
+      onSelectWeek(weekStart);
+    };
+
+    return (
+      <div className="flex-1">
+        <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+            className="p-2 hover:bg-slate-50 rounded-xl transition text-slate-400 hover:text-slate-600 cursor-pointer"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <span className="text-slate-800 font-extrabold text-sm capitalize select-none">
+            {format(currentMonth, "MMMM yyyy", { locale: fr })}
+          </span>
+          <button
+            onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+            className="p-2 hover:bg-slate-50 rounded-xl transition text-slate-400 hover:text-slate-600 cursor-pointer"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-8 gap-1 mb-1 px-1">
+          <div className="text-center text-[10px] font-bold text-slate-300 py-1 select-none">
+            Sem.
+          </div>
+          {["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"].map((day) => (
+            <div
+              key={day}
+              className="text-center text-[10px] font-bold text-slate-400 py-1 select-none"
+            >
+              {day}
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-1">
+          {weeks.map((week, weekIdx) => {
+            const weekStartDate = week[0];
+            const isCurrentWeek = isSameWeek(weekStartDate, currentWeekStart, {
+              weekStartsOn: 1,
+            });
+
+            return (
+              <div
+                key={weekIdx}
+                className="grid grid-cols-8 gap-1 rounded-2xl transition cursor-pointer group p-1 hover:bg-slate-50"
+                onClick={() => handleWeekClick(week)}
+              >
+                <div
+                  className={`
+                  flex items-center justify-center text-[10px] font-extrabold py-1.5 rounded-xl transition-all select-none
+                  ${isCurrentWeek ? "bg-accent text-white shadow-md shadow-accent/25" : "text-slate-400 bg-slate-50 group-hover:bg-accent group-hover:text-white"}
+                `}
+                >
+                  W{format(weekStartDate, "w")}
+                </div>
+                {week.map((day, dayIdx) => {
+                  const isCurrentMonth =
+                    day.getMonth() === currentMonth.getMonth();
+
+                  return (
+                    <div
+                      key={dayIdx}
+                      className={`
+                        aspect-square flex items-center justify-center text-xs font-bold rounded-xl transition-all select-none
+                        ${!isCurrentMonth ? "text-slate-300" : "text-slate-700"}
+                        ${isCurrentWeek ? "bg-accent/5 text-accent font-black" : ""}
+                        group-hover:text-accent-light
+                      `}
+                    >
+                      {format(day, "d")}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div
+      ref={popupRef}
+      className="absolute right-0 top-full mt-2 bg-white border border-slate-100 rounded-3xl shadow-xl z-50 overflow-hidden p-4"
+      style={{ width: "320px" }}
+    >
+      <div className="p-1" style={{ minHeight: "280px" }}>
+        {renderCalendar()}
+      </div>
+    </div>
+  );
+}
 
 export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) {
   const [currentWeek, setCurrentWeek] = useState(new Date());
@@ -19,7 +181,8 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
   const [currentTaskInput, setCurrentTaskInput] = useState('');
   const [currentTime, setCurrentTime] = useState<number>(0); // Durée active en secondes
   const [loading, setLoading] = useState(true);
-  const dateInputRef = useRef<HTMLInputElement>(null);
+  const [isWeekSelectorOpen, setIsWeekSelectorOpen] = useState(false);
+  const weekSelectorRef = useRef<HTMLDivElement>(null);
 
   // Charger les données initiales
   useEffect(() => {
@@ -212,7 +375,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
       {/* Header : Timer + Semaine */}
       <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
         {/* Contrôles du chronomètre */}
-        <div className="bg-white rounded-[2rem] p-4 flex flex-col sm:flex-row items-center gap-4 border border-slate-100 shadow-sm flex-1 w-full lg:w-auto">
+        <div className="bg-white rounded-[2rem] p-2 flex flex-col sm:flex-row items-center gap-4 border border-slate-100 shadow-sm flex-1 w-full lg:w-auto">
           <div className="flex-1 w-full sm:w-auto relative">
             <input
               type="text"
@@ -220,14 +383,8 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
               value={currentTaskInput}
               onChange={(e) => setCurrentTaskInput(e.target.value)}
               disabled={!!activeTimer}
-              className="w-full bg-slate-50 border border-slate-100 text-slate-900 rounded-2xl px-6 py-4 outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all font-bold placeholder:text-slate-400 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-slate-50 border border-slate-100 text-slate-900 rounded-2xl px-6 py-3 outline-none focus:border-accent/50 focus:ring-4 focus:ring-accent/10 transition-all font-bold placeholder:text-slate-400 disabled:opacity-70 disabled:cursor-not-allowed"
             />
-            {activeTimer && (
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                <span className="text-xs font-black text-accent uppercase tracking-widest">En cours</span>
-              </div>
-            )}
           </div>
 
           <div className="flex items-center gap-4 w-full sm:w-auto shrink-0 justify-between sm:justify-start px-2 sm:px-0">
@@ -265,7 +422,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
         </div>
 
         {/* Navigation Semaine */}
-        <div className="flex items-center gap-4 bg-white rounded-3xl p-2 border border-slate-100 shadow-sm shrink-0">
+        <div className="flex items-center gap-4 bg-white rounded-3xl p-2 border border-slate-100 shadow-sm shrink-0 relative">
           <button
             onClick={() => setCurrentWeek(subWeeks(currentWeek, 1))}
             className="w-12 h-12 rounded-2xl flex items-center justify-center text-slate-400 hover:text-accent hover:bg-accent/5 transition-colors"
@@ -274,18 +431,11 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
           </button>
 
           <div 
-            className="flex flex-col items-center min-w-[140px] relative hover:bg-slate-50 p-2 rounded-xl transition-colors cursor-pointer group"
-            onClick={() => {
-              try {
-                dateInputRef.current?.showPicker();
-              } catch (e) {
-                // Fallback pour les anciens navigateurs
-                dateInputRef.current?.focus();
-              }
-            }}
+            ref={weekSelectorRef}
+            className="flex flex-col items-center min-w-[140px] hover:bg-slate-50 p-2 rounded-xl transition-colors cursor-pointer group"
+            onClick={() => setIsWeekSelectorOpen(!isWeekSelectorOpen)}
           >
             <div className="flex items-center gap-2 mb-0.5 pointer-events-none">
-              <Calendar className="w-3 h-3 text-slate-400 group-hover:text-accent transition-colors" />
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-accent transition-colors">
                 {format(startOfWeek(currentWeek, { weekStartsOn: 1 }), 'MMMM', { locale: fr })}
               </span>
@@ -293,18 +443,18 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
             <span className="text-sm font-black text-slate-900 group-hover:text-accent transition-colors pointer-events-none">
               {format(startOfWeek(currentWeek, { weekStartsOn: 1 }), 'dd')} - {format(addDays(startOfWeek(currentWeek, { weekStartsOn: 1 }), 6), 'dd')}
             </span>
-            <input
-              ref={dateInputRef}
-              type="date"
-              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full -z-10"
-              value={format(currentWeek, 'yyyy-MM-dd')}
-              onChange={(e) => {
-                if (e.target.value) {
-                  setCurrentWeek(new Date(e.target.value));
-                }
-              }}
-            />
           </div>
+
+          <WeekSelector
+            isOpen={isWeekSelectorOpen}
+            onClose={() => setIsWeekSelectorOpen(false)}
+            onSelectWeek={(weekStart) => {
+              setCurrentWeek(weekStart);
+              setIsWeekSelectorOpen(false);
+            }}
+            currentWeekStart={startOfWeek(currentWeek, { weekStartsOn: 1 })}
+            buttonRef={weekSelectorRef}
+          />
 
           <button
             onClick={() => setCurrentWeek(addWeeks(currentWeek, 1))}
