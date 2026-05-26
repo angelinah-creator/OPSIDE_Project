@@ -8,4 +8,8 @@ export const adminApi = {
   updateUserStatus: async (userId: string, status: string) => {
     return api.patch(`/users/${userId}/status`, { status });
   },
+
+  getMatches: async () => {
+    return api.get('/matches/admin/all');
+  },
 };

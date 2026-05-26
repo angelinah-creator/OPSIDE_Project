@@ -349,6 +349,27 @@ export class MatchesService {
     return updated;
   }
 
+  async findAllForAdmin() {
+    return this.prisma.match.findMany({
+      include: {
+        candidate: {
+          include: {
+            candidate: true,
+          },
+        },
+        client: {
+          include: {
+            client: true,
+          },
+        },
+        job_offer: true,
+      },
+      orderBy: {
+        matched_at: 'desc',
+      },
+    });
+  }
+
   async findOne(matchId: string, userId: string, role: Role) {
     const match = await this.prisma.match.findUnique({
       where: { id: matchId },

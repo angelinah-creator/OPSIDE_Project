@@ -28,9 +28,9 @@ export default function AdminDashboard() {
 
   const cards = [
     { label: 'Total utilisateurs', value: stats.total, icon: Users, color: 'bg-accent-soft text-accent' },
-    { label: 'Candidats', value: stats.candidats, icon: UserCheck, color: 'bg-green-50 text-green-600' },
-    { label: 'Entreprises', value: stats.clients, icon: Building2, color: 'bg-blue-50 text-blue-600' },
-    { label: 'Suspendus', value: stats.suspended, icon: UserX, color: 'bg-red-50 text-red-500' },
+    { label: 'Candidats', value: stats.candidats, icon: UserCheck, color: 'bg-accent-soft text-accent' },
+    { label: 'Entreprises', value: stats.clients, icon: Building2, color: 'bg-accent-soft text-accent' },
+    { label: 'Suspendus', value: stats.suspended, icon: UserX, color: 'bg-accent-soft text-accent' },
   ]
 
   return (
@@ -68,10 +68,10 @@ export default function AdminDashboard() {
             <Users className="w-4 h-4 text-accent" /> Gérer les utilisateurs
           </Link>
           <Link href="/admin/users?role=candidat" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-background border border-border text-sm text-foreground hover:border-accent/50 hover:bg-accent-soft transition-all">
-            <UserCheck className="w-4 h-4 text-green-600" /> Voir les candidats
+            <UserCheck className="w-4 h-4 text-accent" /> Voir les candidats
           </Link>
           <Link href="/admin/users?role=client" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-background border border-border text-sm text-foreground hover:border-accent/50 hover:bg-accent-soft transition-all">
-            <Building2 className="w-4 h-4 text-blue-600" /> Voir les entreprises
+            <Building2 className="w-4 h-4 text-accent" /> Voir les entreprises
           </Link>
         </div>
       </div>
