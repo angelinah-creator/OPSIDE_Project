@@ -81,12 +81,33 @@ export const timesheetService = {
   },
 
   createEntry: async (data: Partial<Timesheet>): Promise<Timesheet> => {
-    const response = await api.post('/timesheets', data);
+    const payload = {
+      match_id: data.match_id,
+      description: data.description,
+      start_time: data.start_time,
+      end_time: data.end_time,
+      duration: data.duration,
+      status: data.status,
+    };
+    const cleanPayload = Object.fromEntries(
+      Object.entries(payload).filter(([_, value]) => value !== undefined)
+    );
+    const response = await api.post('/timesheets', cleanPayload);
     return response.data;
   },
 
   updateEntry: async (id: string, data: Partial<Timesheet>): Promise<Timesheet> => {
-    const response = await api.put(`/timesheets/${id}`, data);
+    const payload = {
+      description: data.description,
+      start_time: data.start_time,
+      end_time: data.end_time,
+      duration: data.duration,
+      status: data.status,
+    };
+    const cleanPayload = Object.fromEntries(
+      Object.entries(payload).filter(([_, value]) => value !== undefined)
+    );
+    const response = await api.put(`/timesheets/${id}`, cleanPayload);
     return response.data;
   },
 
