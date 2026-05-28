@@ -328,7 +328,6 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
 
   const handleDeleteEntry = async () => {
     if (!selectedEntry?.id) return;
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette entrée ?')) return;
     
     try {
       await timesheetService.deleteEntry(selectedEntry.id);
