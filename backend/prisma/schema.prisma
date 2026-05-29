@@ -12,6 +12,12 @@ enum Role {
   admin
 }
 
+enum TimerStatus {
+  running
+  paused
+  stopped
+}
+
 enum UserStatus {
   active
   suspended
@@ -148,12 +154,17 @@ model User {
   skills                 Skill[]
   tests                  Test[]
   job_offers             JobOffer[]
-  applications           Candidature[]  @relation("CandidateApplications")
-  client_custom_tests    CustomTest[]   @relation("ClientCustomTests")
-  candidate_custom_tests CustomTest[]   @relation("CandidateCustomTests")
-  matches        Match[]        @relation("CandidateMatches")
-  client_matches Match[]        @relation("ClientMatches")
-  notifications  Notification[]
+  applications           Candidature[]         @relation("CandidateApplications")
+  client_custom_tests    CustomTest[]          @relation("ClientCustomTests")
+  candidate_custom_tests CustomTest[]          @relation("CandidateCustomTests")
+  matches                Match[]               @relation("CandidateMatches")
+  client_matches         Match[]               @relation("ClientMatches")
+  notifications          Notification[]
+  candidate_sessions     WorkspaceSession[]    @relation("CandidateWorkspaceSessions")
+  client_sessions        WorkspaceSession[]    @relation("ClientWorkspaceSessions")
+  candidate_timesheets   Timesheet[]           @relation("CandidateTimesheets")
+  client_timesheets      Timesheet[]           @relation("ClientTimesheets")
+  time_entries           TimeEntry[]
 
   @@map("users")
 }
@@ -467,6 +478,15 @@ enum NotificationType {
   test_result
   sourcing_invitation
   workspace_invitation
+  workspace_timer_start
+  timesheet_submitted
+}
+
+enum TimesheetStatus {
+  draft
+  submitted
+  approved
+  rejected
 }
 
 model Candidature {
@@ -499,6 +519,9 @@ model Match {
   client        User             @relation("ClientMatches", fields: [client_id], references: [id], onDelete: Cascade)
   job_offer     JobOffer?        @relation(fields: [job_offer_id], references: [id], onDelete: SetNull)
   custom_test   CustomTest?
+  workspace_sessions WorkspaceSession[]
+  timesheets    Timesheet[]
+  time_entries  TimeEntry[]
 
   @@map("matches")
 }
@@ -546,4 +569,69 @@ model Notification {
   user        User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("notifications")
+}
+
+model WorkspaceSession {
+  id           String    @id @default(uuid())
+  match_id     String
+  candidate_id String
+  client_id    String
+  started_at   DateTime  @default(now())
+  stopped_at   DateTime?
+  duration_min Int?      // durée calculée en minutes après stop
+  note         String?   @db.Text
+  created_at   DateTime  @default(now())
+
+  match        Match     @relation(fields: [match_id], references: [id], onDelete: Cascade)
+  candidate    User      @relation("CandidateWorkspaceSessions", fields: [candidate_id], references: [id], onDelete: Cascade)
+  client       User      @relation("ClientWorkspaceSessions", fields: [client_id], references: [id], onDelete: Cascade)
+
+  @@map("workspace_sessions")
+}
+
+model Timesheet {
+  id              String           @id @default(uuid())
+  match_id        String
+  candidate_id    String
+  client_id       String
+  week_start      DateTime         // lundi de la semaine
+  week_end        DateTime         // dimanche de la semaine
+  total_hours     Float            // total heures travaillées
+  daily_rate      Float            // TJM en EUR au moment de génération
+  amount_due      Float            // total_hours / 8 * daily_rate
+  currency        Currency         @default(EUR)
+  status          TimesheetStatus  @default(draft)
+  submitted_at    DateTime?
+  approved_at     DateTime?
+  rejection_note  String?          @db.Text
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+
+  match           Match            @relation(fields: [match_id], references: [id], onDelete: Cascade)
+  candidate       User             @relation("CandidateTimesheets", fields: [candidate_id], references: [id], onDelete: Cascade)
+  client          User             @relation("ClientTimesheets", fields: [client_id], references: [id], onDelete: Cascade)
+
+  @@unique([match_id, week_start])
+  @@map("timesheets")
+}
+
+model TimeEntry {
+  id               String       @id @default(uuid())
+  user_id          String
+  match_id         String
+  description      String?      @db.Text
+  start_time       DateTime
+  end_time         DateTime?
+  duration         Int          @default(0) // en secondes
+  status           TimerStatus  @default(stopped)
+  paused_at        DateTime[]
+  resumed_at       DateTime[]
+  date             DateTime     @db.Date
+  created_at       DateTime     @default(now())
+  updated_at       DateTime     @updatedAt
+
+  user             User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  match            Match        @relation(fields: [match_id], references: [id], onDelete: Cascade)
+
+  @@map("time_entries")
 }

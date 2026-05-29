@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import Logo from '@/components/ui/Logo'
 import { User, Building2, ArrowRight, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -99,7 +99,7 @@ function RegisterChoiceContent() {
 
 export default function RegisterChoicePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Chargement...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-2 border-accent border-t-transparent rounded-full" /></div>}>
       <RegisterChoiceContent />
     </Suspense>
   )

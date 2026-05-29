@@ -79,10 +79,9 @@ export default function CustomTestTab() {
     if (tests.length === 0) return (
       <div className="bg-white rounded-3xl p-12 border border-slate-100 shadow-sm flex flex-col items-center justify-center min-h-[400px] text-center">
         <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-6">
-          <FlaskConical className="w-8 h-8 text-slate-300" />
+          <XCircle className="w-8 h-8 text-slate-300" />
         </div>
-        <h3 className="text-xl font-bold text-slate-900 mb-2">Aucun test reçu</h3>
-        <p className="text-slate-500 max-w-sm">Lorsqu'un client vous enverra un test technique, il apparaîtra ici.</p>
+        <p className="text-slate-500 max-w-sm">Aucun test reçu</p>
       </div>
     )
 

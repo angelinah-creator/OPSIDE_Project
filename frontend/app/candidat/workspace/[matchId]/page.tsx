@@ -188,9 +188,9 @@ export default function CandidatWorkspace() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 w-full min-w-0 h-[100dvh] overflow-y-auto">
-        <div className="p-4 md:p-10 w-full">
-          <header className="flex items-center gap-4 mb-8 md:mb-10">
+      <main className={`flex-1 w-full min-w-0 h-[100dvh] flex flex-col ${activeTab === 'workspace_time' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+        <div className="p-4 md:p-10 w-full flex-1 flex flex-col min-h-0">
+          <header className="flex items-center gap-4 mb-8 md:mb-10 shrink-0">
             <button
               onClick={() => setIsSidebarOpen(true)}
               className="lg:hidden p-2.5 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm transition-colors shrink-0"
@@ -206,9 +206,9 @@ export default function CandidatWorkspace() {
           </header>
 
           {/* Tab Content */}
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1 flex flex-col min-h-0">
             {activeTab === 'workspace_home' && <WorkspaceHome />}
-            {activeTab === 'workspace_time' && <WorkspaceTimeTracking />}
+            {activeTab === 'workspace_time' && <WorkspaceTimeTracking matchId={params.matchId as string} />}
             {activeTab === 'workspace_factures' && <WorkspaceFactures />}
             {activeTab === 'workspace_contrats' && <WorkspaceContrats />}
           </div>

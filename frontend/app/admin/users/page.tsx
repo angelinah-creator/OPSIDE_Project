@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { adminApi  } from '@/lib/admin-service'
 import Button from '@/components/ui/Button'
@@ -26,7 +26,7 @@ const ROLE_LABELS: Record<string, { label: string; class: string }> = {
   admin: { label: 'Admin', class: 'bg-foreground text-white border-foreground' },
 }
 
-function AdminUsersPageContent() {
+function AdminUsersContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
@@ -209,8 +209,8 @@ function AdminUsersPageContent() {
 
 export default function AdminUsersPage() {
   return (
-    <Suspense fallback={<div className="p-6 lg:p-10">Chargement...</div>}>
-      <AdminUsersPageContent />
+    <Suspense fallback={<div className="p-12 flex justify-center"><div className="animate-spin w-8 h-8 border-2 border-accent border-t-transparent rounded-full" /></div>}>
+      <AdminUsersContent />
     </Suspense>
   )
 }

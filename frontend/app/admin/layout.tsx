@@ -6,12 +6,13 @@ import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
 import { getUser, clearTokens } from '@/lib/auth-service'
 import { authApi } from '@/lib/auth-service'
-import { Users, LayoutDashboard, LogOut, Menu, X, Video } from 'lucide-react'
+import { Users, LayoutDashboard, LogOut, Menu, X, Video, Handshake } from 'lucide-react'
 import clsx from 'clsx'
 
 const NAV = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/users', label: 'Utilisateurs', icon: Users },
+  { href: '/admin/matches', label: 'Matches', icon: Handshake },
   { href: '/admin/videos', label: 'Aide Entretiens', icon: Video },
 ]
 

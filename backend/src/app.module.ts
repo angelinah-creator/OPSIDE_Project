@@ -19,6 +19,8 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { CandidaturesModule } from './candidatures/candidatures.module';
 import { MatchesModule } from './matches/matches.module';
 import { CustomTestModule } from './custom-test/custom-test.module';
+import { WorkspaceModule } from './workspace/workspace.module';
+import { TimesheetsModule } from './timesheets/timesheets.module';
 
 validateEnvironment();
 
@@ -49,6 +51,8 @@ validateEnvironment();
     CandidaturesModule,
     MatchesModule,
     CustomTestModule,
+    WorkspaceModule,
+    TimesheetsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

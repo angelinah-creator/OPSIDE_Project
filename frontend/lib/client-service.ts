@@ -1,5 +1,4 @@
 import api from './api';
-import { optimizeImageForUpload, uploadLimits } from './upload-utils';
 
 export type CompanySize = 'size_1_10' | 'size_11_50' | 'size_51_200' | 'size_200_plus';
 
@@ -42,13 +41,8 @@ export const clientApi = {
   },
 
   uploadLogo: async (file: File) => {
-    const optimizedFile = await optimizeImageForUpload(file);
-    if (optimizedFile.size > uploadLimits.defaultMaxBytes) {
-      throw new Error('IMAGE_TOO_LARGE');
-    }
-
     const form = new FormData();
-    form.append('logo', optimizedFile);
+    form.append('logo', file);
     const res = await api.post('/client/profile/logo', form, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });

@@ -253,15 +253,7 @@ export default function CandidatProfilePage() {
       await candidateApi.uploadPhoto(f)
       flash('Photo mise à jour !')
       refresh()
-    } catch (err: unknown) {
-      if (err instanceof Error && err.message === 'IMAGE_TOO_LARGE') {
-        setError('Image trop volumineuse: reduisez-la sous 1 Mo puis reessayez.')
-      } else if ((err as { response?: { status?: number } })?.response?.status === 413) {
-        setError('Image trop volumineuse pour le serveur proxy (limite 1 Mo).')
-      } else {
-        setError('Erreur lors de l\'upload de la photo.')
-      }
-    }
+    } catch { setError('Erreur lors de l\'upload de la photo.') }
     e.target.value = ''
   }
 

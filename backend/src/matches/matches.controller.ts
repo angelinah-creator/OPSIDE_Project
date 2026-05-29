@@ -66,6 +66,12 @@ export class MatchesController {
     return this.matchesService.addToWorkspace(id, clientId);
   }
 
+  @Get('admin/all')
+  @Roles(Role.admin)
+  findAllForAdmin() {
+    return this.matchesService.findAllForAdmin();
+  }
+
   @Get(':id')
   findOne(
     @Param('id') id: string,
