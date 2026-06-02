@@ -250,10 +250,21 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
       return;
     }
 
+    const description = (currentTaskInput || '').trim();
+    if (!description) {
+      toast.error('Veuillez saisir une description avant de démarrer le chronomètre');
+      return;
+    }
+
+    if (description.length < 18) {
+      toast.error('La description doit contenir au moins 18 caractères');
+      return;
+    }
+
     try {
       const newTimer = await timesheetService.start({
         match_id: matchId,
-        description: currentTaskInput || undefined,
+        description: description,
       });
       setActiveTimer(newTimer);
       toast.success('Chronomètre démarré');
@@ -311,12 +322,23 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
   };
 
   const handleSaveEntry = async (data: Partial<Timesheet>) => {
+    const description = (data.description || '').trim();
+    if (!description) {
+      toast.error('Veuillez saisir une description avant d\'enregistrer');
+      return;
+    }
+
+    if (description.length < 18) {
+      toast.error('La description doit contenir au moins 18 caractères');
+      return;
+    }
+
     try {
       if (popupMode === 'create') {
-        await timesheetService.createEntry({ ...data, match_id: matchId });
+        await timesheetService.createEntry({ ...data, description, match_id: matchId });
         toast.success('Entrée créée avec succès');
       } else if (popupMode === 'edit' && selectedEntry?.id) {
-        await timesheetService.updateEntry(selectedEntry.id, data);
+        await timesheetService.updateEntry(selectedEntry.id, { ...data, description });
         toast.success('Entrée mise à jour');
       }
       setIsPopupOpen(false);
@@ -378,7 +400,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
           <div className="flex-1 w-full sm:w-auto relative">
             <input
               type="text"
-              placeholder="Sur quoi travaillez-vous ?"
+              placeholder="Sur quoi travaillez-vous ? (min. 18 caractères)"
               value={currentTaskInput}
               onChange={(e) => setCurrentTaskInput(e.target.value)}
               disabled={!!activeTimer}

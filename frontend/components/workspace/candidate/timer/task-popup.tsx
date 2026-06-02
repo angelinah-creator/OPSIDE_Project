@@ -171,7 +171,7 @@ export function TaskPopup({
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Que faites-vous ?"
+              placeholder="Que faites-vous ? (min. 18 caractères)"
               className="w-full bg-slate-50 border border-slate-200 text-slate-900 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/50 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={mode === 'edit' && !isEditable}
             />
