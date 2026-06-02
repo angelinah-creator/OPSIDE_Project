@@ -161,6 +161,7 @@ model User {
   client_matches         Match[]        @relation("ClientMatches")
   notifications          Notification[]
   timesheets             Timesheet[]
+  histories              History[]
 
   @@map("users")
 }
@@ -575,4 +576,24 @@ model Timesheet {
   match            Match        @relation(fields: [match_id], references: [id], onDelete: Cascade)
 
   @@map("timesheets")
+}
+
+model History {
+  id           String   @id @default(uuid())
+  user_id      String
+  type         String   // 'apply' | 'test'
+  title        String
+  date         DateTime @default(now())
+  result       String
+  icon         String   // 'Briefcase' | 'Code2'
+  color        String
+  reference_id String?
+  is_deleted   Boolean  @default(false)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, reference_id, type])
+  @@map("histories")
 }

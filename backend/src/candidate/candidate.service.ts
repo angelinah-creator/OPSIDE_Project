@@ -539,6 +539,195 @@ export class CandidateService {
     return { message: 'Média supprimé avec succès' };
   }
 
+  async getHistory(userId: string) {
+    // 1. Fetch current candidatures and custom tests for the candidate
+    const [candidatures, tests] = await Promise.all([
+      this.prisma.candidature.findMany({
+        where: { candidate_id: userId },
+        include: {
+          job_offer: {
+            include: {
+              client: {
+                include: {
+                  client: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      this.prisma.customTest.findMany({
+        where: { candidate_id: userId },
+        include: {
+          match: {
+            include: {
+              client: {
+                include: {
+                  client: true,
+                },
+              },
+              job_offer: true,
+            },
+          },
+        },
+      }),
+    ]);
+
+    // 2. Fetch existing histories
+    const existingHistories = await this.prisma.history.findMany({
+      where: { user_id: userId },
+    });
+
+    const existingMap = new Map<string, any>(
+      existingHistories.map((h) => [`${h.type}-${h.reference_id}`, h]),
+    );
+
+    const historyItemsToCreate: any[] = [];
+    const historyItemsToUpdate: any[] = [];
+
+    // 3. Process candidatures
+    for (const cand of candidatures) {
+      const companyName = cand.job_offer?.client?.client?.company_name || 'Entreprise';
+      const status = cand.status;
+      
+      let result = 'En attente';
+      let color = 'bg-blue-500';
+      
+      if (status === 'matched') {
+        result = 'Matché';
+        color = 'bg-emerald-500';
+      } else if (status === 'rejected') {
+        result = 'Rejeté';
+        color = 'bg-red-500';
+      } else if (status === 'withdrawn') {
+        result = 'Retiré';
+        color = 'bg-slate-500';
+      }
+
+      const title = `Candidature envoyée - ${companyName}`;
+      const date = cand.applied_at;
+      const key = `apply-${cand.id}`;
+
+      const existing = existingMap.get(key);
+      if (!existing) {
+        historyItemsToCreate.push({
+          user_id: userId,
+          type: 'apply',
+          title,
+          date: new Date(date),
+          result,
+          icon: 'Briefcase',
+          color,
+          reference_id: cand.id,
+        });
+      } else {
+        if (existing.result !== result || existing.color !== color || existing.title !== title) {
+          historyItemsToUpdate.push({
+            id: existing.id,
+            data: { result, color, title },
+          });
+        }
+      }
+    }
+
+    // 4. Process custom tests
+    for (const test of tests) {
+      const companyName = test.match?.client?.client?.company_name || test.match?.job_offer?.title || 'Entreprise';
+      const status = test.status;
+      const score = test.score;
+      
+      let result = 'À passer';
+      let color = 'bg-blue-500';
+
+      if (status === 'scored') {
+        const scoreVal = score !== null && score !== undefined ? score : 0;
+        result = `${scoreVal}%`;
+        color = scoreVal >= (test.threshold || 75) ? 'bg-emerald-500' : 'bg-red-500';
+      } else if (status === 'in_progress') {
+        result = 'En cours';
+        color = 'bg-blue-500';
+      } else if (status === 'submitted') {
+        result = 'Soumis';
+        color = 'bg-amber-500';
+      } else if (status === 'expired') {
+        result = 'Expiré';
+        color = 'bg-slate-500';
+      }
+
+      const title = `Test technique - ${companyName}`;
+      const date = test.submitted_at || test.created_at;
+      const key = `test-${test.id}`;
+
+      const existing = existingMap.get(key);
+      if (!existing) {
+        historyItemsToCreate.push({
+          user_id: userId,
+          type: 'test',
+          title,
+          date: new Date(date),
+          result,
+          icon: 'Code2',
+          color,
+          reference_id: test.id,
+        });
+      } else {
+        if (existing.result !== result || existing.color !== color || existing.title !== title) {
+          historyItemsToUpdate.push({
+            id: existing.id,
+            data: { result, color, title },
+          });
+        }
+      }
+    }
+
+    // 5. Create new history items if any
+    if (historyItemsToCreate.length > 0) {
+      await this.prisma.history.createMany({
+        data: historyItemsToCreate,
+      });
+    }
+
+    // 6. Update existing items if status has changed
+    for (const item of historyItemsToUpdate) {
+      await this.prisma.history.update({
+        where: { id: item.id },
+        data: item.data,
+      });
+    }
+
+    // 7. Return non-deleted history records sorted by date descending
+    return this.prisma.history.findMany({
+      where: {
+        user_id: userId,
+        is_deleted: false,
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+  }
+
+  async deleteHistoryItem(userId: string, itemId: string) {
+    const historyItem = await this.prisma.history.findUnique({
+      where: { id: itemId },
+    });
+
+    if (!historyItem) {
+      throw new NotFoundException("Activité introuvable dans l'historique");
+    }
+
+    if (historyItem.user_id !== userId) {
+      throw new ForbiddenException("Vous n'êtes pas autorisé à supprimer cette activité");
+    }
+
+    await this.prisma.history.update({
+      where: { id: itemId },
+      data: { is_deleted: true },
+    });
+
+    return { message: "Activité supprimée de l'historique avec succès" };
+  }
+
   private mapCountryToCurrency(country: Country): Currency {
     const mapping: Record<Country, Currency> = {
       madagascar: Currency.MGA,

@@ -201,4 +201,22 @@ export class CandidateController {
   ) {
     return this.candidateService.deleteEducationMedia(userId, educationId, mediaId);
   }
+
+  // ─── Historique
+
+  @Get('history')
+  @Roles(Role.candidat)
+  getHistory(@CurrentUser('id') userId: string) {
+    return this.candidateService.getHistory(userId);
+  }
+
+  @Delete('history/:id')
+  @Roles(Role.candidat)
+  @HttpCode(HttpStatus.OK)
+  deleteHistoryItem(
+    @CurrentUser('id') userId: string,
+    @Param('id', ParseUUIDPipe) itemId: string,
+  ) {
+    return this.candidateService.deleteHistoryItem(userId, itemId);
+  }
 }

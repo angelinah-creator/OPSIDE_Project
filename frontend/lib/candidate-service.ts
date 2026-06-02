@@ -178,4 +178,14 @@ export const candidateApi = {
     const { data } = await api.get('/candidate/applied-jobs');
     return data;
   },
+
+  getHistory: async () => {
+    const { data } = await api.get('/candidate/history');
+    return data;
+  },
+
+  deleteHistoryItem: async (id: string) => {
+    const { data } = await api.delete(`/candidate/history/${id}`);
+    return data;
+  },
 };
