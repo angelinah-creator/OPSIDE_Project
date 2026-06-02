@@ -24,7 +24,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null
 }
 
-// Configuration Couleurs & Labels
 const STATUS_COLORS: Record<string, string> = {
   pending_candidate: '#f59e0b', // Amber
   pending_client:    '#3b82f6', // Blue
