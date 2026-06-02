@@ -15,7 +15,7 @@ export default function TestStepper({
   return (
     <div className="bg-white rounded-2xl border border-border p-4">
       <h3 className="text-sm font-semibold text-foreground mb-3">Navigation</h3>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-5 gap-2 max-w-[240px] sm:max-w-[280px] mx-auto lg:mx-0">
         {questions.map((q, idx) => {
           const isAnswered = answers[idx] !== undefined && answers[idx] !== '';
           const isCurrent = idx === currentIndex;

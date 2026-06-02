@@ -178,7 +178,7 @@ export default function TakeCustomTestPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header avec timer */}
-      <header className="bg-white border-b border-border px-6 py-4 sticky top-0 z-40">
+      <header className="bg-white border-b border-border px-4 sm:px-6 py-3 sm:py-4 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <img src="/logo.webp" alt="OPSIDE" className="w-24" />
@@ -190,7 +190,7 @@ export default function TakeCustomTestPage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Colonne principale : question */}
           <div className="lg:col-span-3 space-y-6">
@@ -224,7 +224,7 @@ export default function TakeCustomTestPage() {
           </div>
 
           {/* Sidebar : stepper */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 max-w-sm w-full mx-auto lg:mx-0 lg:max-w-none">
             <TestStepper
               questions={questions}
               currentIndex={currentIndex}
