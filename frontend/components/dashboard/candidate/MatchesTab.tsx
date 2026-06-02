@@ -18,10 +18,11 @@ export default function CandidateMatchesTab() {
   const fetchMatches = async () => {
     try {
       const data = await matchService.getCandidateMatches()
-      setMatches(data)
+      const clientInvitations = data.filter((match: any) => match.initiated_by === 'client')
+      setMatches(clientInvitations)
     } catch (error) {
       console.error('Error fetching matches:', error)
-      toast.error('Impossible de charger les matchs')
+      toast.error('Impossible de charger les invitations')
     } finally {
       setLoading(false)
     }
@@ -31,7 +32,7 @@ export default function CandidateMatchesTab() {
     try {
       setRespondingId(id)
       await matchService.respond(id, action)
-      toast.success(action === 'confirm' ? 'Match confirmé !' : 'Match décliné')
+      toast.success(action === 'confirm' ? 'Invitation acceptée !' : 'Invitation déclinée')
       fetchMatches()
     } catch (error) {
       console.error('Error responding to match:', error)
@@ -56,9 +57,9 @@ export default function CandidateMatchesTab() {
         <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-6">
           <Bell className="w-8 h-8 text-slate-300" />
         </div>
-        <h3 className="text-xl font-bold text-slate-900 mb-2">Aucun match actif</h3>
+        <h3 className="text-xl font-bold text-slate-900 mb-2">Aucune invitation active</h3>
         <p className="text-slate-500 max-w-sm">
-          Postulez à des offres ou attendez d'être sourcé par des clients pour voir vos matchs ici.
+          Attendez d'être sourcé par des clients pour voir vos invitations ici.
         </p>
       </div>
     )
