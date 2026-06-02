@@ -47,15 +47,12 @@ export default function TechniqueTab({ score, profile }: TechniqueTabProps) {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+            <div className="w-1/2">
               <Link href="/candidat/test/start" className="flex-1 w-full">
                 <Button className="w-full rounded-2xl py-4 md:py-6 text-sm md:text-base font-bold shadow-lg shadow-accent/20">
                   {score ? 'Repasser le test' : 'Passer le test'}
                 </Button>
               </Link>
-              <Button variant="outline" className="flex-1 w-full rounded-2xl py-4 md:py-6 text-sm md:text-base font-bold text-slate-700">
-                Voir les détails du test
-              </Button>
             </div>
           </div>
         </div>
