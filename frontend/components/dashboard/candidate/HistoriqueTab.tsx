@@ -20,6 +20,14 @@ const iconMap: Record<string, any> = {
   Code2: Code2,
 };
 
+const colorMap: Record<string, string> = {
+  'bg-blue-500': 'bg-blue-500',
+  'bg-emerald-500': 'bg-emerald-500',
+  'bg-red-500': 'bg-red-500',
+  'bg-slate-500': 'bg-slate-500',
+  'bg-amber-500': 'bg-amber-500',
+};
+
 export default function HistoriqueTab() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -101,12 +109,13 @@ export default function HistoriqueTab() {
       <div className="p-4 md:p-6 border-b border-slate-50 bg-slate-50/50">
         <h2 className="font-bold text-slate-900 text-lg md:text-base">Activités récentes</h2>
       </div>
-      <div className="divide-y divide-slate-50">
+        <div className="divide-y divide-slate-50">
         {activities.map((item) => {
           const IconComponent = iconMap[item.icon] || Briefcase;
+          const bgClass = colorMap[item.color] || 'bg-slate-500';
           return (
             <div key={item.id} className="p-4 md:p-6 flex flex-wrap sm:flex-nowrap items-center gap-3 md:gap-4 hover:bg-slate-50 transition-colors cursor-pointer group">
-              <div className={`w-10 h-10 rounded-xl ${item.color} text-white flex items-center justify-center shrink-0`}>
+              <div className={`w-10 h-10 rounded-xl ${bgClass} text-white flex items-center justify-center shrink-0`}>
                 <IconComponent className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0 pr-4 sm:pr-0">

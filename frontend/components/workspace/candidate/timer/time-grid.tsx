@@ -81,6 +81,52 @@ export function TimeGrid({
     }
   };
 
+  const getEntryChunks = (entry: Timesheet, isActive: boolean, durationSeconds: number) => {
+    const chunks: Array<{
+      key: string;
+      entry: Timesheet & { isActive: boolean };
+      dayIndex: number;
+      startHour: number;
+      durationHours: number;
+      isEditable: boolean;
+      isDraggable: boolean;
+    }> = [];
+
+    const entryStart = new Date(entry.start_time).getTime();
+    const entryEnd = entryStart + durationSeconds * 1000;
+    
+    const startDateStr = format(new Date(entryStart), 'yyyy-MM-dd');
+    const endDateStr = format(new Date(entryEnd), 'yyyy-MM-dd');
+    const isMultiDay = startDateStr !== endDateStr;
+
+    DAYS.forEach((day, index) => {
+      const dayStart = new Date(day);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayStartMs = dayStart.getTime();
+      const dayEndMs = dayStartMs + 24 * 3600 * 1000;
+
+      const overlapStart = Math.max(entryStart, dayStartMs);
+      const overlapEnd = Math.min(entryEnd, dayEndMs);
+
+      if (overlapStart < overlapEnd) {
+        const startHour = (overlapStart - dayStartMs) / (3600 * 1000);
+        const durationHours = (overlapEnd - overlapStart) / (3600 * 1000);
+
+        chunks.push({
+          key: `${entry.id}-${index}-${isActive ? 'active' : 'stopped'}`,
+          entry: { ...entry, isActive },
+          dayIndex: index,
+          startHour,
+          durationHours,
+          isEditable: !isActive && isEditable(entry.start_time),
+          isDraggable: !isActive && !isMultiDay,
+        });
+      }
+    });
+
+    return chunks;
+  };
+
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full">
       {/* En-tête des jours */}
@@ -149,41 +195,37 @@ export function TimeGrid({
 
           {/* Blocs de tâches (entrées historiques) */}
           {entries
-            .filter((e) => e.status === TimerStatus.STOPPED || activeTimer?.id !== e.id) // Exclure l'actif s'il existe (géré à part)
-            .map((entry) => {
-              const dayIndex = getDayIndex(entry.start_time);
-              const isCurrentWeek = isSameDay(startOfWeek(new Date(entry.start_time), { weekStartsOn: 1 }), weekStart);
-              
-              if (!isCurrentWeek) return null;
-
-              return (
-                <TaskBlock
-                  key={entry.id}
-                  entry={{ ...entry, isActive: false }}
-                  pixelsPerHour={PIXELS_PER_HOUR}
-                  dayIndex={dayIndex}
-                  startHour={getStartHour(entry.start_time)}
-                  durationHours={getDurationHours(entry.duration)}
-                  onClick={() => onBlockClick(entry)}
-                  onUpdate={(newStart, newDuration) => onBlockUpdate(entry, newStart, newDuration)}
-                  isEditable={isEditable(entry.start_time)}
-                />
-              );
-            })}
+            .filter((e) => e.status === TimerStatus.STOPPED || activeTimer?.id !== e.id)
+            .flatMap((entry) => getEntryChunks(entry, false, entry.duration))
+            .map((chunk) => (
+              <TaskBlock
+                key={chunk.key}
+                entry={chunk.entry}
+                pixelsPerHour={PIXELS_PER_HOUR}
+                dayIndex={chunk.dayIndex}
+                startHour={chunk.startHour}
+                durationHours={chunk.durationHours}
+                onClick={() => onBlockClick(chunk.entry)}
+                onUpdate={(newStart, newDuration) => onBlockUpdate(chunk.entry, newStart, newDuration)}
+                isEditable={chunk.isEditable}
+                isDraggable={chunk.isDraggable}
+              />
+            ))}
 
           {/* Bloc de la tâche active */}
-          {activeTimer && isSameDay(startOfWeek(new Date(activeTimer.start_time), { weekStartsOn: 1 }), weekStart) && (
+          {activeTimer && getEntryChunks(activeTimer, true, currentTimerDuration ?? activeTimer.duration).map((chunk) => (
             <TaskBlock
-              key={`active-${activeTimer.id}`}
-              entry={{ ...activeTimer, isActive: true }}
+              key={chunk.key}
+              entry={chunk.entry}
               pixelsPerHour={PIXELS_PER_HOUR}
-              dayIndex={getDayIndex(activeTimer.start_time)}
-              startHour={getStartHour(activeTimer.start_time)}
-              durationHours={getDurationHours(currentTimerDuration ?? activeTimer.duration)}
-              onClick={() => {}} // Pas de clic sur la tâche active
+              dayIndex={chunk.dayIndex}
+              startHour={chunk.startHour}
+              durationHours={chunk.durationHours}
+              onClick={() => {}}
               isEditable={false}
+              isDraggable={false}
             />
-          )}
+          ))}
         </div>
       </div>
     </div>

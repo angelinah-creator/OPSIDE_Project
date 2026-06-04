@@ -9,6 +9,7 @@ interface TaskBlockProps {
   onClick: () => void;
   onUpdate?: (newStartHour: number, newDurationHours: number) => void;
   isEditable?: boolean;
+  isDraggable?: boolean;
 }
 
 export function TaskBlock({
@@ -20,6 +21,7 @@ export function TaskBlock({
   onClick,
   onUpdate,
   isEditable = true,
+  isDraggable = true,
 }: TaskBlockProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
@@ -38,7 +40,7 @@ export function TaskBlock({
 
   const handleMouseDown = (e: React.MouseEvent, type: 'drag' | 'resize-top' | 'resize-bottom', initialStart: number, initialDuration: number) => {
     e.stopPropagation();
-    if (!isEditable || isActive) return;
+    if (!isEditable || isActive || !isDraggable) return;
 
     const startY = e.clientY;
     let hasMoved = false;
@@ -127,12 +129,12 @@ export function TaskBlock({
     <div
       ref={taskRef}
       onClick={handleBlockClick}
-      onMouseDown={isEditable && !isActive ? (e) => handleMouseDown(e, 'drag', tempStartHour, tempDuration) : undefined}
+      onMouseDown={isEditable && !isActive && isDraggable ? (e) => handleMouseDown(e, 'drag', tempStartHour, tempDuration) : undefined}
       className={`absolute rounded-lg px-2 py-1 text-xs transition-all select-none border shadow-sm ${
         isActive
           ? 'bg-accent text-white border-accent cursor-default shadow-accent/20'
           : isEditable
-            ? 'bg-accent/10 border-accent/20 text-accent cursor-move hover:bg-accent/20'
+            ? `bg-accent/10 border-accent/20 text-accent ${isDraggable ? 'cursor-move' : 'cursor-pointer'} hover:bg-accent/20`
             : 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-60'
       } ${isDragging || isResizing ? 'opacity-90 z-50 shadow-md scale-[1.02]' : 'z-10'}`}
       style={{
@@ -143,7 +145,7 @@ export function TaskBlock({
         userSelect: 'none',
       }}
     >
-      {isEditable && !isActive && (
+      {isEditable && !isActive && isDraggable && (
         <div
           className="absolute top-0 left-0 right-0 h-1.5 cursor-ns-resize hover:bg-accent/30 active:bg-accent/40 transition-colors rounded-t-lg"
           onMouseDown={(e) => handleMouseDown(e, 'resize-top', tempStartHour, tempDuration)}
@@ -157,7 +159,7 @@ export function TaskBlock({
         <div className="text-[10px] mt-0.5 font-mono opacity-80">{formatDuration(entry.duration)}</div>
       </div>
 
-      {isEditable && !isActive && (
+      {isEditable && !isActive && isDraggable && (
         <div
           className="absolute bottom-0 left-0 right-0 h-1.5 cursor-ns-resize hover:bg-accent/30 active:bg-accent/40 transition-colors rounded-b-lg"
           onMouseDown={(e) => handleMouseDown(e, 'resize-bottom', tempStartHour, tempDuration)}
