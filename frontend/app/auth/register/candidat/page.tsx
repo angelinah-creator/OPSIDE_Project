@@ -20,7 +20,7 @@ export default function CandidatRegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Définit 
+  // Définit champ
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((p) => ({ ...p, [k]: e.target.value }))
 
@@ -48,9 +48,19 @@ export default function CandidatRegisterPage() {
       }
       router.push(`/auth/verify-email-notice?email=${encodeURIComponent(form.email)}`)
     } catch (err: any) {
+      const status = err.response?.status
       const msg = err.response?.data?.message
-      if (err.response?.status === 409) setError('Cet email est déjà utilisé.')
-      else setError(typeof msg === 'string' ? msg : 'Une erreur est survenue.')
+      if (status === 409) {
+        setError('Cet email est déjà utilisé.')
+      } else if (Array.isArray(msg)) {
+        setError(msg.join(', '))
+      } else if (typeof msg === 'string') {
+        setError(msg)
+      } else if (!err.response) {
+        setError('Impossible de contacter le serveur. Vérifiez votre connexion.')
+      } else {
+        setError('Une erreur est survenue. Veuillez réessayer.')
+      }
     } finally {
       setLoading(false)
     }
