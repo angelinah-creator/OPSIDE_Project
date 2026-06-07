@@ -1,12 +1,10 @@
 import api from './api';
 
 export const jobOfferApi = {
-  // Pour les candidats
   getJobOffers: async () => {
     return api.get('/job-offers/candidate');
   },
 
-  // Pour les clients
   getClientJobOffers: async () => {
     return api.get('/job-offers/client');
   },

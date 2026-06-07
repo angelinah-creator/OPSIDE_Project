@@ -22,30 +22,35 @@ import { Role } from '@prisma/client';
 export class JobOffersController {
   constructor(private readonly jobOffersService: JobOffersService) {}
 
+  // Create
   @Post()
   @Roles(Role.client)
   create(@CurrentUser('id') userId: string, @Body() createJobOfferDto: CreateJobOfferDto) {
     return this.jobOffersService.create(userId, createJobOfferDto);
   }
 
+  // Find all for candidates
   @Get('candidate')
   @Roles(Role.candidat, Role.admin)
   findAllForCandidates() {
     return this.jobOffersService.findAllForCandidates();
   }
 
+  // Find all for client
   @Get('client')
   @Roles(Role.client)
   findAllForClient(@CurrentUser('id') userId: string) {
     return this.jobOffersService.findAllForClient(userId);
   }
 
+  // Find one
   @Get(':id')
   @Roles(Role.client, Role.candidat, Role.admin)
   findOne(@Param('id') id: string) {
     return this.jobOffersService.findOne(id);
   }
 
+  // Update
   @Patch(':id')
   @Roles(Role.client)
   update(
@@ -56,6 +61,7 @@ export class JobOffersController {
     return this.jobOffersService.update(id, userId, updateJobOfferDto);
   }
 
+  // Remove
   @Delete(':id')
   @Roles(Role.client)
   remove(@Param('id') id: string, @CurrentUser('id') userId: string) {

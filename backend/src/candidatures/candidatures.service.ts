@@ -1,7 +1,7 @@
 import { Injectable, ConflictException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCandidatureDto } from './dto/create-candidature.dto';
-import { CandidatureStatus, NotificationType, Role } from '@prisma/client';
+import { CandidatureStatus, NotificationType } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
 import { MailService } from '../mail/mail.service';
 
@@ -13,8 +13,8 @@ export class CandidaturesService {
     private mailService: MailService,
   ) {}
 
+  // Create
   async create(candidateId: string, dto: CreateCandidatureDto) {
-    // Vérifier si le candidat a déjà postulé
     const existing = await this.prisma.candidature.findFirst({
       where: {
         candidate_id: candidateId,
@@ -52,13 +52,11 @@ export class CandidaturesService {
       },
     });
 
-    // Incrémenter le compteur de candidatures sur l'offre
     await this.prisma.jobOffer.update({
       where: { id: dto.job_offer_id },
       data: { applications_count: { increment: 1 } },
     });
 
-    // Notification au client
     const candidateName = `${candidature.candidate.first_name || ''} ${candidature.candidate.last_name || ''}`.trim() || 'Un candidat';
     await this.notificationsService.create({
       user_id: jobOffer.client_id,
@@ -68,7 +66,6 @@ export class CandidaturesService {
       link: `/client/dashboard`,
     });
 
-    // Email au client
     try {
       await this.mailService.sendNewCandidatureEmail(
         jobOffer.client.email,
@@ -80,7 +77,6 @@ export class CandidaturesService {
       console.error('Error sending new candidature email to client:', e);
     }
 
-    // Notification au candidat
     await this.notificationsService.create({
       user_id: candidateId,
       type: NotificationType.new_application,
@@ -92,6 +88,7 @@ export class CandidaturesService {
     return candidature;
   }
 
+  // Find all for candidate
   async findAllForCandidate(candidateId: string) {
     return this.prisma.candidature.findMany({
       where: { candidate_id: candidateId },
@@ -110,6 +107,7 @@ export class CandidaturesService {
     });
   }
 
+  // Find all for client
   async findAllForClient(clientId: string) {
     const candidatures = await this.prisma.candidature.findMany({
       where: {
@@ -138,7 +136,6 @@ export class CandidaturesService {
       orderBy: { applied_at: 'desc' },
     });
 
-    // Fetch all client matches to identify sourced candidates and their test statuses
     const matches = await this.prisma.match.findMany({
       where: {
         client_id: clientId,
@@ -155,7 +152,6 @@ export class CandidaturesService {
           m.job_offer_id === cand.job_offer_id
       );
 
-      // A candidate is sourced if the match was initiated by the client.
       const isSourced = match?.initiated_by === 'client';
       const hasTest = !!match?.custom_test;
       const testPassed =
@@ -163,10 +159,6 @@ export class CandidaturesService {
         match?.custom_test?.score !== null &&
         match?.custom_test?.score >= match?.custom_test?.threshold;
 
-      // Anonymization rules:
-      // - Sourced profiles start anonymous.
-      // - If a test was sent: they remain anonymous until the test is PASSED (>75%).
-      // - If NO test was sent: they are NOT anonymous (so the client can see the profile before sending Calendly link).
       const shouldAnonymize = isSourced && hasTest && !testPassed;
 
       if (shouldAnonymize) {
@@ -191,6 +183,7 @@ export class CandidaturesService {
     });
   }
 
+  // Update status
   async updateStatus(id: string, clientId: string, status: CandidatureStatus) {
     const candidature = await this.prisma.candidature.findUnique({
       where: { id },
@@ -221,9 +214,7 @@ export class CandidaturesService {
       data: { status },
     });
 
-    // Logique si accepté (Match) ou refusé
     if (status === CandidatureStatus.matched) {
-      // Créer un Match automatique CONFIRMÉ (plus besoin de confirmation candidat selon demande USER)
       const match = await this.prisma.match.create({
         data: {
           candidate_id: candidature.candidate_id,
@@ -239,7 +230,6 @@ export class CandidaturesService {
         }
       });
 
-      // Notification de match confirmé au candidat
       await this.notificationsService.create({
         user_id: candidature.candidate_id,
         type: NotificationType.match_confirmed,
@@ -248,12 +238,10 @@ export class CandidaturesService {
         link: `/candidat/dashboard`,
       });
 
-      // Email automatique de match confirmé
       try {
         const companyName = candidature.job_offer.client.client?.company_name || 'Le client';
         const candidateName = `${candidature.candidate.first_name || ''} ${candidature.candidate.last_name || ''}`.trim() || 'Un candidat';
         
-        // Email au candidat
         await this.mailService.sendMatchConfirmationEmail(
           candidature.candidate.email,
           'candidate',
@@ -261,7 +249,6 @@ export class CandidaturesService {
           candidature.job_offer.title
         );
 
-        // Email au client
         await this.mailService.sendMatchConfirmationEmail(
           candidature.job_offer.client.email,
           'client',
@@ -279,7 +266,6 @@ export class CandidaturesService {
         message: `Votre candidature pour l'offre ${candidature.job_offer.title} n'a pas été retenue.`,
       });
       
-      // Email automatique de refus
       try {
         await this.mailService.sendCandidatureRejectionEmail(
           candidature.candidate.email,

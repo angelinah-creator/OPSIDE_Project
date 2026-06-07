@@ -20,13 +20,14 @@ import ClientProfilTab from '@/components/dashboard/client/ClientProfilTab'
 import ClientCandidaturesTab from '@/components/dashboard/client/CandidaturesTab'
 import ClientSourcingTab from '@/components/dashboard/client/SourcingTab'
 import NotificationsTab from '@/components/dashboard/NotificationsTab'
-import { notificationService } from '@/lib/notification-service'
-import { CheckSquare, Home, ArrowRightLeft } from 'lucide-react'
+
+import { Home, ArrowRightLeft } from 'lucide-react';
 import Link from 'next/link'
 import { useNotifications } from '@/hooks/useNotifications'
 
 type TabType = 'dashboard' | 'candidatures' | 'sourcing' | 'matches' | 'notifications' | 'offres' | 'profil'
 
+// Client dashboard
 export default function ClientDashboard() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
@@ -37,6 +38,7 @@ export default function ClientDashboard() {
   const { unreadCount: unreadNotifications } = useNotifications()
 
   useEffect(() => {
+    // Fetch data
     const fetchData = async () => {
       try {
         const u = getUser()
@@ -60,6 +62,7 @@ export default function ClientDashboard() {
     fetchData()
   }, [router])
 
+  // Gère logout
   const handleLogout = async () => {
     try {
       const rt = (await import('js-cookie')).default.get('refresh_token') || ''

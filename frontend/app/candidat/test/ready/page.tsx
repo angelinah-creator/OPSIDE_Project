@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { getUser } from '@/lib/auth-service';
-import { candidateApi } from '@/lib/candidate-service';
-import { Code2, ArrowRight, CheckCircle2, ShieldCheck, Zap, Laptop } from 'lucide-react';
 
+import { ArrowRight } from 'lucide-react';
+
+// Test ready page
 export default function TestReadyPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);

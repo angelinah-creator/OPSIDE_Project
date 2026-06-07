@@ -1,17 +1,18 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { authApi, setTokens, setUser, getDashboardByRole } from '@/lib/auth-service'
-import { Loader2, CheckCircle2, XCircle, ArrowRight } from 'lucide-react'
+import { authApi, setTokens, setUser } from '@/lib/auth-service';
+import { Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
 
-export default function VerifyEmailPage() {
+// Verify email content
+function VerifyEmailContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
-  
+
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
   const hasVerified = useRef(false)
@@ -26,18 +27,17 @@ export default function VerifyEmailPage() {
     if (hasVerified.current) return
     hasVerified.current = true
 
+    // Verify
     const verify = async () => {
       try {
         const { data } = await authApi.verifyEmail(token)
-        
-        // Auto-login
+
         setTokens(data.access_token, data.refresh_token)
         setUser(data.user)
-        
+
         setStatus('success')
         setMessage('Votre adresse e-mail a été vérifiée avec succès !')
-        
-        // Redirect after 2 seconds
+
         setTimeout(() => {
           const destination = data.user.role === 'candidat' ? '/candidat/onboarding' : '/client/onboarding'
           router.push(destination)
@@ -97,5 +97,14 @@ export default function VerifyEmailPage() {
         )}
       </div>
     </div>
+  )
+}
+
+// Verify email page
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-12 h-12 text-accent animate-spin" /></div>}>
+      <VerifyEmailContent />
+    </Suspense>
   )
 }

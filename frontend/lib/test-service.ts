@@ -56,7 +56,6 @@ export const testApi = {
       const res = await api.get('/tests/latest-score');
       return res.data;
     } catch (err) {
-      // Mock fallback: always return 85 for now as requested
       return { score: 85 };
     }
   },

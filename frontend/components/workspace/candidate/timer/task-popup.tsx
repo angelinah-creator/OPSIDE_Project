@@ -12,6 +12,7 @@ interface TaskPopupProps {
   isEditable?: boolean;
 }
 
+// Task popup
 export function TaskPopup({
   isOpen,
   onClose,
@@ -58,6 +59,7 @@ export function TaskPopup({
     }
   }, [entry]);
 
+  // Calculate duration
   const calculateDuration = (start: string, end: string) => {
     if (!start || !end) return '00:00:00';
     
@@ -73,6 +75,7 @@ export function TaskPopup({
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
   };
 
+  // Gère start change
   const handleStartChange = (value: string) => {
     setStartTime(value);
     const newDuration = calculateDuration(value, endTime);
@@ -95,6 +98,7 @@ export function TaskPopup({
     }
   };
 
+  // Gère end change
   const handleEndChange = (value: string) => {
     setEndTime(value);
     const newDuration = calculateDuration(startTime, value);
@@ -120,8 +124,8 @@ export function TaskPopup({
     }
   };
 
+  // Gère save
   const handleSave = () => {
-    // Si c'est une création via la grille, s'assurer qu'on a bien initialisé les dates
     let finalData = { ...formData, description };
 
     if (mode === 'create' && (!finalData.start_time || !finalData.end_time)) {

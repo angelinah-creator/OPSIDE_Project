@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { Mail, ArrowLeft } from 'lucide-react';
 import Button from '@/components/ui/Button'
 
+// Verify email notice page
 export default function VerifyEmailNoticePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6 py-12">

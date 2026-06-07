@@ -13,8 +13,8 @@ export class MatchesService {
     private mailService: MailService,
   ) {}
 
+  // Source candidate
   async sourceCandidate(clientId: string, dto: CreateMatchDto) {
-    // Vérifier si un match existe déjà
     const existing = await this.prisma.match.findFirst({
       where: {
         candidate_id: dto.candidate_id,
@@ -45,7 +45,6 @@ export class MatchesService {
       },
     });
 
-    // Notification au candidat
     const companyName = match.client.client?.company_name || 'Un client';
     const projectName = match.job_offer?.title || 'une opportunité';
     
@@ -57,7 +56,6 @@ export class MatchesService {
       link: `/candidat/dashboard`,
     });
 
-    // Envoi d'email au candidat
     try {
       const candidateUser = await this.prisma.user.findUnique({ where: { id: dto.candidate_id } });
       if (candidateUser?.email) {
@@ -74,6 +72,7 @@ export class MatchesService {
     return match;
   }
 
+  // Respond to match
   async respondToMatch(matchId: string, userId: string, role: Role, action: 'confirm' | 'reject') {
     const match = await this.prisma.match.findUnique({
       where: { id: matchId },
@@ -88,7 +87,6 @@ export class MatchesService {
       throw new NotFoundException('Match introuvable.');
     }
 
-    // Vérifier les permissions
     if (role === Role.candidat && match.candidate_id !== userId) {
       throw new ForbiddenException('Accès refusé.');
     }
@@ -106,7 +104,6 @@ export class MatchesService {
         },
       });
 
-      // Notification à l'autre partie
       const recipientId = role === Role.candidat ? match.client_id : match.candidate_id;
       const rejectorName = role === Role.candidat ? 'Le candidat' : 'Le client';
       
@@ -117,7 +114,6 @@ export class MatchesService {
         message: `${rejectorName} a décliné le match${match.job_offer ? ` pour le projet ${match.job_offer.title}` : ''}.`,
       });
 
-      // Email au client si le candidat refuse
       if (role === Role.candidat) {
         try {
           const clientUser = await this.prisma.user.findUnique({ where: { id: match.client_id } });
@@ -139,8 +135,6 @@ export class MatchesService {
     }
 
     if (action === 'confirm') {
-      // Un match ne peut être confirmé que par la partie qui n'a pas initié, ou selon le flux
-      // Ici, on considère que si le statut est pending_candidate, seul le candidat peut confirmer
       if (match.status === MatchStatus.pending_candidate && role !== Role.candidat) {
         throw new ForbiddenException('Seul le candidat peut confirmer ce match.');
       }
@@ -156,9 +150,6 @@ export class MatchesService {
         },
       });
 
-      // --- SOURCING TO CANDIDATURE BRIDGE ---
-      // If the candidate confirmed the invitation, automatically create a Candidature record with status 'matched'.
-      // This bridges them seamlessly into the post-match validation and testing flow.
       if (match.job_offer_id) {
         const existingCandidature = await this.prisma.candidature.findFirst({
           where: {
@@ -178,7 +169,6 @@ export class MatchesService {
         }
       }
 
-      // Notification aux deux parties
       const companyName = match.client.client?.company_name || 'Le client';
       const candidateName = `${match.candidate.first_name || ''} ${match.candidate.last_name || ''}`.trim() || 'Un candidat';
       const projectName = match.job_offer?.title || 'sourcing';
@@ -199,7 +189,6 @@ export class MatchesService {
         link: `/client/dashboard`,
       });
 
-      // Email avec lien Calendly (confirmé)
       try {
         const candidateUser = await this.prisma.user.findUnique({ where: { id: match.candidate_id } });
         const clientUser = await this.prisma.user.findUnique({ where: { id: match.client_id } });
@@ -229,6 +218,7 @@ export class MatchesService {
     }
   }
 
+  // Find all for candidate
   async findAllForCandidate(candidateId: string) {
     return this.prisma.match.findMany({
       where: {
@@ -246,6 +236,7 @@ export class MatchesService {
     });
   }
 
+  // Find all for client
   async findAllForClient(clientId: string) {
     return this.prisma.match.findMany({
       where: { client_id: clientId },
@@ -268,6 +259,7 @@ export class MatchesService {
     });
   }
 
+  // End contract
   async endContract(matchId: string, clientId: string) {
     const match = await this.prisma.match.findUnique({
       where: { id: matchId },
@@ -304,6 +296,7 @@ export class MatchesService {
     return updated;
   }
 
+  // Add to workspace
   async addToWorkspace(matchId: string, clientId: string) {
     const match = await this.prisma.match.findUnique({
       where: { id: matchId },
@@ -349,6 +342,7 @@ export class MatchesService {
     return updated;
   }
 
+  // Find all for admin
   async findAllForAdmin() {
     return this.prisma.match.findMany({
       include: {
@@ -370,6 +364,7 @@ export class MatchesService {
     });
   }
 
+  // Find one
   async findOne(matchId: string, userId: string, role: Role) {
     const match = await this.prisma.match.findUnique({
       where: { id: matchId },
@@ -392,7 +387,6 @@ export class MatchesService {
       throw new NotFoundException('Match introuvable.');
     }
 
-    // Vérifier les permissions
     if (role === Role.candidat && match.candidate_id !== userId) {
       throw new ForbiddenException('Accès refusé.');
     }

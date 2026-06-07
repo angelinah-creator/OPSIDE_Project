@@ -28,11 +28,13 @@ const colorMap: Record<string, string> = {
   'bg-amber-500': 'bg-amber-500',
 };
 
+// Historique tab
 export default function HistoriqueTab() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Fetch activities
     const fetchActivities = async () => {
       try {
         const data = await candidateApi.getHistory();
@@ -48,6 +50,7 @@ export default function HistoriqueTab() {
     fetchActivities();
   }, []);
 
+  // Gère delete
   const handleDelete = async (id: string) => {
     try {
       await candidateApi.deleteHistoryItem(id);
@@ -59,6 +62,7 @@ export default function HistoriqueTab() {
     }
   };
 
+  // Formate date
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     const now = new Date();

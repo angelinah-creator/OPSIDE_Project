@@ -12,9 +12,11 @@ const navItems = [
   { href: '/admin/matches', label: 'Matches', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg> },
 ];
 
+// Admin sidebar
 export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  // Logout
   const logout = async () => {
     try { const Cookies = (await import('js-cookie')).default; await authApi.logout(Cookies.get('refresh_token') || '') } catch {}
     clearTokens(); router.push('/')

@@ -19,6 +19,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
     });
   }
 
+  // Validate
   async validate(req: Request, payload: { sub: string; email: string; role: string }) {
     const refreshToken = req.body?.refresh_token;
 

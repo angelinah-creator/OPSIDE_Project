@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
-import { Award, Check, Code2, Star, FlaskConical } from 'lucide-react';
+import { Award } from 'lucide-react';
 import CustomTestTab from './CustomTestTab';
 
 interface TechniqueTabProps {
@@ -10,6 +10,7 @@ interface TechniqueTabProps {
   profile: any;
 }
 
+// Technique tab
 export default function TechniqueTab({ score, profile }: TechniqueTabProps) {
   return (
     <div className="grid grid-cols-1 gap-8">

@@ -7,10 +7,11 @@ import QuestionCard from '@/components/test/QuestionCard';
 import Timer from '@/components/test/Timer';
 import TestStepper from '@/components/test/TestStepper';
 import Button from '@/components/ui/Button';
-import { ChevronRight, Send, AlertTriangle } from 'lucide-react';
+import { ChevronRight, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
+// Take custom test page
 export default function TakeCustomTestPage() {
   const router = useRouter();
   const params = useParams();
@@ -28,24 +29,28 @@ export default function TakeCustomTestPage() {
   const [cheatWarning, setCheatWarning] = useState<string | null>(null);
 
   useEffect(() => {
+    // Gère copy paste
     const handleCopyPaste = (e: Event) => {
       e.preventDefault();
       e.stopPropagation();
       setCheatWarning("L'utilisation du copier, couper et coller est interdite pendant l'évaluation.");
     };
 
+    // Gère visibility change
     const handleVisibilityChange = () => {
       if (document.hidden) {
         setCheatWarning("Vous avez quitté l'onglet du test. Les changements d'onglet ne sont pas autorisés et sont enregistrés.");
       }
     };
 
+    // Gère mouse leave
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY <= 0 || e.relatedTarget === null) {
         setCheatWarning("Veuillez rester sur cette page. Il est interdit de quitter la zone de test.");
       }
     };
 
+    // Gère before unload
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "Vous avez un test en cours. Êtes-vous sûr de vouloir quitter ?";
@@ -70,6 +75,7 @@ export default function TakeCustomTestPage() {
   }, []);
 
   useEffect(() => {
+    // Load test
     const loadTest = async () => {
       try {
         const tests = await customTestService.getCandidateTests();
@@ -80,9 +86,7 @@ export default function TakeCustomTestPage() {
         }
 
         if (currentTest.status === 'sent') {
-          // Démarrer le test s'il n'est pas encore démarré
           await customTestService.startTest(testId);
-          // Re-fetch to get questions
           const updatedTests = await customTestService.getCandidateTests();
           currentTest = updatedTests.find(t => t.id === testId);
         }
@@ -91,9 +95,6 @@ export default function TakeCustomTestPage() {
           throw new Error("Questions introuvables.");
         }
 
-        // Map questions from custom test format to QuestionCard format if needed
-        // custom test format: { id, type, question, options?, points }
-        // QuestionCard expects: { id, type, question_text, options?, points, code_snippet? }
         const mappedQuestions = (currentTest.questions as any[]).map(q => ({
           ...q,
           question_text: q.question,
@@ -113,6 +114,7 @@ export default function TakeCustomTestPage() {
     loadTest();
   }, [testId]);
 
+  // Gère answer change
   const handleAnswerChange = (value: any) => {
     setAnswers((prev) => {
       const updated = [...prev];
@@ -124,7 +126,6 @@ export default function TakeCustomTestPage() {
   const handleSubmit = useCallback(async () => {
     setSubmitting(true);
     try {
-      // Build the answers object mapping 'q{id}' to answer
       const answersObj: Record<string, string> = {};
       questions.forEach((q, idx) => {
         if (answers[idx]) {

@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { matchService } from '@/lib/match-service'
-import { Bell, User, Check, X, Calendar, MessageSquare, Briefcase } from 'lucide-react'
+import { Bell, Check, X, Calendar, Briefcase } from 'lucide-react';
 import { toast } from 'sonner'
 import clsx from 'clsx'
 
+// Candidate matches tab
 export default function CandidateMatchesTab() {
   const [matches, setMatches] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -15,6 +16,7 @@ export default function CandidateMatchesTab() {
     fetchMatches()
   }, [])
 
+  // Fetch matches
   const fetchMatches = async () => {
     try {
       const data = await matchService.getCandidateMatches()
@@ -28,6 +30,7 @@ export default function CandidateMatchesTab() {
     }
   }
 
+  // Gère respond
   const handleRespond = async (id: string, action: 'confirm' | 'reject') => {
     try {
       setRespondingId(id)

@@ -11,6 +11,7 @@ export class VideosService {
     private readonly uploadService: UploadService,
   ) {}
 
+  // Create
   async create(file: Express.Multer.File, createVideoDto: CreateVideoDto) {
     if (!file) {
       throw new NotFoundException('Fichier vidéo requis');
@@ -27,18 +28,21 @@ export class VideosService {
     });
   }
 
+  // Find all
   async findAll() {
     return this.prisma.video.findMany({
       orderBy: { created_at: 'desc' },
     });
   }
 
+  // Find one
   async findOne(id: string) {
     const video = await this.prisma.video.findUnique({ where: { id } });
     if (!video) throw new NotFoundException('Vidéo introuvable');
     return video;
   }
 
+  // Update
   async update(id: string, updateVideoDto: UpdateVideoDto) {
     await this.findOne(id); // Vérifier si elle existe
     return this.prisma.video.update({
@@ -47,6 +51,7 @@ export class VideosService {
     });
   }
 
+  // Remove
   async remove(id: string) {
     const video = await this.findOne(id);
     await this.uploadService.deleteVideo(video.public_id);

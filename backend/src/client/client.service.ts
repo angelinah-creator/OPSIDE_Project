@@ -16,6 +16,7 @@ export class ClientService {
     private uploadService: UploadService,
   ) {}
 
+  // Create profile
   async createProfile(userId: string, dto: CreateClientProfileDto) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user || user.role !== 'client') {
@@ -40,6 +41,7 @@ export class ClientService {
     return { message: 'Profil client créé avec succès', profile };
   }
 
+  // Récupère my profile
   async getMyProfile(userId: string) {
     const profile = await this.prisma.clientProfile.findUnique({
       where: { user_id: userId },
@@ -55,6 +57,7 @@ export class ClientService {
     return profile;
   }
 
+  // Récupère profile by id
   async getProfileById(profileId: string) {
     const profile = await this.prisma.clientProfile.findUnique({
       where: { id: profileId },
@@ -70,6 +73,7 @@ export class ClientService {
     return profile;
   }
 
+  // Update profile
   async updateProfile(userId: string, dto: UpdateClientProfileDto) {
     const profile = await this.prisma.clientProfile.findUnique({ where: { user_id: userId } });
     if (!profile) {
@@ -87,6 +91,7 @@ export class ClientService {
     return { message: 'Profil client mis à jour', profile: updated };
   }
 
+  // Upload logo
   async uploadLogo(userId: string, file: Express.Multer.File) {
     const profile = await this.prisma.clientProfile.findUnique({ where: { user_id: userId } });
     if (!profile) {

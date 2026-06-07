@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Logo from '@/components/ui/Logo'
+
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
@@ -31,6 +31,7 @@ const COUNTRIES = [
   { value: 'tunisie', label: 'Tunisie', flag: 'tn' },
 ]
 
+// Client onboarding page
 export default function ClientOnboardingPage() {
   const router = useRouter()
   const [step, setStep] = useState(0)
@@ -54,17 +55,19 @@ export default function ClientOnboardingPage() {
     interview_availability: ''
   })
 
+  // Définit c
   const setC = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setCompany(p => ({ ...p, [k]: e.target.value }))
 
+  // Définit ct
   const setCt = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setContact(p => ({ ...p, [k]: e.target.value }))
 
+  // Gère finish
   const handleFinish = async () => {
     setError('')
     setLoading(true)
     try {
-      // 1. Create profile
       const profileData = {
         ...company, ...contact,
         contact_name: contact.contact_name || company.company_name,
@@ -81,7 +84,6 @@ export default function ClientOnboardingPage() {
 
       await clientApi.createProfile(cleanedData)
 
-      // 2. Upload logo if any
       if (logoFile) await clientApi.uploadLogo(logoFile).catch(() => { })
 
       router.push('/client/dashboard')

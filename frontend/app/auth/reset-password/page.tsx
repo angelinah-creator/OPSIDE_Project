@@ -3,12 +3,13 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import Logo from '@/components/ui/Logo'
+
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { authApi } from '@/lib/auth-service'
 import { ArrowLeft, CheckCircle2, Eye, EyeOff, AlertCircle } from 'lucide-react'
 
+// Reset password form
 function ResetPasswordForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -27,6 +28,7 @@ function ResetPasswordForm() {
     }
   }, [token])
 
+  // Gère submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -145,6 +147,7 @@ function ResetPasswordForm() {
   )
 }
 
+// Reset password page
 export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">

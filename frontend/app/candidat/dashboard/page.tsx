@@ -6,36 +6,24 @@ import { getUser, clearTokens, authApi } from '@/lib/auth-service';
 import { candidateApi } from '@/lib/candidate-service';
 import { testApi } from '@/lib/test-service';
 import { matchService } from '@/lib/match-service';
-import { 
-  User, 
-  LogOut, 
-  Code2, 
-  Briefcase, 
-  History, 
-  Bell, 
-  BookOpen, 
-  Search,
-  UserPlus,
-  Menu,
-  X
-} from 'lucide-react';
+import { User, LogOut, Code2, Briefcase, History, Bell, BookOpen, UserPlus, Menu, X } from 'lucide-react';
 import clsx from 'clsx';
 
-// Tab Components
 import TechniqueTab from '@/components/dashboard/candidate/TechniqueTab';
 import OffresTab from '@/components/dashboard/candidate/OffresTab';
 import HistoriqueTab from '@/components/dashboard/candidate/HistoriqueTab';
 import ProfilTab from '@/components/dashboard/candidate/ProfilTab';
 import NotificationsTab from '@/components/dashboard/NotificationsTab';
 import AideTab from '@/components/dashboard/candidate/AideTab';
-import CustomTestTab from '@/components/dashboard/candidate/CustomTestTab';
+
 import MatchesTab from '@/components/dashboard/candidate/MatchesTab';
 import { useNotifications } from '@/hooks/useNotifications';
-import { CheckSquare, Home, ArrowRightLeft } from 'lucide-react';
+import { Home, ArrowRightLeft } from 'lucide-react';
 import Link from 'next/link';
 
 type TabType = 'technique' | 'offres' | 'historique' | 'profil' | 'matches' | 'notifications' | 'aide';
 
+// Candidat dashboard
 export default function CandidatDashboard() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
@@ -48,6 +36,7 @@ export default function CandidatDashboard() {
   const { unreadCount: unreadNotifications } = useNotifications();
 
   useEffect(() => {
+    // Fetch data
     const fetchData = async () => {
       try {
         const u = getUser();
@@ -62,7 +51,6 @@ export default function CandidatDashboard() {
         setProfile(p);
 
         const scoreRes = await testApi.getLatestScore();
-        // Forced mock score for UI testing if null
         setLatestScore(scoreRes.score || 85);
         
         const matchesData = await matchService.getCandidateMatches();
@@ -82,6 +70,7 @@ export default function CandidatDashboard() {
     fetchData();
   }, [router]);
 
+  // Gère logout
   const handleLogout = async () => {
     try {
       const Cookies = (await import('js-cookie')).default;

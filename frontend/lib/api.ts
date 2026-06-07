@@ -19,6 +19,7 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 let isRefreshing = false;
 let failedQueue: Array<{ resolve: (v: string) => void; reject: (e: unknown) => void }> = [];
 
+// Process queue
 function processQueue(error: unknown, token: string | null = null) {
   failedQueue.forEach(({ resolve, reject }) => {
     if (error) reject(error);

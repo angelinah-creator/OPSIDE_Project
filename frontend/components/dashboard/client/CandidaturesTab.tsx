@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { candidatureService } from '@/lib/candidature-service'
 import { matchService } from '@/lib/match-service'
 import { customTestService, CreateCustomTestPayload } from '@/lib/custom-test-service'
-import { FileText, User, Briefcase, MapPin, DollarSign, Calendar, Clock, Globe, Link as LinkIcon, Download, Target, ChevronLeft, ChevronRight, CheckCircle, XCircle, FlaskConical, Send, RefreshCw, Plus, Minus, Home } from 'lucide-react'
+import { FileText, User, Briefcase, MapPin, DollarSign, Calendar, Clock, Globe, LinkIcon, Target, ChevronLeft, ChevronRight, CheckCircle, XCircle, RefreshCw, Plus, Minus, Home } from 'lucide-react';
 import { toast } from 'sonner'
 import clsx from 'clsx'
 import Modal from '@/components/ui/Modal'
@@ -17,13 +17,13 @@ const DIFFICULTY_LABELS: Record<string, string> = {
   senior: 'Senior (> 5 ans)',
 }
 
+// Client candidatures tab
 export default function ClientCandidaturesTab() {
   const [candidatures, setCandidatures] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [isUpdating, setIsUpdating] = useState<string | null>(null)
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null)
 
-  // Validation post-match state
   const [showTestModal, setShowTestModal] = useState(false)
   const [selectedMatchForTest, setSelectedMatchForTest] = useState<any>(null)
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
@@ -35,12 +35,10 @@ export default function ClientCandidaturesTab() {
   const [requestingRetest, setRequestingRetest] = useState<string | null>(null)
   const [addingToWorkspace, setAddingToWorkspace] = useState<string | null>(null)
 
-  // Custom Calendly modal state
   const [showCalendlyModal, setShowCalendlyModal] = useState(false)
   const [calendlyUrl, setCalendlyUrl] = useState('')
   const [selectedMatchForCalendly, setSelectedMatchForCalendly] = useState<any>(null)
 
-  // Filtering & Pagination
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'matched' | 'rejected'>('all')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 9
@@ -49,13 +47,13 @@ export default function ClientCandidaturesTab() {
     fetchCandidatures()
   }, [])
 
+  // Fetch candidatures
   const fetchCandidatures = async () => {
     try {
       const data = await candidatureService.getClientApplications()
       const matchesData = await matchService.getClientMatches()
       
       const enrichedData = data.map((cand: any) => {
-        // Include confirmed OR rejected matches (rejected happens if test failed, we still want to show retest button)
         const match = matchesData.find((m: any) => m.candidate_id === cand.candidate_id && m.job_offer_id === cand.job_offer_id && ['confirmed', 'rejected'].includes(m.status))
         return { ...cand, match }
       })
@@ -69,6 +67,7 @@ export default function ClientCandidaturesTab() {
     }
   }
 
+  // Gère status update
   const handleStatusUpdate = async (id: string, status: 'matched' | 'rejected') => {
     try {
       setIsUpdating(`${id}-${status}`)
@@ -83,6 +82,7 @@ export default function ClientCandidaturesTab() {
     }
   }
 
+  // Formate date
   const formatDate = (m?: number, y?: number) => {
     if (!y) return '';
     const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
@@ -93,6 +93,7 @@ export default function ClientCandidaturesTab() {
     immediate: 'Immédiat', two_weeks: 'Sous 2 semaines', one_month: 'Sous 1 mois', three_months: 'Sous 3 mois',
   };
 
+  // Formate time ago
   const formatTimeAgo = (dateString: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -134,7 +135,6 @@ export default function ClientCandidaturesTab() {
     )
   }
 
-  // Filtering logic
   const filteredCandidatures = candidatures
     .filter(cand => {
       if (statusFilter === 'all') return true
@@ -142,7 +142,6 @@ export default function ClientCandidaturesTab() {
     })
     .sort((a, b) => new Date(b.applied_at).getTime() - new Date(a.applied_at).getTime())
 
-  // Pagination Logic
   const totalPages = Math.ceil(filteredCandidatures.length / itemsPerPage)
   const paginatedCandidatures = filteredCandidatures.slice(
     (currentPage - 1) * itemsPerPage,
@@ -312,7 +311,6 @@ export default function ClientCandidaturesTab() {
                       const testPassed = test?.status === 'scored' && test?.score >= test?.threshold
                       const calendlySent = !!match.calendly_url
 
-                      // If Calendly has been sent, only show the Add to Workspace button
                       if (calendlySent) {
                         return (
                           <div className="space-y-3">

@@ -60,6 +60,7 @@ interface ClientOfferFormModalProps {
   onSuccess: () => void;
 }
 
+// Client offer form modal
 export default function ClientOfferFormModal({ 
   isOpen, 
   onClose, 
@@ -96,6 +97,7 @@ export default function ClientOfferFormModal({
     setFormError('');
   }, [editingOffer, isOpen, allSkills]);
 
+  // Gère submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');

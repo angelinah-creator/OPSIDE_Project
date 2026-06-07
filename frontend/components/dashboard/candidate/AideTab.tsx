@@ -12,12 +12,14 @@ interface Video {
   created_at: string;
 }
 
+// Aide tab
 export default function AideTab() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [watchVideoUrl, setWatchVideoUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    // Fetch videos
     const fetchVideos = async () => {
       try {
         const data = await videoApi.getAll();
@@ -31,6 +33,7 @@ export default function AideTab() {
     fetchVideos();
   }, []);
 
+  // Formate date
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric', month: 'long', year: 'numeric'

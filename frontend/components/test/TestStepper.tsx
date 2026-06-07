@@ -7,6 +7,7 @@ interface TestStepperProps {
   answers: any[];
 }
 
+// Test stepper
 export default function TestStepper({
   questions,
   currentIndex,

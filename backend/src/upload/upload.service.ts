@@ -12,6 +12,7 @@ export class UploadService {
     });
   }
 
+  // Upload image
   async uploadImage(
     file: Express.Multer.File,
     folder: string,
@@ -55,6 +56,7 @@ export class UploadService {
     });
   }
 
+  // Upload media
   async uploadMedia(
     file: Express.Multer.File,
     folder: string,
@@ -110,10 +112,12 @@ export class UploadService {
     });
   }
 
+  // Delete file
   async deleteFile(publicId: string): Promise<void> {
     await cloudinary.uploader.destroy(publicId);
   }
 
+  // Delete video
   async deleteVideo(publicId: string): Promise<void> {
     await cloudinary.uploader.destroy(publicId, { resource_type: 'video' });
   }

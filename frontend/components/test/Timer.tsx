@@ -8,6 +8,7 @@ interface TimerProps {
   className?: string;
 }
 
+// Timer
 export default function Timer({ durationMinutes, onExpire, className = '' }: TimerProps) {
   const [secondsLeft, setSecondsLeft] = useState(durationMinutes * 60);
 
@@ -24,6 +25,7 @@ export default function Timer({ durationMinutes, onExpire, className = '' }: Tim
     return () => clearInterval(interval);
   }, [secondsLeft, onExpire]);
 
+  // Formate time
   const formatTime = (totalSeconds: number) => {
     const mins = Math.floor(totalSeconds / 60);
     const secs = totalSeconds % 60;

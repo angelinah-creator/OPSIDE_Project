@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { testApi } from '@/lib/test-service';
+
 import Button from '@/components/ui/Button';
 import { CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
 
+// Test result page
 export default function TestResultPage() {
   const params = useParams();
   const router = useRouter();
@@ -17,20 +18,11 @@ export default function TestResultPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    /* --- MOCK MODE: Bypass API for testing --- */
-    /*
-    testApi
-      .getTestResult(testId)
-      .then((res) => setResult(res))
-      .catch((err) => setError(err.response?.data?.message || 'Erreur'))
-      .finally(() => setLoading(false));
-    */
 
     setTimeout(() => {
       setResult({ score: 85, status: 'completed' });
       setLoading(false);
     }, 1000);
-    /* --- END MOCK MODE --- */
   }, [testId]);
 
   if (loading) {

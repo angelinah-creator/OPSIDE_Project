@@ -24,6 +24,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
     private configService: ConfigService,
   ) {}
 
+  // Gère connection
   async handleConnection(@ConnectedSocket() client: Socket) {
     try {
       const token = client.handshake.auth.token || client.handshake.headers.authorization?.split(' ')[1];
@@ -37,7 +38,6 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
         secret: this.configService.get('JWT_ACCESS_SECRET'),
       });
 
-      // Rejoindre une "room" spécifique à l'utilisateur
       client.join(`user_${payload.sub}`);
       console.log(`Client connecté aux notifications: ${payload.sub}`);
     } catch (error) {
@@ -46,11 +46,12 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
     }
   }
 
+  // Gère disconnect
   handleDisconnect(client: Socket) {
     console.log('Client déconnecté des notifications');
   }
 
-  // Méthode pour envoyer une notification à un utilisateur spécifique
+  // Send notification to user
   sendNotificationToUser(userId: string, notification: any) {
     this.server.to(`user_${userId}`).emit('newNotification', notification);
     this.server.to(`user_${userId}`).emit('unreadCountUpdate');

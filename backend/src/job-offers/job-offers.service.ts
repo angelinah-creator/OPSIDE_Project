@@ -11,6 +11,7 @@ import { UpdateJobOfferDto } from './dto/update-job-offer.dto';
 export class JobOffersService {
   constructor(private prisma: PrismaService) {}
 
+  // Create
   async create(userId: string, dto: CreateJobOfferDto) {
     console.log('Creating job offer for user:', userId, 'with data:', dto);
     try {
@@ -62,6 +63,7 @@ export class JobOffersService {
     }
   }
 
+  // Find all for candidates
   async findAllForCandidates() {
     const offers = await this.prisma.jobOffer.findMany({
       where: { status: 'active' },
@@ -79,6 +81,7 @@ export class JobOffersService {
     }));
   }
 
+  // Find all for client
   async findAllForClient(userId: string) {
     const offers = await this.prisma.jobOffer.findMany({
       where: { client_id: userId },
@@ -96,6 +99,7 @@ export class JobOffersService {
     }));
   }
 
+  // Find one
   async findOne(id: string) {
     const offer = await this.prisma.jobOffer.findUnique({
       where: { id },
@@ -116,6 +120,7 @@ export class JobOffersService {
     };
   }
 
+  // Update
   async update(id: string, userId: string, dto: UpdateJobOfferDto) {
     const offer = await this.prisma.jobOffer.findUnique({ where: { id } });
     if (!offer) {
@@ -177,6 +182,7 @@ export class JobOffersService {
     return this.findOne(id);
   }
 
+  // Remove
   async remove(id: string, userId: string) {
     const offer = await this.prisma.jobOffer.findUnique({ where: { id } });
     if (!offer) {

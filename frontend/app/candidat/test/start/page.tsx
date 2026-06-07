@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
-import { testApi } from '@/lib/test-service';
+
 import { candidateApi } from '@/lib/candidate-service';
 import { ArrowLeft, Code2, Check, Info } from 'lucide-react';
 import Link from 'next/link';
@@ -15,6 +15,7 @@ const SPECIALITIES = [
   { value: 'data', label: 'Data / IA' }, { value: 'other', label: 'Autre' },
 ];
 
+// Start test page
 export default function StartTestPage() {
   const router = useRouter();
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
@@ -34,12 +35,14 @@ export default function StartTestPage() {
       .finally(() => setFetching(false));
   }, []);
 
+  // Récupère difficulty
   const getDifficulty = (years: number) => {
     if (years < 2) return { label: 'Junior', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100', condition: '0 à 2 ans d\'expérience' };
     if (years <= 5) return { label: 'Mid-Level', color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-100', condition: '2 à 5 ans d\'expérience' };
     return { label: 'Senior', color: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-100', condition: 'Plus de 5 ans d\'expérience' };
   };
 
+  // Gère start
   const handleStart = async () => {
     if (selectedSkills.length === 0) {
       setError('Veuillez sélectionner au moins une compétence.');
@@ -53,17 +56,11 @@ export default function StartTestPage() {
     setLoading(true);
     setError('');
     try {
-      /* --- MOCK MODE: Bypass API for testing --- */
-      /*
-      const res = await testApi.startTest(selectedSkills, profile.speciality);
-      router.push(`/candidat/test/${res.testId}`);
-      */
       console.log('MOCK: Starting test with skills:', selectedSkills);
       setTimeout(() => {
         router.push(`/candidat/test/mock-test-id`);
         setLoading(false);
       }, 800);
-      /* --- END MOCK MODE --- */
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erreur lors de la création du test.');
     } finally {
@@ -71,6 +68,7 @@ export default function StartTestPage() {
     }
   };
 
+  // Toggle skill
   const toggleSkill = (id: string) => {
     if (selectedSkills.includes(id)) {
       setSelectedSkills(selectedSkills.filter(s => s !== id));
@@ -91,7 +89,6 @@ export default function StartTestPage() {
   const difficulty = getDifficulty(profile?.experience_years || 0);
   const mySkills = profile?.candidate_skills?.map((cs: any) => cs.skill) || [];
 
-  // Group skills by category
   const groupedSkills = mySkills.reduce((acc: any, skill: any) => {
     const cat = skill.category || 'Autres';
     if (!acc[cat]) acc[cat] = [];

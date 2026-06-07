@@ -7,10 +7,7 @@ import {
   isSameDay, eachDayOfInterval, isWithinInterval,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import {
-  ChevronLeft, ChevronRight, Clock,
-  ChevronDown, Calendar, CircleX
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, CircleX } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
@@ -18,17 +15,15 @@ import {
 import { timesheetService, ReportData } from '@/lib/timesheet-service';
 import { toast } from 'sonner';
 
-// ─── Palette de couleurs ──────────────────────────────────────────────────────
 const COLORS = [
   '#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
   '#ec4899', '#14b8a6', '#f97316', '#3b82f6', '#84cc16',
   '#06b6d4', '#a855f7', '#d946ef', '#0ea5e9', '#22c55e',
 ];
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 type PeriodType = 'day' | 'week' | 'month' | 'year' | 'custom';
 
-// ─── Utilitaires ──────────────────────────────────────────────────────────────
+// Formate hours
 function formatHours(hours: number): string {
   const h = Math.floor(Math.abs(hours));
   const m = Math.floor((Math.abs(hours) - h) * 60);
@@ -36,13 +31,14 @@ function formatHours(hours: number): string {
   return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
+// Add days
 function addDays(date: Date, days: number): Date {
   const result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;
 }
 
-// ─── PeriodSelector ───────────────────────────────────────────────────────────
+// Period selector
 function PeriodSelector({
   isOpen, onClose, onSelectPeriod, currentPeriodType, buttonRef,
 }: {
@@ -59,6 +55,7 @@ function PeriodSelector({
 
   useEffect(() => {
     if (!isOpen) return;
+    // Gère click outside
     const handleClickOutside = (event: MouseEvent) => {
       if (
         popupRef.current && !popupRef.current.contains(event.target as Node) &&
@@ -83,6 +80,7 @@ function PeriodSelector({
     { label: 'Mois dernier', value: 'last_month' },
   ];
 
+  // Gère shortcut click
   const handleShortcutClick = (value: string) => {
     const now = new Date();
     switch (value) {
@@ -104,6 +102,7 @@ function PeriodSelector({
     onClose();
   };
 
+  // Render calendar
   const renderCalendar = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
@@ -113,6 +112,7 @@ function PeriodSelector({
     const weeks: Date[][] = [];
     for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
 
+    // Gère day click
     const handleDayClick = (day: Date) => {
       if (!customStart || (customStart && customEnd)) {
         setCustomStart(day); setCustomEnd(null);
@@ -122,6 +122,7 @@ function PeriodSelector({
       }
     };
 
+    // Vérifie si in range
     const isInRange = (day: Date) => {
       if (!customStart) return false;
       if (!customEnd) return isSameDay(day, customStart);
@@ -227,7 +228,7 @@ function PeriodSelector({
   );
 }
 
-// ─── Composant principal ──────────────────────────────────────────────────────
+// Workspace home
 export default function WorkspaceHome({ matchId }: { matchId?: string }) {
   const [periodType, setPeriodType] = useState<PeriodType>('week');
   const [offset, setOffset] = useState(0);
@@ -239,7 +240,6 @@ export default function WorkspaceHome({ matchId }: { matchId?: string }) {
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // ── Calcul de la période ───────────────────────────────────────────────────
   const { periodStart, periodEnd, displayText } = useMemo(() => {
     const now = new Date();
 
@@ -280,6 +280,7 @@ export default function WorkspaceHome({ matchId }: { matchId?: string }) {
     }
   }, [periodType, offset, customStart, customEnd]);
 
+  // Gère select period
   const handleSelectPeriod = (type: PeriodType, start?: Date, end?: Date) => {
     setPeriodType(type);
     setOffset(0);
@@ -293,6 +294,7 @@ export default function WorkspaceHome({ matchId }: { matchId?: string }) {
     }
   }, [periodStart, periodEnd, matchId]);
 
+  // Fetch report
   const fetchReport = async (start: Date, end: Date, mId: string) => {
     setLoading(true);
     try {
@@ -309,11 +311,9 @@ export default function WorkspaceHome({ matchId }: { matchId?: string }) {
     }
   };
 
-  // ── Données graphiques ─────────────────────────────────────────────────────
   const dailyData = useMemo(() => {
     if (!reportData) return [];
 
-    // Pour jour / semaine → granularité journalière
     if (periodType === 'day' || periodType === 'week' || periodType === 'custom') {
       const days = eachDayOfInterval({ start: periodStart, end: periodEnd });
       return days.map((day) => {
@@ -330,7 +330,6 @@ export default function WorkspaceHome({ matchId }: { matchId?: string }) {
       });
     }
 
-    // Pour mois → granularité hebdomadaire (grouper les byDay par semaine)
     if (periodType === 'month') {
       const days = eachDayOfInterval({ start: periodStart, end: periodEnd });
       const weekMap = new Map<string, { hours: number; days: Date[] }>();
@@ -352,7 +351,6 @@ export default function WorkspaceHome({ matchId }: { matchId?: string }) {
       }));
     }
 
-    // Pour année → granularité mensuelle
     const monthMap = new Map<string, number>();
     reportData.byDay.forEach((d) => {
       const monthKey = d.day.slice(0, 7); // 'yyyy-MM'
@@ -387,7 +385,7 @@ export default function WorkspaceHome({ matchId }: { matchId?: string }) {
     return daysWithData > 0 ? total / daysWithData : 0;
   }, [dailyData]);
 
-  // ── Tooltips ───────────────────────────────────────────────────────────────
+  // Custom bar tooltip
   const CustomBarTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -400,6 +398,7 @@ export default function WorkspaceHome({ matchId }: { matchId?: string }) {
     return null;
   };
 
+  // Custom pie tooltip
   const CustomPieTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (

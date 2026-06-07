@@ -12,10 +12,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     super({ adapter });
   }
 
+  // Événement on module init
   async onModuleInit() {
     await this.$connect();
   }
 
+  // Événement on module destroy
   async onModuleDestroy() {
     await this.$disconnect();
   }

@@ -11,6 +11,7 @@ interface FileUploadProps {
   preview?: string;
 }
 
+// File upload
 export default function FileUpload({
   label,
   accept = 'image/*',
@@ -24,6 +25,7 @@ export default function FileUpload({
   const [fileName, setFileName] = useState<string | null>(null);
   const ref = useRef<HTMLInputElement>(null);
 
+  // Gère change
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;

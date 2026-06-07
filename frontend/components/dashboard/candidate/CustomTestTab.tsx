@@ -1,16 +1,17 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation'
 import { customTestService, CustomTest } from '@/lib/custom-test-service'
 import { toast } from 'sonner'
-import { FlaskConical, Clock, CheckCircle, XCircle, Play, Send, AlertTriangle, Code, ChevronRight, Eye, EyeOff } from 'lucide-react'
+import { FlaskConical, Clock, CheckCircle, XCircle, AlertTriangle, Code, ChevronRight } from 'lucide-react';
 import clsx from 'clsx'
 
 
 
 type TestPhase = 'list' | 'instructions' | 'submitted'
 
+// Custom test tab
 export default function CustomTestTab() {
   const router = useRouter()
   const [tests, setTests] = useState<CustomTest[]>([])
@@ -35,12 +36,13 @@ export default function CustomTestTab() {
 
 
 
+  // Gère start test
   const handleStartTest = async (test: CustomTest) => {
-    // If not started, the custom test page will start it anyway, but we can set phase to instructions here first
     setActiveTest(test)
     setPhase('instructions')
   }
 
+  // Gère begin test
   const handleBeginTest = () => {
     if (activeTest) {
       router.push(`/candidat/custom-test/${activeTest.id}`)
@@ -49,6 +51,7 @@ export default function CustomTestTab() {
 
 
 
+  // Récupère status badge
   const getStatusBadge = (status: string, score?: number, threshold?: number) => {
     const cfgMap: Record<string, { label: string; cls: string }> = {
       sent: { label: 'En attente', cls: 'bg-amber-100 text-amber-700' },
@@ -67,7 +70,6 @@ export default function CustomTestTab() {
     return <span className={clsx('px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider', c.cls)}>{c.label}</span>
   }
 
-  // ─── Phase: LIST ───
   if (phase === 'list') {
     if (loading) return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
@@ -169,7 +171,6 @@ export default function CustomTestTab() {
     )
   }
 
-  // ─── Phase: INSTRUCTIONS ───
   if (phase === 'instructions' && activeTest) {
     return (
       <div className="max-w-2xl mx-auto">

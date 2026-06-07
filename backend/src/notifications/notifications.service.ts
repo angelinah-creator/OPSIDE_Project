@@ -10,6 +10,7 @@ export class NotificationsService {
     private notificationsGateway: NotificationsGateway,
   ) {}
 
+  // Create
   async create(data: {
     user_id: string;
     type: NotificationType;
@@ -25,12 +26,12 @@ export class NotificationsService {
       },
     });
 
-    // Envoyer la notification en temps réel via WebSocket
     this.notificationsGateway.sendNotificationToUser(data.user_id, notification);
 
     return notification;
   }
 
+  // Find all
   async findAll(user_id: string) {
     return this.prisma.notification.findMany({
       where: { user_id },
@@ -38,6 +39,7 @@ export class NotificationsService {
     });
   }
 
+  // Mark as read
   async markAsRead(id: string, user_id: string) {
     const result = await this.prisma.notification.updateMany({
       where: { id, user_id },
@@ -47,6 +49,7 @@ export class NotificationsService {
     return result;
   }
 
+  // Mark all as read
   async markAllAsRead(user_id: string) {
     const result = await this.prisma.notification.updateMany({
       where: { user_id, read: false },
@@ -56,12 +59,14 @@ export class NotificationsService {
     return result;
   }
 
+  // Récupère unread count
   async getUnreadCount(user_id: string) {
     return this.prisma.notification.count({
       where: { user_id, read: false },
     });
   }
 
+  // Remove
   async remove(id: string, userId: string) {
     return this.prisma.notification.delete({
       where: { id, user_id: userId },

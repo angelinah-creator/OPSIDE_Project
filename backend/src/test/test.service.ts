@@ -10,7 +10,7 @@ import { ClaudeClientService } from '../ai/claude-client.service';
 import { generateTestPrompt } from '../ai/prompts/generate-test.prompt';
 import { evaluateAnswersPrompt } from '../ai/prompts/evaluate-answers.prompt';
 import { ConfigService } from '@nestjs/config';
-import { TestStatus } from '@prisma/client';
+
 
 @Injectable()
 export class TestService {
@@ -25,8 +25,8 @@ export class TestService {
     private configService: ConfigService,
   ) {}
 
+  // Start test
   async startTest(userId: string, skills: string[], speciality: string) {
-    // Vérifier que le candidat a un profil complété
     const candidate = await this.prisma.candidateProfile.findUnique({
       where: { user_id: userId },
     });
@@ -34,7 +34,6 @@ export class TestService {
       throw new ForbiddenException('Vous devez compléter votre profil avant de passer un test.');
     }
 
-    // Vérifier si le candidat a déjà passé un test ce mois-ci (règle métier)
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
     const recentTest = await this.prisma.test.findFirst({
@@ -52,10 +51,8 @@ export class TestService {
       );
     }
 
-    // Déterminer la difficulté
     const difficulty = this.determineDifficulty(candidate.experience_years);
 
-    // Générer le test via Claude
     const systemPrompt = 'Tu es un examinateur technique senior. Réponds UNIQUEMENT en JSON valide.';
     const userPrompt = generateTestPrompt(speciality, difficulty, skills);
 
@@ -84,7 +81,6 @@ export class TestService {
       }
     }
 
-    // Stocker le test
     const test = await this.prisma.test.create({
       data: {
         candidate_id: userId,
@@ -100,7 +96,6 @@ export class TestService {
       },
     });
 
-    // Retirer les réponses correctes avant de renvoyer au front
     const safeQuestions = this.sanitizeQuestions(jsonResponse.questions);
 
     return {
@@ -110,6 +105,7 @@ export class TestService {
     };
   }
 
+  // Start test by id
   async startTestById(userId: string, testId: string) {
     const test = await this.prisma.test.findUnique({
       where: { id: testId },
@@ -122,7 +118,6 @@ export class TestService {
       throw new BadRequestException('Ce test ne peut plus être démarré');
     }
 
-    // Mettre à jour le statut et started_at
     await this.prisma.test.update({
       where: { id: testId },
       data: {
@@ -140,6 +135,7 @@ export class TestService {
     };
   }
 
+  // Submit test
   async submitTest(userId: string, testId: string, answers: any[]) {
     const test = await this.prisma.test.findUnique({
       where: { id: testId },
@@ -153,7 +149,6 @@ export class TestService {
 
     const questions = test.questions as any[];
 
-    // Évaluation par Claude
     const systemPrompt = 'Tu es un correcteur technique. Réponds UNIQUEMENT en JSON.';
     const userPrompt = evaluateAnswersPrompt(questions, answers);
 
@@ -184,7 +179,6 @@ export class TestService {
 
     const totalScore = evaluation.total_score;
 
-    // Mise à jour du test
     await this.prisma.test.update({
       where: { id: testId },
       data: {
@@ -203,6 +197,7 @@ export class TestService {
     };
   }
 
+  // Récupère test result
   async getTestResult(userId: string, testId: string) {
     const test = await this.prisma.test.findUnique({
       where: { id: testId },
@@ -220,6 +215,7 @@ export class TestService {
     };
   }
 
+  // Récupère latest test score
   async getLatestTestScore(userId: string): Promise<number | null> {
     const latest = await this.prisma.test.findFirst({
       where: {
@@ -233,19 +229,21 @@ export class TestService {
     return latest?.score ?? null;
   }
 
-  // Helpers
+  // Determine difficulty
   private determineDifficulty(years: number): 'junior' | 'mid' | 'senior' {
     if (years < 2) return 'junior';
     if (years < 5) return 'mid';
     return 'senior';
   }
 
+  // Extract and parse j s o n
   private extractAndParseJSON(raw: string): any {
     const jsonMatch = raw.match(/```json\s*([\s\S]*?)\s*```/) || raw.match(/({[\s\S]*})/);
     if (!jsonMatch) throw new Error('No JSON found in response');
     return JSON.parse(jsonMatch[1]);
   }
 
+  // Sanitize questions
   private sanitizeQuestions(questions: any[]) {
     return questions.map(({ correct_answer, evaluation_criteria, ...q }) => q);
   }

@@ -33,36 +33,43 @@ interface AuthenticatedRequest extends Request {
 export class TimesheetsController {
   constructor(private readonly timesheetsService: TimesheetsService) {}
 
+  // Start timer
   @Post('timer/start')
   startTimer(@Body() startTimerDto: StartTimerDto, @Req() req: AuthenticatedRequest) {
     return this.timesheetsService.startTimer(req.user.id, startTimerDto);
   }
 
+  // Pause timer
   @Post('timer/pause')
   pauseTimer(@Req() req: AuthenticatedRequest) {
     return this.timesheetsService.pauseTimer(req.user.id);
   }
 
+  // Resume timer
   @Post('timer/resume')
   resumeTimer(@Req() req: AuthenticatedRequest) {
     return this.timesheetsService.resumeTimer(req.user.id);
   }
 
+  // Stop timer
   @Post('timer/stop')
   stopTimer(@Req() req: AuthenticatedRequest) {
     return this.timesheetsService.stopTimer(req.user.id);
   }
 
+  // Récupère active timer
   @Get('timer/active')
   getActiveTimer(@Req() req: AuthenticatedRequest) {
     return this.timesheetsService.getActiveTimer(req.user.id);
   }
 
+  // Create entry
   @Post()
   createEntry(@Body() createDto: CreateTimesheetDto, @Req() req: AuthenticatedRequest) {
     return this.timesheetsService.createEntry(req.user.id, createDto);
   }
 
+  // Update entry
   @Put(':id')
   updateEntry(
     @Param('id') id: string,
@@ -72,11 +79,13 @@ export class TimesheetsController {
     return this.timesheetsService.updateEntry(req.user.id, id, updateDto);
   }
 
+  // Delete entry
   @Delete(':id')
   deleteEntry(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     return this.timesheetsService.deleteEntry(req.user.id, id);
   }
 
+  // Récupère entries
   @Get()
   getEntries(
     @Query('startDate') startDate?: string,
@@ -92,6 +101,7 @@ export class TimesheetsController {
     );
   }
 
+  // Récupère report
   @Get('report')
   getReport(@Query() reportDto: GetReportDto, @Req() req: AuthenticatedRequest) {
     return this.timesheetsService.getReport(reportDto, req.user.id, req.user.role);

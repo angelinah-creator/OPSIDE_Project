@@ -21,30 +21,35 @@ import { Role } from '@prisma/client';
 export class TestController {
   constructor(private readonly testService: TestService) {}
 
+  // Start test
   @Post('start')
   @Roles(Role.candidat)
   startTest(@CurrentUser('id') userId: string, @Body() dto: StartTestDto) {
     return this.testService.startTest(userId, dto.skills, dto.speciality);
   }
 
+  // Start test by id
   @Get(':testId/start')
   @Roles(Role.candidat)
   startTestById(@CurrentUser('id') userId: string, @Param('testId', ParseUUIDPipe) testId: string) {
     return this.testService.startTestById(userId, testId);
   }
 
+  // Submit test
   @Post('submit')
   @Roles(Role.candidat)
   submitTest(@CurrentUser('id') userId: string, @Body() dto: SubmitTestDto) {
     return this.testService.submitTest(userId, dto.testId, dto.answers);
   }
 
+  // Récupère test result
   @Get(':testId/result')
   @Roles(Role.candidat)
   getTestResult(@CurrentUser('id') userId: string, @Param('testId', ParseUUIDPipe) testId: string) {
     return this.testService.getTestResult(userId, testId);
   }
 
+  // Récupère latest score
   @Get('latest-score')
   @Roles(Role.candidat)
   getLatestScore(@CurrentUser('id') userId: string) {

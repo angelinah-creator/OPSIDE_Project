@@ -2,22 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { adminApi } from '@/lib/admin-service'
-import { 
-  Search, 
-  RefreshCw, 
-  Handshake, 
-  ArrowRight, 
-  Calendar, 
-  Building2, 
-  Briefcase, 
-  Clock, 
-  CheckCircle2, 
-  XCircle,
-  FileSpreadsheet,
-  AlertCircle,
-  ChevronLeft,
-  ChevronRight
-} from 'lucide-react'
+import { Search, RefreshCw, Handshake, Calendar, Building2, Clock, CheckCircle2, XCircle, FileSpreadsheet, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import clsx from 'clsx'
 
 interface Match {
@@ -100,17 +85,16 @@ const SPECIALITY_LABELS: Record<string, string> = {
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 20, 50]
 
+// Admin matches page
 export default function AdminMatchesPage() {
   const [matches, setMatches] = useState<Match[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   
-  // Filtering states
   const [search, setSearch] = useState('')
   const [selectedClient, setSelectedClient] = useState('')
   const [selectedStatus, setSelectedStatus] = useState('')
   
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
@@ -132,12 +116,10 @@ export default function AdminMatchesPage() {
     fetchMatches()
   }, [fetchMatches])
 
-  // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1)
   }, [search, selectedClient, selectedStatus])
 
-  // Get list of unique clients present in matches for filter dropdown
   const clientOptions = useMemo(() => {
     const map = new Map<string, string>()
     matches.forEach(m => {
@@ -150,13 +132,10 @@ export default function AdminMatchesPage() {
     return Array.from(map.entries()).map(([id, name]) => ({ id, name }))
   }, [matches])
 
-  // Filtered matches (exclude 'rejected')
   const filteredMatches = useMemo(() => {
     return matches.filter(m => {
-      // Exclude rejected matches from the list
       if (m.status === 'rejected') return false
 
-      // 1. Search Query
       const q = search.toLowerCase()
       const candidateName = `${m.candidate?.first_name || ''} ${m.candidate?.last_name || ''}`.toLowerCase()
       const candidateEmail = (m.candidate?.email || '').toLowerCase()
@@ -171,17 +150,14 @@ export default function AdminMatchesPage() {
         clientName.includes(q) ||
         projectTitle.includes(q)
 
-      // 2. Client Filter
       const matchesClient = !selectedClient || m.client_id === selectedClient
 
-      // 3. Status Filter
       const matchesStatus = !selectedStatus || m.status === selectedStatus
 
       return matchesSearch && matchesClient && matchesStatus
     })
   }, [matches, search, selectedClient, selectedStatus])
 
-  // Pagination calculations
   const totalPages = Math.ceil(filteredMatches.length / itemsPerPage)
   const paginatedMatches = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage
@@ -189,12 +165,11 @@ export default function AdminMatchesPage() {
     return filteredMatches.slice(startIndex, endIndex)
   }, [filteredMatches, currentPage, itemsPerPage])
 
-  // Handle page change
+  // Go to page
   const goToPage = (page: number) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)))
   }
 
-  // Statistics
   const stats = useMemo(() => {
     return {
       total: matches.length,
@@ -205,13 +180,12 @@ export default function AdminMatchesPage() {
     }
   }, [matches])
 
-  // Initials generator
+  // Récupère initials
   const getInitials = (firstName: string | null, lastName: string | null, fallback: string) => {
     if (!firstName && !lastName) return fallback.substring(0, 2).toUpperCase()
     return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase()
   }
 
-  // Get status options (excluding 'rejected')
   const statusOptions = useMemo(() => {
     return Object.entries(STATUS_LABELS).filter(([key]) => key !== 'rejected')
   }, [])
@@ -342,7 +316,6 @@ export default function AdminMatchesPage() {
       {/* Main List Container */}
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         {loading ? (
-          // Loading Skeletons
           <div className="divide-y divide-slate-100">
             {[1, 2, 3].map(i => (
               <div key={i} className="p-6 flex flex-col md:flex-row items-center justify-between gap-4 animate-pulse">
@@ -360,7 +333,6 @@ export default function AdminMatchesPage() {
             ))}
           </div>
         ) : filteredMatches.length === 0 ? (
-          // Empty State
           <div className="p-16 text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-slate-50 text-slate-400 mb-4 border border-slate-100">
               <Handshake className="w-7 h-7" />

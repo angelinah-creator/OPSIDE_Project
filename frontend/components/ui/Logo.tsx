@@ -7,6 +7,7 @@ interface LogoProps {
   className?: string;
 }
 
+// Logo
 export default function Logo({ size = 32, showText = true, className = '' }: LogoProps) {
   return (
     <Link href="/" className={`flex items-center gap-2.5 ${className}`}>

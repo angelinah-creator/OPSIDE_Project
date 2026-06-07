@@ -14,23 +14,23 @@ interface Video {
   created_at: string
 }
 
+// Admin videos page
 export default function AdminVideosPage() {
   const [videos, setVideos] = useState<Video[]>([])
   const [loading, setLoading] = useState(true)
   
-  // Modals
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [watchVideoUrl, setWatchVideoUrl] = useState<string | null>(null)
   const [videoToDelete, setVideoToDelete] = useState<Video | null>(null)
   
-  // Form State
   const [currentVideo, setCurrentVideo] = useState<Partial<Video>>({})
   const [file, setFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Fetch videos
   const fetchVideos = async () => {
     setLoading(true)
     try {
@@ -47,6 +47,7 @@ export default function AdminVideosPage() {
     fetchVideos()
   }, [])
 
+  // Gère upload submit
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!file || !currentVideo.title) return
@@ -73,6 +74,7 @@ export default function AdminVideosPage() {
     }
   }
 
+  // Gère edit submit
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!currentVideo.id) return
@@ -94,10 +96,12 @@ export default function AdminVideosPage() {
     }
   }
 
+  // Gère delete
   const handleDelete = (vid: Video) => {
     setVideoToDelete(vid)
   }
 
+  // Confirm delete
   const confirmDelete = async () => {
     if (!videoToDelete) return
     
@@ -114,11 +118,13 @@ export default function AdminVideosPage() {
     }
   }
 
+  // Open edit modal
   const openEditModal = (vid: Video) => {
     setCurrentVideo(vid)
     setIsEditModalOpen(true)
   }
 
+  // Formate date
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('fr-FR', {
       day: 'numeric', month: 'long', year: 'numeric'

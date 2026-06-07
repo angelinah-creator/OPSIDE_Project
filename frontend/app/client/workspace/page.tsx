@@ -26,6 +26,7 @@ import WorkspaceClientNotes from '@/components/workspace/client/WorkspaceClientN
 
 type TabType = 'workspace_home' | 'workspace_collabs' | 'workspace_time' | 'workspace_factures' | 'workspace_notes'
 
+// Client workspace
 export default function ClientWorkspace() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
@@ -35,6 +36,7 @@ export default function ClientWorkspace() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   useEffect(() => {
+    // Fetch data
     const fetchData = async () => {
       try {
         const u = getUser()
@@ -58,6 +60,7 @@ export default function ClientWorkspace() {
     fetchData()
   }, [router])
 
+  // Gère logout
   const handleLogout = async () => {
     try {
       const rt = (await import('js-cookie')).default.get('refresh_token') || ''

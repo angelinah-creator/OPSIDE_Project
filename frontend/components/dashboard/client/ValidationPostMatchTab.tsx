@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { matchService } from '@/lib/match-service'
 import { customTestService, CreateCustomTestPayload } from '@/lib/custom-test-service'
 import { toast } from 'sonner'
-import { CheckCircle, XCircle, Clock, Send, RefreshCw, Calendar, FlaskConical, User, Briefcase, Target, ChevronDown, ChevronUp, X, Plus, Minus, Home } from 'lucide-react'
+import { CheckCircle, XCircle, Clock, RefreshCw, Calendar, FlaskConical, User, Briefcase, Target, Plus, Minus, Home } from 'lucide-react';
 import clsx from 'clsx'
 import Modal from '@/components/ui/Modal'
 
@@ -44,6 +44,7 @@ type Match = {
   custom_test?: any
 }
 
+// Validation post match tab
 export default function ValidationPostMatchTab() {
   const [matches, setMatches] = useState<Match[]>([])
   const [loading, setLoading] = useState(true)
@@ -54,12 +55,10 @@ export default function ValidationPostMatchTab() {
   const [addingToWorkspace, setAddingToWorkspace] = useState<string | null>(null)
   const [rejectingMatch, setRejectingMatch] = useState<string | null>(null)
 
-  // Custom Calendly modal state
   const [showCalendlyModal, setShowCalendlyModal] = useState(false)
   const [calendlyUrl, setCalendlyUrl] = useState('')
   const [selectedMatchForCalendly, setSelectedMatchForCalendly] = useState<any>(null)
 
-  // Test form state
   const [selectedSkills, setSelectedSkills] = useState<string[]>([])
   const [difficulty, setDifficulty] = useState<'junior' | 'mid' | 'senior'>('mid')
   const [duration, setDuration] = useState(60)
@@ -79,6 +78,7 @@ export default function ValidationPostMatchTab() {
 
   useEffect(() => { fetchMatches() }, [fetchMatches])
 
+  // Open test modal
   const openTestModal = (match: Match) => {
     setSelectedMatch(match)
     setSelectedSkills([])
@@ -88,12 +88,14 @@ export default function ValidationPostMatchTab() {
     setShowTestModal(true)
   }
 
+  // Toggle skill
   const toggleSkill = (skill: string) => {
     setSelectedSkills(prev =>
       prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]
     )
   }
 
+  // Gère send test
   const handleSendTest = async () => {
     if (!selectedMatch) return
     if (selectedSkills.length === 0) { toast.error('Sélectionnez au moins une compétence'); return }
@@ -117,6 +119,7 @@ export default function ValidationPostMatchTab() {
     }
   }
 
+  // Gère send calendly
   const handleSendCalendly = async (matchId: string) => {
     try {
       setSendingCalendly(matchId)
@@ -129,6 +132,7 @@ export default function ValidationPostMatchTab() {
     }
   }
 
+  // Gère add to workspace
   const handleAddToWorkspace = async (matchId: string) => {
     try {
       setAddingToWorkspace(matchId)
@@ -142,6 +146,7 @@ export default function ValidationPostMatchTab() {
     }
   }
 
+  // Gère retest
   const handleRetest = async (testId: string) => {
     try {
       setRequestingRetest(testId)
@@ -155,6 +160,7 @@ export default function ValidationPostMatchTab() {
     }
   }
 
+  // Gère reject match
   const handleRejectMatch = async (matchId: string) => {
     try {
       setRejectingMatch(matchId)
@@ -168,6 +174,7 @@ export default function ValidationPostMatchTab() {
     }
   }
 
+  // Récupère test status badge
   const getTestStatusBadge = (test: any) => {
     if (!test) return null
     const cfg: Record<string, { label: string; cls: string }> = {
@@ -283,7 +290,6 @@ export default function ValidationPostMatchTab() {
                   const testPassed = test?.status === 'scored' && test?.score >= test?.threshold
                   const canRetest = test?.status === 'scored' && test?.score < test?.threshold && test?.retest_allowed && !test?.retest_used
 
-                  // If Calendly has been sent, only show the Add to Workspace button
                   if (calendlySent) {
                     return (
                       <div className="space-y-3">

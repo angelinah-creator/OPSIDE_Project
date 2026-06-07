@@ -12,6 +12,7 @@ interface QuestionCardProps {
   onAnswerChange: (answer: any) => void;
 }
 
+// Question card
 export default function QuestionCard({
   question,
   index,

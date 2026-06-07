@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Logo from '@/components/ui/Logo'
+
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { authApi } from '@/lib/auth-service'
 import { Eye, EyeOff, ArrowLeft, ArrowRight } from 'lucide-react'
 
+// Client register page
 export default function ClientRegisterPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -21,9 +22,11 @@ export default function ClientRegisterPage() {
     confirm: ''
   })
 
+  // Définit 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(p => ({ ...p, [k]: e.target.value }))
 
+  // Gère submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')

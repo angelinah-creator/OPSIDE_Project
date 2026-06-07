@@ -4,6 +4,7 @@ interface BadgeProps {
   className?: string;
 }
 
+// Badge
 export default function Badge({ children, variant = 'default', className = '' }: BadgeProps) {
   const variants = {
     default: 'bg-[#EFEFEF] text-[#4B4B4B]',

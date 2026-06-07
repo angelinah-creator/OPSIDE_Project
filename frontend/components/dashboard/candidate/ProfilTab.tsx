@@ -1,13 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { 
-  ExternalLink, Mail, Phone, MapPin, Calendar, DollarSign, 
-  Briefcase, GraduationCap, Pencil, Save, X, Plus, Trash2, 
-  Camera, ImagePlus, ChevronLeft, ChevronRight, Check,
-  // Github,
-  Info
-} from 'lucide-react';
+import { ExternalLink, Mail, Phone, MapPin, Calendar, DollarSign, Briefcase, Pencil, Save, X, Plus, Trash2, Camera, ImagePlus, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { candidateApi } from '@/lib/candidate-service';
 import Input from '@/components/ui/Input';
 import Textarea from '@/components/ui/Textarea';
@@ -16,7 +10,6 @@ import CountrySelect from '@/components/ui/CountrySelect';
 import SkillSelector from '@/components/ui/SkillSelector';
 import Button from '@/components/ui/Button';
 
-// ─── Constants ───────────────────────────────────────────────────
 const SPECIALITIES = [
   { value: 'frontend', label: 'Frontend' }, { value: 'backend', label: 'Backend' },
   { value: 'fullstack', label: 'Fullstack' }, { value: 'mobile', label: 'Mobile' },
@@ -66,6 +59,7 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => ({
   value: String(i + 1),
   label: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][i],
 }));
+// Years
 const years = () => {
   const now = new Date().getFullYear();
   return Array.from({ length: 30 }, (_, i) => ({ value: String(now - i), label: String(now - i) }));
@@ -78,9 +72,9 @@ const SPEC_LABEL: Record<string, string> = {
   devops: 'DevOps', design: 'Design UX/UI', data: 'Data / IA', other: 'Autre',
 };
 
-// ─── Media helpers ────────────────────────────────────────────────
 interface MediaPreview { file: File; previewUrl: string }
 
+// Media gallery
 function MediaGallery({ medias, onDelete, editMode, onOpen }: {
   medias: any[]
   onDelete?: (id: string) => void
@@ -122,6 +116,7 @@ function MediaGallery({ medias, onDelete, editMode, onOpen }: {
   );
 }
 
+// Media preview row
 function MediaPreviewRow({ previews, onRemove }: { previews: MediaPreview[]; onRemove: (i: number) => void }) {
   if (!previews.length) return null;
   return (
@@ -144,6 +139,7 @@ function MediaPreviewRow({ previews, onRemove }: { previews: MediaPreview[]; onR
   );
 }
 
+// Auto textarea
 function AutoTextarea({ value, onChange, placeholder, className = '', readOnly = false }: {
   value: string; onChange?: (v: string) => void; placeholder?: string; className?: string; readOnly?: boolean
 }) {
@@ -172,6 +168,7 @@ interface ProfilTabProps {
   profile: any;
 }
 
+// Profil tab
 export default function ProfilTab({ user: initialUser, profile: initialProfile }: ProfilTabProps) {
   const [profile, setProfile] = useState<any>(initialProfile);
   const [user, setUser] = useState<any>(initialUser);
@@ -183,7 +180,6 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
   const [photoDropdown, setPhotoDropdown] = useState(false);
   const [gallery, setGallery] = useState<{ items: { url: string, type: string }[], index: number } | null>(null);
 
-  // States for Editing
   const [editHero, setEditHero] = useState(false);
   const [heroForm, setHeroForm] = useState({ first_name: '', last_name: '', title: '' });
 
@@ -199,7 +195,6 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
   const [editSocial, setEditSocial] = useState(false);
   const [socialForm, setSocialForm] = useState({ linkedin_url: '', portfolio_url: '', github_url: '' });
 
-  // Exp & Edu
   const [editingExpId, setEditingExpId] = useState<string | null>(null);
   const [expForm, setExpForm] = useState<any>({});
   const [expNewMedia, setExpNewMedia] = useState<MediaPreview[]>([]);
@@ -219,16 +214,19 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     ? (profile.photo_url.startsWith('http') ? profile.photo_url : `${API_URL}${profile.photo_url}`)
     : null;
 
+  // Formate date
   const formatDate = (m?: number, y?: number) => {
     if (!y) return '';
     const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
     return `${m ? months[m - 1] + ' ' : ''}${y}`;
   };
 
+  // Flash
   const flash = (msg: string) => { setSuccess(msg); setTimeout(() => setSuccess(''), 3000); };
+  // Refresh
   const refresh = () => candidateApi.getMyProfile().then((p: any) => { setProfile(p); setUser(p.user); }).catch(() => { });
 
-  // ── Handlers ──
+  // Gère photo change
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return;
     try {
@@ -239,6 +237,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     e.target.value = '';
   };
 
+  // Gère delete photo
   const handleDeletePhoto = async () => {
     setPhotoDropdown(false);
     try {
@@ -248,7 +247,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     } catch { setError('Erreur suppression photo.'); }
   };
 
-  // Hero
+  // Start edit hero
   const startEditHero = () => {
     setEditHero(true);
     setHeroForm({
@@ -258,6 +257,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     });
   };
 
+  // Save hero
   const saveHero = async () => {
     setSaving(true); setError('');
     try {
@@ -269,7 +269,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     } catch { setError('Erreur mise à jour profil.'); } finally { setSaving(false); }
   };
 
-  // Info
+  // Start edit info
   const startEditInfo = () => {
     setEditInfo(true);
     setInfoForm({
@@ -280,6 +280,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     });
   };
 
+  // Save info
   const saveInfo = async () => {
     setSaving(true); setError('');
     try {
@@ -294,7 +295,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     } catch { setError('Erreur mise à jour infos.'); } finally { setSaving(false); }
   };
 
-  // Skills
+  // Save skills
   const saveSkills = async () => {
     setSaving(true); setError('');
     try {
@@ -305,7 +306,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     } catch { setError('Erreur.'); } finally { setSaving(false); }
   };
 
-  // Bio
+  // Save bio
   const saveBio = async () => {
     setSaving(true); setError('');
     try {
@@ -316,7 +317,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     } catch { setError('Erreur.'); } finally { setSaving(false); }
   };
 
-  // Social
+  // Save social
   const saveSocial = async () => {
     setSaving(true); setError('');
     try {
@@ -331,7 +332,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     } catch { setError('Erreur de mise à jour des liens.'); } finally { setSaving(false); }
   };
 
-  // ── Experiences ──
+  // Start edit exp
   const startEditExp = (exp: any) => {
     setEditingExpId(exp.id); setExpNewMedia([]);
     setExpForm({
@@ -343,6 +344,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     });
   };
 
+  // Save exp
   const saveExp = async (id: string) => {
     setSaving(true); setError('');
     try {
@@ -355,11 +357,13 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     } catch { setError('Erreur.'); } finally { setSaving(false); }
   };
 
+  // Delete exp
   const deleteExp = async (id: string) => {
     if (!confirm('Supprimer cette expérience ?')) return;
     try { await candidateApi.deleteExperience(id); await refresh(); } catch {}
   };
 
+  // Add new exp
   const addNewExp = async () => {
     if (!newExpForm.title || !newExpForm.company || !newExpForm.start_year) return;
     setSaving(true); setError('');
@@ -376,11 +380,10 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     } catch { setError('Erreur.'); } finally { setSaving(false); }
   };
 
-  // ── Educations ──
+  // Start edit edu
   const startEditEdu = (edu: any) => {
     setEditingEduId(edu.id); setEduNewMedia([]);
     
-    // Déterminer le level pour l'édition (si autre)
     let formLevel = edu.level;
     let customLevel = '';
     if (edu.level && edu.level !== 'bac' && edu.level !== 'bac_plus_2' && edu.level !== 'bac_plus_3' && edu.level !== 'bac_plus_5' && edu.level !== 'bac_plus_8') {
@@ -390,7 +393,6 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
       }
     }
     
-    // Si la valeur reçue dans level était déjà 'autre', custom_level pourrait être dans custom_level (selon modèle BDD).
     if (edu.level === 'autre' && edu.custom_level) {
       customLevel = edu.custom_level;
     }
@@ -405,6 +407,7 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     });
   };
 
+  // Save edu
   const saveEdu = async (id: string) => {
     setSaving(true); setError('');
     try {
@@ -418,11 +421,13 @@ export default function ProfilTab({ user: initialUser, profile: initialProfile }
     } catch { setError('Erreur.'); } finally { setSaving(false); }
   };
 
+  // Delete edu
   const deleteEdu = async (id: string) => {
     if (!confirm('Supprimer cette formation ?')) return;
     try { await candidateApi.deleteEducation(id); await refresh(); } catch {}
   };
 
+  // Add new edu
   const addNewEdu = async () => {
     if (!newEduForm.school || !newEduForm.degree || !newEduForm.start_year) return;
     setSaving(true); setError('');

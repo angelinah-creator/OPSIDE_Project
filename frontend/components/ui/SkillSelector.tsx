@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Skill, skillApi } from '@/lib/skill-service';
 import { Plus, Pencil, Trash2, X, Check, Search } from 'lucide-react';
-import Input from './Input';
+
 import Button from './Button';
 
 interface SkillSelectorProps {
@@ -13,6 +13,7 @@ interface SkillSelectorProps {
 
 const SYSTEM_CATEGORIES = ['frontend', 'backend', 'fullstack', 'mobile', 'devops', 'design', 'data'];
 
+// Skill selector
 export default function SkillSelector({ selectedIds, onChange, label = 'Compétences *' }: SkillSelectorProps) {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -20,12 +21,12 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
   const [loading, setLoading] = useState(false);
   const [localCategories, setLocalCategories] = useState<string[]>([]);
 
-  // Add / Edit State
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [isAddingSkill, setIsAddingSkill] = useState(false);
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
   const [form, setForm] = useState({ name: '', category: '', customCategory: '' });
 
+  // Load skills
   const loadSkills = async () => {
     try {
       const data = await skillApi.getSkills();
@@ -55,11 +56,13 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
     return res;
   }, [skills, activeCategory, search]);
 
+  // Toggle
   const toggle = (id: string) => {
     if (selectedIds.includes(id)) onChange(selectedIds.filter(x => x !== id));
     else onChange([...selectedIds, id]);
   };
 
+  // Gère create skill
   const handleCreateSkill = async () => {
     if (!form.name || activeCategory === 'all') return;
     setLoading(true);
@@ -69,10 +72,10 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
       toggle(newSkill.id);
       setIsAddingSkill(false);
       setForm({ name: '', category: '', customCategory: '' });
-      // If it was a local category, it now has a skill, but keeping it in localCategories doesn't hurt (Set handles duplicates)
     } catch (err) {} finally { setLoading(false); }
   };
 
+  // Gère create category
   const handleCreateCategory = async () => {
     if (!form.customCategory) return;
     setLocalCategories(prev => [...prev, form.customCategory]);
@@ -81,6 +84,7 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
     setForm({ name: '', category: '', customCategory: '' });
   };
 
+  // Gère update
   const handleUpdate = async () => {
     if (!editingSkill || !form.name) return;
     setLoading(true);
@@ -92,6 +96,7 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
     } catch (err) {} finally { setLoading(false); }
   };
 
+  // Gère delete
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     if (!confirm('Supprimer cette compétence ?')) return;
@@ -102,6 +107,7 @@ export default function SkillSelector({ selectedIds, onChange, label = 'Compéte
     } catch (err) {}
   };
 
+  // Start edit
   const startEdit = (e: React.MouseEvent, skill: Skill) => {
     e.stopPropagation();
     setEditingSkill(skill);

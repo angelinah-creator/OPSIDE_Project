@@ -1,17 +1,5 @@
-import {
-  IsEnum,
-  IsInt,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUrl,
-  Max,
-  Min,
-  IsArray,
-  IsUUID,
-} from 'class-validator';
-import { Speciality, Currency, Availability, CandidateStatus, Country } from '@prisma/client';
+import { IsEnum, IsInt, IsNumber, IsOptional, IsString, IsUrl, Max, Min, IsArray, IsUUID } from 'class-validator';
+import { Speciality, Currency, Availability, Country } from '@prisma/client';
 
 export class CreateCandidateProfileDto {
   @IsOptional()

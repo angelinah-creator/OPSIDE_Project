@@ -7,6 +7,7 @@ interface BlankWorkspacePageProps {
   icon?: React.ReactNode
 }
 
+// Blank workspace page
 export function BlankWorkspacePage({ title, description, icon }: BlankWorkspacePageProps) {
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center min-h-[500px] text-center p-12">

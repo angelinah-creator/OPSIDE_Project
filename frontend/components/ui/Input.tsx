@@ -7,6 +7,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   suffix?: string;
 }
 
+// Input
 export default function Input({ label, error, hint, suffix, className = '', ...props }: InputProps) {
   return (
     <div className="flex flex-col gap-1.5 w-full">

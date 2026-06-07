@@ -2,15 +2,15 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Logo from '@/components/ui/Logo'
+
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
-import Textarea from '@/components/ui/Textarea'
+
 import Select from '@/components/ui/Select'
 import CountrySelect from '@/components/ui/CountrySelect'
 import SkillSelector from '@/components/ui/SkillSelector'
 import { candidateApi } from '@/lib/candidate-service'
-import { User, Plus, Trash2, X, ImagePlus, Video } from 'lucide-react'
+import { User, Plus, Trash2, X, ImagePlus } from 'lucide-react';
 
 const SPECIALITIES = [
   { value: 'frontend', label: 'Frontend' },
@@ -72,6 +72,7 @@ const MONTHS = [
   { value: '9', label: 'Septembre' }, { value: '10', label: 'Octobre' },
   { value: '11', label: 'Novembre' }, { value: '12', label: 'Décembre' },
 ]
+// Years
 const years = () => {
   const now = new Date().getFullYear()
   return Array.from({ length: 30 }, (_, i) => ({ value: String(now - i), label: String(now - i) }))
@@ -92,18 +93,20 @@ interface EduForm {
   mediaFiles: MediaPreview[]
 }
 
+// Empty exp
 const emptyExp = (): ExpForm => ({
   title: '', employment_type: 'temps_plein', company: '',
   start_month: '', start_year: '', end_month: '', end_year: '',
   is_current: false, location: '', description: '', skill_ids: [], mediaFiles: [],
 })
+// Empty edu
 const emptyEdu = (): EduForm => ({
   school: '', degree: '', custom_degree: '', field: '', level: 'bac_plus_3', custom_level: '',
   start_month: '', start_year: '', end_month: '', end_year: '',
   is_current: false, is_self_taught: false, description: '', skill_ids: [], mediaFiles: [],
 })
 
-// ─── Auto-resize textarea ─────────────────────────────────────────
+// Auto textarea
 function AutoTextarea({ value, onChange, placeholder, className = '', label }: {
   value: string; onChange?: (v: string) => void; placeholder?: string; className?: string; label?: string
 }) {
@@ -129,6 +132,7 @@ function AutoTextarea({ value, onChange, placeholder, className = '', label }: {
   )
 }
 
+// Candidat onboarding
 export default function CandidatOnboarding() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -147,15 +151,19 @@ export default function CandidatOnboarding() {
   const [experiences, setExperiences] = useState<ExpForm[]>([])
   const [educations, setEducations] = useState<EduForm[]>([])
 
+  // Définit p
   const setP = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setProfile(p => ({ ...p, [k]: e.target.value }))
 
+  // Définit exp
   const setExp = (i: number, k: string, v: any) =>
     setExperiences(prev => prev.map((e, idx) => idx === i ? { ...e, [k]: v } : e))
 
+  // Définit edu
   const setEdu = (i: number, k: string, v: any) =>
     setEducations(prev => prev.map((e, idx) => idx === i ? { ...e, [k]: v } : e))
 
+  // Gère photo change
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]
     if (!f) return
@@ -163,6 +171,7 @@ export default function CandidatOnboarding() {
     setPhotoPreview(URL.createObjectURL(f))
   }
 
+  // Add exp media
   const addExpMedia = (i: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     const previews: MediaPreview[] = files
@@ -174,12 +183,14 @@ export default function CandidatOnboarding() {
     e.target.value = ''
   }
 
+  // Remove exp media
   const removeExpMedia = (expIdx: number, mediaIdx: number) => {
     setExperiences(prev => prev.map((exp, idx) =>
       idx === expIdx ? { ...exp, mediaFiles: exp.mediaFiles.filter((_, mi) => mi !== mediaIdx) } : exp
     ))
   }
 
+  // Add edu media
   const addEduMedia = (i: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     const previews: MediaPreview[] = files
@@ -191,12 +202,14 @@ export default function CandidatOnboarding() {
     e.target.value = ''
   }
 
+  // Remove edu media
   const removeEduMedia = (eduIdx: number, mediaIdx: number) => {
     setEducations(prev => prev.map((edu, idx) =>
       idx === eduIdx ? { ...edu, mediaFiles: edu.mediaFiles.filter((_, mi) => mi !== mediaIdx) } : edu
     ))
   }
 
+  // Gère submit
   const handleSubmit = async () => {
     setError('')
     const isSpecialityOther = profile.speciality === 'other'
@@ -208,7 +221,6 @@ export default function CandidatOnboarding() {
     }
     setLoading(true)
     try {
-      // 1. Create profile
       await candidateApi.createProfile({
         country: profile.country,
         city: profile.city || undefined,
@@ -225,10 +237,8 @@ export default function CandidatOnboarding() {
         skill_ids: profile.skill_ids,
       })
 
-      // 2. Upload photo
       if (photoFile) await candidateApi.uploadPhoto(photoFile).catch(() => { })
 
-      // 3. Create experiences
       for (const exp of experiences) {
         if (!exp.title || !exp.company || !exp.start_year) continue
         const res = await candidateApi.createExperience({
@@ -247,7 +257,6 @@ export default function CandidatOnboarding() {
         }
       }
 
-      // 4. Create educations
       for (const edu of educations) {
         if (!edu.school || (!edu.is_self_taught && (!edu.degree || !edu.start_year))) continue
 

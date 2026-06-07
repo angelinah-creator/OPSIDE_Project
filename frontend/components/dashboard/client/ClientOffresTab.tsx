@@ -11,9 +11,7 @@ import ClientOfferFormModal from './ClientOfferFormModal';
 
 const ITEMS_PER_PAGE = 6;
 
-/**
- * Composant pour gérer l'affichage raccourci ou complet de la description
- */
+// Expandable description
 function ExpandableDescription({ text, limit = 250 }: { text: string; limit?: number }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const shouldCollapse = text.length > limit;
@@ -42,9 +40,7 @@ function ExpandableDescription({ text, limit = 250 }: { text: string; limit?: nu
   );
 }
 
-/**
- * Formate une date de publication de manière relative ou absolue
- */
+// Formate publication date
 function formatPublicationDate(dateString: string | Date): string {
   if (!dateString) return '';
   
@@ -77,6 +73,7 @@ const WORK_TYPE_LABELS: Record<string, string> = {
   on_site: 'Sur site',
 };
 
+// Client offres tab
 export default function ClientOffresTab() {
   const [offers, setOffers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -86,6 +83,7 @@ export default function ClientOffresTab() {
   const [offerToDelete, setOfferToDelete] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Fetch offers
   const fetchOffers = async () => {
     try {
       setIsLoading(true);
@@ -113,11 +111,13 @@ export default function ClientOffresTab() {
 
   const totalPages = Math.ceil(sortedOffers.length / ITEMS_PER_PAGE);
 
+  // Gère edit
   const handleEdit = (offer: any) => {
     setEditingOffer(offer);
     setShowForm(true);
   };
 
+  // Confirm delete
   const confirmDelete = async () => {
     if (!offerToDelete) return;
     try {

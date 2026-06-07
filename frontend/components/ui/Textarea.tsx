@@ -5,6 +5,7 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   error?: string;
 }
 
+// Textarea
 export default function Textarea({ label, error, className = '', ...props }: TextareaProps) {
   return (
     <div className="flex flex-col gap-1.5">

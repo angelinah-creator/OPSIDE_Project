@@ -21,12 +21,8 @@ export class CustomTestService {
     private mailService: MailService,
   ) { }
 
-  /**
-   * Le client crée et envoie un test custom au candidat.
-   * Les questions sont générées par le mock (prêt pour Claude).
-   */
+  // Create test
   async createTest(clientId: string, dto: CreateCustomTestDto) {
-    // Vérifier que le match existe et est confirmé
     const match = await this.prisma.match.findUnique({
       where: { id: dto.match_id },
       include: {
@@ -41,17 +37,13 @@ export class CustomTestService {
     if (match.client_id !== clientId) throw new ForbiddenException('Accès refusé.');
     if (match.status !== MatchStatus.confirmed) throw new BadRequestException('Le match doit être confirmé pour envoyer un test.');
 
-    // Un seul test par match (sauf retest)
     if (match.custom_test && !match.custom_test.retest_used) {
-      // Vérifier si c'est un retest autorisé
       if (match.custom_test.status === 'scored' && match.custom_test.retest_allowed && !match.custom_test.retest_used) {
-        // Autorisé → continuer
       } else if (match.custom_test.status !== 'expired') {
         throw new ConflictException('Un test existe déjà pour ce match.');
       }
     }
 
-    // Déterminer la difficulté si non fournie
     const difficulty = dto.difficulty || await this.inferDifficulty(dto.candidate_id);
 
     const skills = await this.prisma.skill.findMany({
@@ -62,10 +54,8 @@ export class CustomTestService {
       return s ? s.name : id;
     });
 
-    // ⚠️ MOCK : Génération des questions (remplacer par Claude quand disponible)
     const questions = generateMockQuestions(skillNames, difficulty);
 
-    // Si retest, mettre à jour l'ancien test en expiré
     if (match.custom_test) {
       await this.prisma.customTest.update({
         where: { id: match.custom_test.id },
@@ -88,7 +78,6 @@ export class CustomTestService {
       },
     });
 
-    // Notification au candidat
     const companyName = match.client.client?.company_name || 'Un client';
     const projectName = match.job_offer?.title || 'un projet';
 
@@ -100,7 +89,6 @@ export class CustomTestService {
       link: '/candidat/dashboard',
     });
 
-    // Email au candidat
     try {
       await this.mailService.sendCustomTestInvitationEmail(
         match.candidate.email,
@@ -117,9 +105,7 @@ export class CustomTestService {
     return test;
   }
 
-  /**
-   * Le candidat démarre le test (lance le chrono).
-   */
+  // Start test
   async startTest(testId: string, candidateId: string) {
     const test = await this.prisma.customTest.findUnique({ where: { id: testId } });
     if (!test) throw new NotFoundException('Test introuvable.');
@@ -135,9 +121,7 @@ export class CustomTestService {
     });
   }
 
-  /**
-   * Le candidat soumet ses réponses. Évaluation + logique GO/NO-GO.
-   */
+  // Submit test
   async submitTest(testId: string, candidateId: string, dto: SubmitCustomTestDto) {
     const test = await this.prisma.customTest.findUnique({
       where: { id: testId },
@@ -158,12 +142,10 @@ export class CustomTestService {
       throw new BadRequestException('Ce test a déjà été soumis.');
     }
 
-    // ⚠️ MOCK : Évaluation des réponses (remplacer par Claude quand disponible)
     const questions = test.questions as any[];
     const { score, details } = evaluateMockAnswers(questions, dto.answers);
     const passed = score >= test.threshold;
 
-    // Sauvegarder les résultats
     const updatedTest = await this.prisma.customTest.update({
       where: { id: testId },
       data: {
@@ -181,8 +163,6 @@ export class CustomTestService {
     const projectName = test.match.job_offer?.title || 'le projet';
 
     if (passed) {
-      //   GO : Score ≥ 75%
-      // Notification candidat
       await this.notificationsService.create({
         user_id: candidateId,
         type: NotificationType.test_result,
@@ -191,7 +171,6 @@ export class CustomTestService {
         link: '/candidat/dashboard',
       });
 
-      // Notification client
       await this.notificationsService.create({
         user_id: test.client_id,
         type: NotificationType.test_result,
@@ -200,9 +179,7 @@ export class CustomTestService {
         link: '/client/dashboard',
       });
 
-      // Emails
       try {
-        // Email résultat au candidat + client
         await this.mailService.sendCustomTestResultEmail(
           test.match.candidate.email, 'candidate', score, true, companyName, projectName,
         );
@@ -213,14 +190,11 @@ export class CustomTestService {
         console.error('Failed to send test result emails:', e);
       }
     } else {
-      //  NO-GO : Score < 75%
-      // Match → rejected
       await this.prisma.match.update({
         where: { id: test.match_id },
         data: { status: MatchStatus.rejected, rejected_at: new Date() },
       });
 
-      // Candidature → rejected 
       if (test.match.job_offer_id) {
         await this.prisma.candidature.updateMany({
           where: {
@@ -231,7 +205,6 @@ export class CustomTestService {
         });
       }
 
-      // Notification candidat
       await this.notificationsService.create({
         user_id: candidateId,
         type: NotificationType.test_result,
@@ -240,7 +213,6 @@ export class CustomTestService {
         link: '/candidat/dashboard',
       });
 
-      // Notification client
       await this.notificationsService.create({
         user_id: test.client_id,
         type: NotificationType.test_result,
@@ -249,7 +221,6 @@ export class CustomTestService {
         link: '/client/dashboard',
       });
 
-      // Emails
       try {
         await this.mailService.sendCustomTestResultEmail(
           test.match.candidate.email, 'candidate', score, false, companyName, projectName,
@@ -265,9 +236,7 @@ export class CustomTestService {
     return { ...updatedTest, passed, threshold: test.threshold };
   }
 
-  /**
-   * Le client propose un retest (1 seule fois autorisée).
-   */
+  // Request retest
   async requestRetest(testId: string, clientId: string) {
     const test = await this.prisma.customTest.findUnique({
       where: { id: testId },
@@ -283,13 +252,11 @@ export class CustomTestService {
       throw new BadRequestException('Le candidat a déjà réussi le test, pas de retest nécessaire.');
     }
 
-    // Remettre le match en "confirmed" pour permettre un nouveau test
     await this.prisma.match.update({
       where: { id: test.match_id },
       data: { status: MatchStatus.confirmed, rejected_at: null },
     });
 
-    // Remettre la candidature en "matched"
     if (test.match.job_offer_id) {
       await this.prisma.candidature.updateMany({
         where: {
@@ -300,7 +267,6 @@ export class CustomTestService {
       });
     }
 
-    // Créer de nouvelles questions pour le retest
     const newQuestions = generateMockQuestions(test.skills_tested, test.difficulty || 'mid');
 
     const updatedTest = await this.prisma.customTest.update({
@@ -321,7 +287,6 @@ export class CustomTestService {
     const companyName = test.match.client.client?.company_name || 'Un client';
     const projectName = test.match.job_offer?.title || 'un projet';
 
-    // Notifier le candidat
     await this.notificationsService.create({
       user_id: test.candidate_id,
       type: NotificationType.test_result,
@@ -346,9 +311,7 @@ export class CustomTestService {
     return updatedTest;
   }
 
-  /**
-   * Le client envoie directement le Calendly (en se fiant au score plateforme).
-   */
+  // Send calendly directly
   async sendCalendlyDirectly(matchId: string, clientId: string, calendlyUrl?: string) {
     const match = await this.prisma.match.findUnique({
       where: { id: matchId },
@@ -363,7 +326,6 @@ export class CustomTestService {
     if (match.client_id !== clientId) throw new ForbiddenException('Accès refusé.');
     if (match.status !== MatchStatus.confirmed) throw new BadRequestException('Le match doit être confirmé.');
 
-    // Save the Calendly URL in the database
     await this.prisma.match.update({
       where: { id: matchId },
       data: {
@@ -374,7 +336,6 @@ export class CustomTestService {
     const companyName = match.client.client?.company_name || 'Le client';
     const projectName = match.job_offer?.title || 'le projet';
 
-    // Notification au candidat
     await this.notificationsService.create({
       user_id: match.candidate_id,
       type: NotificationType.match_confirmed,
@@ -383,7 +344,6 @@ export class CustomTestService {
       link: '/candidat/dashboard',
     });
 
-    // Envoyer le lien Calendly
     try {
       await this.mailService.sendCalendlyLinkEmail(
         match.candidate.email,
@@ -398,10 +358,7 @@ export class CustomTestService {
     return { success: true, message: 'Lien Calendly envoyé au candidat.' };
   }
 
-  /**
-   * Récupère le test lié à un match (pour client ou candidat).
-   * Les réponses correctes sont supprimées pour le candidat.
-   */
+  // Récupère test by match
   async getTestByMatch(matchId: string, userId: string) {
     const test = await this.prisma.customTest.findUnique({
       where: { match_id: matchId },
@@ -413,7 +370,7 @@ export class CustomTestService {
     return test;
   }
 
-  /** Récupère le test par ID pour le candidat (sans réponses correctes). */
+  // Récupère test for candidate
   async getTestForCandidate(testId: string, candidateId: string) {
     const test = await this.prisma.customTest.findUnique({
       where: { id: testId },
@@ -426,7 +383,7 @@ export class CustomTestService {
     return test;
   }
 
-  /** Récupère tous les tests envoyés par le client. */
+  // Récupère tests for client
   async getTestsForClient(clientId: string) {
     return this.prisma.customTest.findMany({
       where: { client_id: clientId },
@@ -438,7 +395,7 @@ export class CustomTestService {
     });
   }
 
-  /** Récupère tous les tests reçus par le candidat. */
+  // Récupère tests for candidate
   async getTestsForCandidate(candidateId: string) {
     return this.prisma.customTest.findMany({
       where: { candidate_id: candidateId },
@@ -454,7 +411,7 @@ export class CustomTestService {
     });
   }
 
-  /** Infère la difficulté depuis le profil du candidat. */
+  // Infer difficulty
   private async inferDifficulty(candidateId: string): Promise<string> {
     const profile = await this.prisma.candidateProfile.findUnique({
       where: { user_id: candidateId },

@@ -9,6 +9,7 @@ import { Request, Response } from 'express';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
+  // Catch
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -38,7 +39,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
       console.error('INTERNAL_SERVER_ERROR:', exception);
-      // Log to a file we can read
       try {
         const fs = require('fs');
         const path = require('path');

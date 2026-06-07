@@ -39,11 +39,13 @@ class UpdateMeDto {
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // Update me
   @Patch('me')
   updateMe(@CurrentUser('id') userId: string, @Body() dto: UpdateMeDto) {
     return this.usersService.updateMe(userId, dto);
   }
 
+  // Find all
   @Get()
   @UseGuards(RolesGuard)
   @Roles(Role.admin)
@@ -51,6 +53,7 @@ export class UsersController {
     return this.usersService.findAll(role);
   }
 
+  // Find one
   @Get(':id')
   @UseGuards(RolesGuard)
   @Roles(Role.admin)
@@ -58,6 +61,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  // Update status
   @Patch(':id/status')
   @UseGuards(RolesGuard)
   @Roles(Role.admin)
@@ -68,6 +72,7 @@ export class UsersController {
     return this.usersService.updateStatus(id, dto.status);
   }
 
+  // Delete user
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @UseGuards(RolesGuard)

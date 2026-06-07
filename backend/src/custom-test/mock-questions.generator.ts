@@ -1,12 +1,3 @@
-/**
- * Mock Question Generator for Custom Tests
- *
- *  CE FICHIER EST PRÊT POUR L'API CLAUDE
- * Quand l'API Claude sera disponible, remplacer `generateMockQuestions` par
- * un appel au service Claude avec un prompt adapté (comme dans test.service.ts).
- *
- * Structure des questions identique au test plateforme (compatible Claude).
- */
 
 export interface MockQuestion {
   id: number;
@@ -17,10 +8,7 @@ export interface MockQuestion {
   points: number;
 }
 
-/**
- * Génère un jeu de 10 questions mockées basées sur les compétences demandées.
- * Structure identique à ce que Claude retournerait.
- */
+// Generate mock questions
 export function generateMockQuestions(
   skillsTested: string[],
   difficulty: string = 'mid',
@@ -122,16 +110,11 @@ export function generateMockQuestions(
   ];
 }
 
-/**
- * Évaluation mockée des réponses (remplacera l'appel à Claude)
- * Retourne un score et des détails par question.
- */
+// Evaluate mock answers
 export function evaluateMockAnswers(
   questions: MockQuestion[],
   answers: Record<string, any>,
 ): { score: number; details: Record<string, any> } {
-  // NOTE: En production, cette fonction appellera Claude pour une vraie évaluation.
-  // Pour le mock, on simule un score réaliste entre 55 et 95, avec des codes de triche pour les présentations.
 
   let isCheatPass = false;
   let isCheatFail = false;

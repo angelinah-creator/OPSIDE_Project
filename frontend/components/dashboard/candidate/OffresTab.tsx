@@ -4,27 +4,10 @@ import { candidateApi } from '@/lib/candidate-service';
 import { candidatureService } from '@/lib/candidature-service';
 import { toast } from 'sonner';
 import clsx from 'clsx';
-import { 
-  ChevronRight, 
-  DollarSign, 
-  Search, 
-  ChevronLeft,
-  ChevronRight as ChevronRightIcon,
-  TrendingUp,
-  RotateCcw,
-  Send,
-  ChevronDown,
-  ChevronUp,
-  Briefcase,
-  Clock,
-  Calendar,
-  X
-} from 'lucide-react';
+import { ChevronRight, Search, ChevronLeft, ChevronRightIcon, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
-/**
- * Composant pour gérer l'affichage raccourci ou complet de la description
- */
+// Expandable description
 function ExpandableDescription({ text, limit = 250 }: { text: string; limit?: number }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const shouldCollapse = text.length > limit;
@@ -53,9 +36,7 @@ function ExpandableDescription({ text, limit = 250 }: { text: string; limit?: nu
   );
 }
 
-/**
- * Formate une date de publication de manière relative ou absolue
- */
+// Formate publication date
 function formatPublicationDate(dateString: string | Date): string {
   if (!dateString) return '';
   
@@ -95,6 +76,7 @@ interface Offer {
 
 const ITEMS_PER_PAGE = 6;
 
+// Offres tab
 export default function OffresTab() {
   const [offersData, setOffersData] = useState<Offer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -103,7 +85,6 @@ export default function OffresTab() {
   const [isSubmitting, setIsSubmitting] = useState<string | null>(null);
   const [appliedJobIds, setAppliedJobIds] = useState<string[]>([]);
   
-  // Filter States
   const [filters, setFilters] = useState({
     minExperience: 'all',
     minTjm: 'all',
@@ -111,6 +92,7 @@ export default function OffresTab() {
     workType: 'all'
   });
 
+  // Fetch offers
   const fetchOffers = async () => {
     try {
       setIsLoading(true);
@@ -140,6 +122,7 @@ export default function OffresTab() {
     }
   };
 
+  // Fetch applied jobs
   const fetchAppliedJobs = async () => {
     try {
       const ids = await candidateApi.getAppliedJobs();
@@ -175,6 +158,7 @@ export default function OffresTab() {
   const totalPages = Math.ceil(filteredOffers.length / ITEMS_PER_PAGE);
   const paginatedOffers = filteredOffers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
+  // Reset filters
   const resetFilters = () => {
     setFilters({
       minExperience: 'all',
@@ -186,6 +170,7 @@ export default function OffresTab() {
     setCurrentPage(1);
   };
 
+  // Gère direct apply
   const handleDirectApply = async (offer: Offer) => {
     try {
       setIsSubmitting(offer.id);

@@ -1,3 +1,4 @@
+// Generate test prompt
 export const generateTestPrompt = (
   speciality: string,
   difficulty: string,
@@ -38,7 +39,6 @@ Réponds UNIQUEMENT en JSON valide avec le format suivant :
       "points": 10,
       "evaluation_criteria": "..."
     }
-    // ... etc
   ]
 }
 `;

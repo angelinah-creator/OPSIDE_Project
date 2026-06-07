@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { matchService } from '@/lib/match-service'
-import { Bell, User, Check, X, Calendar, MessageSquare, ExternalLink } from 'lucide-react'
+import { Bell, Check, Calendar } from 'lucide-react';
 import { toast } from 'sonner'
 import clsx from 'clsx'
 
+// Client matches tab
 export default function ClientMatchesTab() {
   const [matches, setMatches] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -14,6 +15,7 @@ export default function ClientMatchesTab() {
     fetchMatches()
   }, [])
 
+  // Fetch matches
   const fetchMatches = async () => {
     try {
       const data = await matchService.getClientMatches()
@@ -108,6 +110,7 @@ export default function ClientMatchesTab() {
   )
 }
 
+// Clock
 function Clock({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">

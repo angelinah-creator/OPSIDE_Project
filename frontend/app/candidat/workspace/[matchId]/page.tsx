@@ -25,6 +25,7 @@ import WorkspaceContrats from '@/components/workspace/candidate/WorkspaceContrat
 
 type TabType = 'workspace_home' | 'workspace_time' | 'workspace_factures' | 'workspace_contrats'
 
+// Candidat workspace
 export default function CandidatWorkspace() {
   const router = useRouter()
   const params = useParams()
@@ -36,6 +37,7 @@ export default function CandidatWorkspace() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   useEffect(() => {
+    // Fetch data
     const fetchData = async () => {
       try {
         const u = getUser()
@@ -64,6 +66,7 @@ export default function CandidatWorkspace() {
     fetchData()
   }, [router])
 
+  // Gère logout
   const handleLogout = async () => {
     try {
       const rt = (await import('js-cookie')).default.get('refresh_token') || ''

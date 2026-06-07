@@ -13,6 +13,7 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
 
+// Modal
 export default function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -22,6 +23,7 @@ export default function Modal({ isOpen, onClose, title, children, size = 'md' }:
   }, []);
 
   useEffect(() => {
+    // Gère escape
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };

@@ -9,6 +9,7 @@ export class MailService {
     private configService: ConfigService,
   ) { }
 
+  // Send verification email
   async sendVerificationEmail(email: string, token: string) {
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
     const url = `${frontendUrl}/auth/verify-email?token=${token}`;
@@ -32,6 +33,7 @@ export class MailService {
     });
   }
 
+  // Send password reset email
   async sendPasswordResetEmail(email: string, token: string) {
     const frontendUrl = this.configService.get<string>('FRONTEND_URL');
     const url = `${frontendUrl}/auth/reset-password?token=${token}`;
@@ -56,6 +58,7 @@ export class MailService {
     });
   }
 
+  // Send match confirmation email
   async sendMatchConfirmationEmail(email: string, role: 'candidate' | 'client', partnerName: string, projectName?: string) {
     const subject = role === 'candidate' ? 'Match confirmé ! — OPSIDE' : 'Match confirmé — Nouveau candidat';
     const message = role === 'candidate'
@@ -79,6 +82,7 @@ export class MailService {
     });
   }
 
+  // Send custom test invitation email
   async sendCustomTestInvitationEmail(
     email: string,
     companyName: string,
@@ -111,6 +115,7 @@ export class MailService {
     });
   }
 
+  // Send custom test result email
   async sendCustomTestResultEmail(
     email: string,
     role: 'candidate' | 'client',
@@ -148,6 +153,7 @@ export class MailService {
     });
   }
 
+  // Send calendly link email
   async sendCalendlyLinkEmail(
     candidateEmail: string,
     companyName: string,
@@ -175,6 +181,7 @@ export class MailService {
     });
   }
 
+  // Send workspace invitation email
   async sendWorkspaceInvitationEmail(
     candidateEmail: string,
     companyName: string,
@@ -201,6 +208,7 @@ export class MailService {
   }
 
 
+  // Send sourcing invitation email
   async sendSourcingInvitationEmail(email: string, clientName: string, projectName: string) {
     await this.mailerService.sendMail({
       to: email,
@@ -221,6 +229,7 @@ export class MailService {
     });
   }
 
+  // Send match decision email
   async sendMatchDecisionEmail(email: string, partnerName: string, decision: 'accepted' | 'refused', projectName?: string) {
     const subject = decision === 'accepted' ? 'Invitation acceptée !' : 'Invitation déclinée';
     const message = decision === 'accepted'
@@ -242,6 +251,7 @@ export class MailService {
     });
   }
 
+  // Send candidature rejection email
   async sendCandidatureRejectionEmail(email: string, jobTitle: string) {
     await this.mailerService.sendMail({
       to: email,
@@ -261,6 +271,7 @@ export class MailService {
     });
   }
 
+  // Send new candidature email
   async sendNewCandidatureEmail(email: string, candidateName: string, jobTitle: string, message?: string) {
     await this.mailerService.sendMail({
       to: email,

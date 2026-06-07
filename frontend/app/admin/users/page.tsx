@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { adminApi  } from '@/lib/admin-service'
+import { adminApi } from '@/lib/admin-service'
 import Button from '@/components/ui/Button'
 import { User } from '@/lib/auth-service'
-import { Search, ChevronDown, ShieldOff, ShieldCheck, RefreshCw, Filter } from 'lucide-react'
+import { Search, ShieldOff, ShieldCheck, RefreshCw } from 'lucide-react'
 import clsx from 'clsx'
 
 const ROLES = [
@@ -26,7 +26,8 @@ const ROLE_LABELS: Record<string, { label: string; class: string }> = {
   admin: { label: 'Admin', class: 'bg-foreground text-white border-foreground' },
 }
 
-export default function AdminUsersPage() {
+// Inner page content using useSearchParams
+function AdminUsersContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [users, setUsers] = useState<User[]>([])
@@ -59,6 +60,7 @@ export default function AdminUsersPage() {
     )
   }, [search, users])
 
+  // Toggle user status
   const toggleStatus = async (user: User) => {
     const newStatus = user.status === 'suspended' ? 'active' : 'suspended'
     setActionLoading(user.id)
@@ -146,9 +148,9 @@ export default function AdminUsersPage() {
                         <div className="flex items-center gap-3">
                           {/* Avatar or Initials */}
                           {user.candidate?.photo_url || user.client?.logo_url ? (
-                            <img 
-                              src={user.candidate?.photo_url || user.client?.logo_url} 
-                              alt="" 
+                            <img
+                              src={user.candidate?.photo_url || user.client?.logo_url}
+                              alt=""
                               className="w-9 h-9 rounded-full object-cover border border-border shrink-0"
                             />
                           ) : (
@@ -204,5 +206,14 @@ export default function AdminUsersPage() {
         )}
       </div>
     </div>
+  )
+}
+
+// Admin users page
+export default function AdminUsersPage() {
+  return (
+    <Suspense fallback={<div className="p-12 flex items-center justify-center"><div className="animate-spin w-8 h-8 border-2 border-accent border-t-transparent rounded-full" /></div>}>
+      <AdminUsersContent />
+    </Suspense>
   )
 }

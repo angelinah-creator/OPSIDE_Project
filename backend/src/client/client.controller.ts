@@ -28,6 +28,7 @@ import { Role } from '@prisma/client';
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
+  // Create profile
   @Post('profile')
   @Roles(Role.client)
   @HttpCode(HttpStatus.CREATED)
@@ -35,24 +36,28 @@ export class ClientController {
     return this.clientService.createProfile(userId, dto);
   }
 
+  // Récupère my profile
   @Get('profile/me')
   @Roles(Role.client)
   getMyProfile(@CurrentUser('id') userId: string) {
     return this.clientService.getMyProfile(userId);
   }
 
+  // Récupère profile by id
   @Get('profile/:id')
   @Roles(Role.client, Role.admin)
   getProfileById(@Param('id', ParseUUIDPipe) id: string) {
     return this.clientService.getProfileById(id);
   }
 
+  // Update profile
   @Patch('profile')
   @Roles(Role.client)
   updateProfile(@CurrentUser('id') userId: string, @Body() dto: UpdateClientProfileDto) {
     return this.clientService.updateProfile(userId, dto);
   }
 
+  // Upload logo
   @Post('profile/logo')
   @Roles(Role.client)
   @UseInterceptors(FileInterceptor('logo', { storage: memoryStorage() }))

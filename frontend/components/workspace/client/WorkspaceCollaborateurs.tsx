@@ -3,11 +3,8 @@
 import { useEffect, useState, useCallback } from 'react'
 import { matchService } from '@/lib/match-service'
 import { toast } from 'sonner'
-import {
-  Users, User, Briefcase, MapPin, DollarSign, Globe, Link as LinkIcon,
-  Calendar, Clock, Target, XCircle, AlertTriangle, CheckCircle
-} from 'lucide-react'
-import clsx from 'clsx'
+import { Users, User, Briefcase, MapPin, DollarSign, Globe, LinkIcon, Target, XCircle, AlertTriangle } from 'lucide-react';
+
 import Modal from '@/components/ui/Modal'
 import { getMockScore } from '@/components/dashboard/client/SourcingTab'
 
@@ -16,6 +13,7 @@ const AVAIL_LABEL: Record<string, string> = {
   one_month: 'Sous 1 mois', three_months: 'Sous 3 mois', unavailable: 'Indisponible'
 }
 
+// Formate date
 const formatDate = (m?: number, y?: number) => {
   if (!y) return ''
   const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc']
@@ -54,6 +52,7 @@ type Collaborateur = {
   }
 }
 
+// Workspace collaborateurs
 export default function WorkspaceCollaborateurs() {
   const [collabs, setCollabs] = useState<Collaborateur[]>([])
   const [loading, setLoading] = useState(true)
@@ -74,6 +73,7 @@ export default function WorkspaceCollaborateurs() {
 
   useEffect(() => { fetchCollabs() }, [fetchCollabs])
 
+  // Gère end contract
   const handleEndContract = async () => {
     if (!selectedCollab) return
     try {
@@ -90,6 +90,7 @@ export default function WorkspaceCollaborateurs() {
     }
   }
 
+  // Récupère a p i
   const getAPI = (url?: string) => {
     if (!url) return null
     return url.startsWith('http') ? url : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${url}`

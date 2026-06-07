@@ -16,13 +16,13 @@ import {
   eachDayOfInterval,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Play, Square, Pause, Calendar, Clock, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Square, Pause } from 'lucide-react';
 import { TimeGrid } from './timer/time-grid';
 import { TaskPopup } from './timer/task-popup';
 import { timesheetService, Timesheet, TimerStatus } from '@/lib/timesheet-service';
 import { toast } from 'sonner';
 
-// Composant WeekSelector pour la navigation par semaine personnalisée
+// Week selector
 function WeekSelector({
   isOpen,
   onClose,
@@ -42,6 +42,7 @@ function WeekSelector({
   useEffect(() => {
     if (!isOpen) return;
 
+    // Gère click outside
     const handleClickOutside = (event: MouseEvent) => {
       if (
         popupRef.current &&
@@ -59,6 +60,7 @@ function WeekSelector({
 
   if (!isOpen) return null;
 
+  // Render calendar
   const renderCalendar = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
@@ -72,6 +74,7 @@ function WeekSelector({
       weeks.push(days.slice(i, i + 7));
     }
 
+    // Gère week click
     const handleWeekClick = (week: Date[]) => {
       const weekStart = startOfWeek(week[0], { weekStartsOn: 1 });
       onSelectWeek(weekStart);
@@ -171,6 +174,7 @@ function WeekSelector({
   );
 }
 
+// Workspace time tracking
 export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [entries, setEntries] = useState<Timesheet[]>([]);
@@ -184,13 +188,11 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
   const [isWeekSelectorOpen, setIsWeekSelectorOpen] = useState(false);
   const weekSelectorRef = useRef<HTMLDivElement>(null);
 
-  // Charger les données initiales
   useEffect(() => {
     fetchActiveTimer();
     fetchEntries(currentWeek);
   }, [matchId, currentWeek]);
 
-  // Mettre à jour le chronomètre actif chaque seconde
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (activeTimer && activeTimer.status === TimerStatus.RUNNING) {
@@ -207,6 +209,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
     return () => clearInterval(interval);
   }, [activeTimer]);
 
+  // Fetch active timer
   const fetchActiveTimer = async () => {
     try {
       const active = await timesheetService.getActive();
@@ -221,6 +224,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
     }
   };
 
+  // Fetch entries
   const fetchEntries = async (week: Date) => {
     try {
       setLoading(true);
@@ -236,6 +240,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
     }
   };
 
+  // Gère start timer
   const handleStartTimer = async () => {
     if (activeTimer) {
       if (activeTimer.status === TimerStatus.PAUSED) {
@@ -274,6 +279,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
     }
   };
 
+  // Gère pause timer
   const handlePauseTimer = async () => {
     if (!activeTimer || activeTimer.status !== TimerStatus.RUNNING) return;
     try {
@@ -285,6 +291,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
     }
   };
 
+  // Gère stop timer
   const handleStopTimer = async () => {
     if (!activeTimer) return;
     try {
@@ -298,12 +305,14 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
     }
   };
 
+  // Gère create manual entry
   const handleCreateManualEntry = () => {
     setSelectedEntry({ match_id: matchId });
     setPopupMode('create');
     setIsPopupOpen(true);
   };
 
+  // Gère grid click
   const handleGridClick = (date: Date, startHour: number) => {
     const startTime = new Date(date);
     startTime.setHours(startHour, 0, 0, 0);
@@ -321,6 +330,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
     setIsPopupOpen(true);
   };
 
+  // Gère save entry
   const handleSaveEntry = async (data: Partial<Timesheet>) => {
     const description = (data.description || '').trim();
     if (!description) {
@@ -348,6 +358,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
     }
   };
 
+  // Gère delete entry
   const handleDeleteEntry = async () => {
     if (!selectedEntry?.id) return;
     
@@ -361,6 +372,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
     }
   };
 
+  // Gère block update
   const handleBlockUpdate = async (entry: Timesheet, newStartHour: number, newDurationHours: number) => {
     const startDate = new Date(entry.start_time);
     const startH = Math.floor(newStartHour);
@@ -382,6 +394,7 @@ export default function WorkspaceTimeTracking({ matchId }: { matchId: string }) 
     }
   };
 
+  // Formate time
   const formatTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);

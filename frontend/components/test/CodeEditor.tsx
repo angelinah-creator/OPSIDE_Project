@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+
 import { Editor } from '@monaco-editor/react';
 
 interface CodeEditorProps {
@@ -9,6 +9,7 @@ interface CodeEditorProps {
   placeholder?: string;
 }
 
+// Code editor
 export default function CodeEditor({
   value,
   onChange,

@@ -20,6 +20,7 @@ import { Role, CandidatureStatus } from '@prisma/client';
 export class CandidaturesController {
   constructor(private readonly candidaturesService: CandidaturesService) {}
 
+  // Create
   @Post()
   @Roles(Role.candidat)
   create(
@@ -29,18 +30,21 @@ export class CandidaturesController {
     return this.candidaturesService.create(userId, createCandidatureDto);
   }
 
+  // Find all for candidate
   @Get('candidate')
   @Roles(Role.candidat)
   findAllForCandidate(@CurrentUser('id') userId: string) {
     return this.candidaturesService.findAllForCandidate(userId);
   }
 
+  // Find all for client
   @Get('client')
   @Roles(Role.client)
   findAllForClient(@CurrentUser('id') userId: string) {
     return this.candidaturesService.findAllForClient(userId);
   }
 
+  // Update status
   @Patch(':id/status')
   @Roles(Role.client)
   updateStatus(

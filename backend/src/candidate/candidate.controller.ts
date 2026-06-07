@@ -1,19 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  UseInterceptors,
-  UploadedFile,
-  ParseUUIDPipe,
-  HttpCode,
-  HttpStatus,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards, UseInterceptors, UploadedFile, ParseUUIDPipe, HttpCode, HttpStatus } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { CandidateService } from './candidate.service';
@@ -34,8 +19,8 @@ import { Role } from '@prisma/client';
 export class CandidateController {
   constructor(private readonly candidateService: CandidateService) {}
 
-  // ─── Profile ──────────────────────────────────────────────────────
 
+  // Create profile
   @Post('profile')
   @Roles(Role.candidat)
   @HttpCode(HttpStatus.CREATED)
@@ -43,36 +28,42 @@ export class CandidateController {
     return this.candidateService.createProfile(userId, dto);
   }
 
+  // Récupère my profile
   @Get('profile/me')
   @Roles(Role.candidat)
   getMyProfile(@CurrentUser('id') userId: string) {
     return this.candidateService.getMyProfile(userId);
   }
 
+  // Récupère profile by id
   @Get('profile/:id')
   @Roles(Role.candidat, Role.client, Role.admin)
   getProfileById(@Param('id', ParseUUIDPipe) id: string) {
     return this.candidateService.getProfileById(id);
   }
 
+  // Find all
   @Get('all')
   @Roles(Role.client, Role.admin)
   findAll() {
     return this.candidateService.findAllProfiles();
   }
 
+  // Récupère applied jobs
   @Get('applied-jobs')
   @Roles(Role.candidat)
   getAppliedJobs(@CurrentUser('id') userId: string) {
     return this.candidateService.getAppliedJobIds(userId);
   }
 
+  // Update profile
   @Patch('profile')
   @Roles(Role.candidat)
   updateProfile(@CurrentUser('id') userId: string, @Body() dto: UpdateCandidateProfileDto) {
     return this.candidateService.updateProfile(userId, dto);
   }
 
+  // Upload photo
   @Post('profile/photo')
   @Roles(Role.candidat)
   @UseInterceptors(FileInterceptor('photo', { storage: memoryStorage() }))
@@ -83,6 +74,7 @@ export class CandidateController {
     return this.candidateService.uploadPhoto(userId, file);
   }
 
+  // Delete photo
   @Delete('profile/photo')
   @Roles(Role.candidat)
   @HttpCode(HttpStatus.OK)
@@ -90,8 +82,8 @@ export class CandidateController {
     return this.candidateService.deletePhoto(userId);
   }
 
-  // ─── Experiences ──────────────────────────────────────────────────
 
+  // Create experience
   @Post('experiences')
   @Roles(Role.candidat)
   @HttpCode(HttpStatus.CREATED)
@@ -99,12 +91,14 @@ export class CandidateController {
     return this.candidateService.createExperience(userId, dto);
   }
 
+  // Récupère experiences
   @Get('experiences')
   @Roles(Role.candidat)
   getExperiences(@CurrentUser('id') userId: string) {
     return this.candidateService.getExperiences(userId);
   }
 
+  // Update experience
   @Patch('experiences/:id')
   @Roles(Role.candidat)
   updateExperience(
@@ -115,6 +109,7 @@ export class CandidateController {
     return this.candidateService.updateExperience(userId, experienceId, dto);
   }
 
+  // Delete experience
   @Delete('experiences/:id')
   @Roles(Role.candidat)
   @HttpCode(HttpStatus.OK)
@@ -125,6 +120,7 @@ export class CandidateController {
     return this.candidateService.deleteExperience(userId, experienceId);
   }
 
+  // Upload experience media
   @Post('experiences/:id/media')
   @Roles(Role.candidat)
   @UseInterceptors(FileInterceptor('media', { storage: memoryStorage() }))
@@ -136,6 +132,7 @@ export class CandidateController {
     return this.candidateService.uploadExperienceMedia(userId, experienceId, file);
   }
 
+  // Delete experience media
   @Delete('experiences/:experienceId/media/:mediaId')
   @Roles(Role.candidat)
   deleteExperienceMedia(
@@ -146,8 +143,8 @@ export class CandidateController {
     return this.candidateService.deleteExperienceMedia(userId, experienceId, mediaId);
   }
 
-  // ─── Educations ───────────────────────────────────────────────────
 
+  // Create education
   @Post('educations')
   @Roles(Role.candidat)
   @HttpCode(HttpStatus.CREATED)
@@ -155,12 +152,14 @@ export class CandidateController {
     return this.candidateService.createEducation(userId, dto);
   }
 
+  // Récupère educations
   @Get('educations')
   @Roles(Role.candidat)
   getEducations(@CurrentUser('id') userId: string) {
     return this.candidateService.getEducations(userId);
   }
 
+  // Update education
   @Patch('educations/:id')
   @Roles(Role.candidat)
   updateEducation(
@@ -171,6 +170,7 @@ export class CandidateController {
     return this.candidateService.updateEducation(userId, educationId, dto);
   }
 
+  // Delete education
   @Delete('educations/:id')
   @Roles(Role.candidat)
   @HttpCode(HttpStatus.OK)
@@ -181,6 +181,7 @@ export class CandidateController {
     return this.candidateService.deleteEducation(userId, educationId);
   }
 
+  // Upload education media
   @Post('educations/:id/media')
   @Roles(Role.candidat)
   @UseInterceptors(FileInterceptor('media', { storage: memoryStorage() }))
@@ -192,6 +193,7 @@ export class CandidateController {
     return this.candidateService.uploadEducationMedia(userId, educationId, file);
   }
 
+  // Delete education media
   @Delete('educations/:educationId/media/:mediaId')
   @Roles(Role.candidat)
   deleteEducationMedia(
@@ -202,14 +204,15 @@ export class CandidateController {
     return this.candidateService.deleteEducationMedia(userId, educationId, mediaId);
   }
 
-  // ─── Historique
 
+  // Récupère history
   @Get('history')
   @Roles(Role.candidat)
   getHistory(@CurrentUser('id') userId: string) {
     return this.candidateService.getHistory(userId);
   }
 
+  // Delete history item
   @Delete('history/:id')
   @Roles(Role.candidat)
   @HttpCode(HttpStatus.OK)

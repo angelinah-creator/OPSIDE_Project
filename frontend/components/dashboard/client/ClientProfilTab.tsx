@@ -1,10 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import {
-  Pencil, Save, Mail, Phone, MapPin, Globe, Building2,
-  Users, Check, X, Camera, ExternalLink, BriefcaseBusiness, Calendar, LogOut
-} from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Pencil, Save, Mail, Phone, MapPin, Globe, Building2, Users, Check, Camera, ExternalLink, BriefcaseBusiness, Calendar } from 'lucide-react';
 import { clientApi, ClientProfile } from '@/lib/client-service';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -17,7 +14,6 @@ interface ClientProfilTabProps {
   onProfileUpdate?: (p: ClientProfile) => void;
 }
 
-// ─── Constants ───────────────────────────────────────────────────
 const SIZES = [
   { value: 'size_1_10', label: '1–10 employés' },
   { value: 'size_11_50', label: '11–50 employés' },
@@ -54,6 +50,7 @@ const COUNTRY_LABELS: Record<string, { label: string; flag: string }> = {
   tunisie: { label: 'Tunisie', flag: 'tn' },
 };
 
+// Client profil tab
 export default function ClientProfilTab({ profile: initialProfile, user: initialUser, onProfileUpdate }: ClientProfilTabProps) {
   const [profile, setProfile] = useState<ClientProfile | null>(initialProfile);
   const [user, setUser] = useState<any>(initialUser);
@@ -63,7 +60,6 @@ export default function ClientProfilTab({ profile: initialProfile, user: initial
   const logoInputRef = useRef<HTMLInputElement>(null);
   const [logoUrl, setLogoUrl] = useState(profile?.logo_url || '');
 
-  // ── Edit states ──
   const [editHero, setEditHero] = useState(false);
   const [heroForm, setHeroForm] = useState({
     company_name: '',
@@ -80,8 +76,10 @@ export default function ClientProfilTab({ profile: initialProfile, user: initial
     contact_name: '', contact_email: '', contact_phone: '', interview_availability: ''
   });
 
+  // Flash
   const flash = (msg: string) => { setSuccess(msg); setTimeout(() => setSuccess(''), 3000); };
   
+  // Refresh
   const refresh = async () => {
     try {
       const p = await clientApi.getMyProfile();
@@ -94,7 +92,7 @@ export default function ClientProfilTab({ profile: initialProfile, user: initial
     }
   };
 
-  // ── Handlers ──
+  // Gère logo change
   const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return;
     try {
@@ -105,6 +103,7 @@ export default function ClientProfilTab({ profile: initialProfile, user: initial
     e.target.value = '';
   };
 
+  // Start edit hero
   const startEditHero = () => {
     setHeroForm({
       company_name: profile?.company_name || '',
@@ -113,6 +112,7 @@ export default function ClientProfilTab({ profile: initialProfile, user: initial
     setEditHero(true);
   };
 
+  // Save hero
   const saveHero = async () => {
     setSaving(true); setError('');
     try {
@@ -126,6 +126,7 @@ export default function ClientProfilTab({ profile: initialProfile, user: initial
     } catch { setError('Erreur lors de la mise à jour.'); } finally { setSaving(false); }
   };
 
+  // Start edit info
   const startEditInfo = () => {
     setInfoForm({
       company_size: profile?.company_size || '',
@@ -137,6 +138,7 @@ export default function ClientProfilTab({ profile: initialProfile, user: initial
     setEditInfo(true);
   };
 
+  // Save info
   const saveInfo = async () => {
     setSaving(true); setError('');
     try {
@@ -150,6 +152,7 @@ export default function ClientProfilTab({ profile: initialProfile, user: initial
     } catch { setError('Erreur lors de la mise à jour.'); } finally { setSaving(false); }
   };
 
+  // Start edit contact
   const startEditContact = () => {
     setContactForm({
       contact_name: profile?.contact_name || '',
@@ -160,6 +163,7 @@ export default function ClientProfilTab({ profile: initialProfile, user: initial
     setEditContact(true);
   };
 
+  // Save contact
   const saveContact = async () => {
     setSaving(true); setError('');
     try {

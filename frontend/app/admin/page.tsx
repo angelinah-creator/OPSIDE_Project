@@ -6,7 +6,7 @@ import { adminApi } from '@/lib/admin-service'
 import { Users, UserCheck, Building2, Handshake, ArrowUpRight, AlertTriangle } from 'lucide-react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 
-// Custom Tooltip
+// Custom tooltip
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -43,7 +43,7 @@ const STATUS_LABELS: Record<string, string> = {
 const CANDIDATE_COLOR = '#6366f1' // Indigo
 const CLIENT_COLOR = '#06b6d4'    // Cyan
 
-// Composants de Chargement (Skeletons)
+// K p i card skeleton
 const KPICardSkeleton = () => (
   <div className="bg-white rounded-xl md:rounded-2xl border border-slate-100 p-3 md:p-5 shadow-xs flex flex-col gap-3 animate-pulse">
     <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-slate-100" />
@@ -52,6 +52,7 @@ const KPICardSkeleton = () => (
   </div>
 )
 
+// Chart skeleton
 const ChartSkeleton = () => (
   <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-xs animate-pulse h-[300px] flex flex-col justify-between">
     <div className="space-y-2">
@@ -69,6 +70,7 @@ const ChartSkeleton = () => (
   </div>
 )
 
+// Admin dashboard
 export default function AdminDashboard() {
   const [users, setUsers]     = useState<any[]>([])
   const [matches, setMatches] = useState<any[]>([])
@@ -85,7 +87,6 @@ export default function AdminDashboard() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Stats dérivées 
   const stats = useMemo(() => {
     const candidats  = users.filter(u => u.role === 'candidat')
     const clients    = users.filter(u => u.role === 'client')
@@ -99,7 +100,6 @@ export default function AdminDashboard() {
     }
   }, [users, matches])
 
-  // Données des Graphiques
   const userPieData = useMemo(() => [
     { name: 'Candidats',   value: stats.candidats, color: CANDIDATE_COLOR },
     { name: 'Entreprises', value: stats.clients,   color: CLIENT_COLOR },
@@ -112,7 +112,6 @@ export default function AdminDashboard() {
     color: STATUS_COLORS[key],
   })).filter(d => d.value > 0), [matches])
 
-  // Configuration des cartes KPI
   const cards = [
     { label: 'Total utilisateurs', value: stats.total,     icon: Users,        color: 'from-purple-500 to-purple-600',       textColor: 'text-purple-600' },
     { label: 'Candidats inscrits', value: stats.candidats, icon: UserCheck,    color: 'from-purple-500 to-purple-600',       textColor: 'text-purple-600' },

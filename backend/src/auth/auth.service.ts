@@ -25,6 +25,7 @@ export class AuthService {
     private mailService: MailService,
   ) {}
 
+  // Register
   async register(dto: RegisterDto) {
     if (dto.role === Role.admin) {
       throw new BadRequestException('Impossible de créer un compte admin via inscription');
@@ -72,6 +73,7 @@ export class AuthService {
     };
   }
 
+  // Login
   async login(dto: LoginDto) {
     const email = dto.email.toLowerCase();
     const user = await this.prisma.user.findUnique({
@@ -112,6 +114,7 @@ export class AuthService {
     };
   }
 
+  // Refresh tokens
   async refreshTokens(userId: string, email: string, role: string, oldRefreshToken: string) {
     await this.prisma.refreshToken.updateMany({
       where: { token: oldRefreshToken },
@@ -125,6 +128,7 @@ export class AuthService {
     };
   }
 
+  // Logout
   async logout(userId: string, refreshToken: string) {
     await this.prisma.refreshToken.updateMany({
       where: {
@@ -137,6 +141,7 @@ export class AuthService {
     return { message: 'Déconnexion réussie' };
   }
 
+  // Logout all
   async logoutAll(userId: string) {
     await this.prisma.refreshToken.updateMany({
       where: { user_id: userId },
@@ -146,6 +151,7 @@ export class AuthService {
     return { message: 'Déconnexion de tous les appareils réussie' };
   }
 
+  // Verify email
   async verifyEmail(token: string) {
     const user = await this.prisma.user.findFirst({
       where: { email_verification_token: token },
@@ -178,6 +184,7 @@ export class AuthService {
     };
   }
 
+  // Me
   async me(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -210,13 +217,13 @@ export class AuthService {
     return user;
   }
 
+  // Forgot password
   async forgotPassword(dto: ForgotPasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
 
     if (!user) {
-      // Pour des raisons de sécurité, on ne dit pas si l'email existe ou non
       return { message: 'Si votre adresse e-mail est enregistrée, vous recevrez un lien de réinitialisation.' };
     }
 
@@ -241,6 +248,7 @@ export class AuthService {
     return { message: 'Si votre adresse e-mail est enregistrée, vous recevrez un lien de réinitialisation.' };
   }
 
+  // Reset password
   async resetPassword(dto: ResetPasswordDto) {
     const user = await this.prisma.user.findFirst({
       where: {
@@ -266,12 +274,12 @@ export class AuthService {
       },
     });
 
-    // Optionnel: révoquer tous les refresh tokens existants pour forcer une nouvelle connexion partout
     await this.logoutAll(user.id);
 
     return { message: 'Votre mot de passe a été réinitialisé avec succès.' };
   }
 
+  // Generate tokens
   private async generateTokens(userId: string, email: string, role: Role) {
     const payload = { sub: userId, email, role };
 

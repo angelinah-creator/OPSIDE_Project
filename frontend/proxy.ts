@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+// Proxy
 export function proxy(request: NextRequest) {
   const token = request.cookies.get('access_token')?.value
   const userCookie = request.cookies.get('user')?.value
@@ -13,7 +14,6 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  // Role guard
   if (token && userCookie) {
     try {
       const user = JSON.parse(userCookie)

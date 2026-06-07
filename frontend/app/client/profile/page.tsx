@@ -3,19 +3,15 @@
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Logo from '@/components/ui/Logo'
+
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import CountrySelect from '@/components/ui/CountrySelect'
 import { authApi, clearTokens } from '@/lib/auth-service'
 import { clientApi } from '@/lib/client-service'
-import {
-  ArrowLeft, LogOut, Pencil, Save, X, Camera, Building2, BriefcaseBusiness, MapPin,
-  ExternalLink, Check, Globe, Mail, Phone, Calendar
-} from 'lucide-react'
+import { ArrowLeft, LogOut, Pencil, Save, Camera, Building2, BriefcaseBusiness, MapPin, ExternalLink, Check, Globe, Mail, Phone, Calendar } from 'lucide-react';
 
-// ─── Constants ───────────────────────────────────────────────────
 const SIZES = [
   { value: 'size_1_10', label: '1–10 employés' },
   { value: 'size_11_50', label: '11–50 employés' },
@@ -52,19 +48,17 @@ const COUNTRY_LABELS: Record<string, { label: string; flag: string }> = {
   tunisie: { label: 'Tunisie', flag: 'tn' },
 }
 
-// ─── Main Component ───────────────────────────────────────────────
+// Client profile page
 export default function ClientProfilePage() {
   const router = useRouter()
   const logoInputRef = useRef<HTMLInputElement>(null)
 
-  // ── State ──
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  // Hero section
   const [editHero, setEditHero] = useState(false)
   const [heroForm, setHeroForm] = useState({
     company_name: '',
@@ -74,23 +68,21 @@ export default function ClientProfilePage() {
   })
   const [logoUrl, setLogoUrl] = useState('')
 
-  // Company info section
   const [editInfo, setEditInfo] = useState(false)
   const [infoForm, setInfoForm] = useState({
     company_size: '', industry: '', country: '', city: '', website: ''
   })
 
-  // Contact section
   const [editContact, setEditContact] = useState(false)
   const [contactForm, setContactForm] = useState({
     contact_name: '', contact_email: '', contact_phone: '', interview_availability: ''
   })
 
-  // ── Load ──
   useEffect(() => {
     loadProfile()
   }, [])
 
+  // Load profile
   const loadProfile = async () => {
     try {
       const p = await clientApi.getMyProfile()
@@ -131,7 +123,9 @@ export default function ClientProfilePage() {
     }
   }
 
+  // Flash
   const flash = (msg: string) => { setSuccess(msg); setTimeout(() => setSuccess(''), 3000) }
+  // Refresh
   const refresh = async () => {
     try {
       const p = await clientApi.getMyProfile()
@@ -140,7 +134,7 @@ export default function ClientProfilePage() {
     } catch { }
   }
 
-  // ── Logo handlers ──
+  // Gère logo change
   const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return
     try {
@@ -151,7 +145,7 @@ export default function ClientProfilePage() {
     e.target.value = ''
   }
 
-  // ── Save handlers ──
+  // Save hero
   const saveHero = async () => {
     setSaving(true); setError('')
     try {
@@ -169,6 +163,7 @@ export default function ClientProfilePage() {
     } catch { setError('Erreur lors de la mise à jour.') } finally { setSaving(false) }
   }
 
+  // Save info
   const saveInfo = async () => {
     setSaving(true); setError('')
     try {
@@ -182,6 +177,7 @@ export default function ClientProfilePage() {
     } catch { setError('Erreur lors de la mise à jour.') } finally { setSaving(false) }
   }
 
+  // Save contact
   const saveContact = async () => {
     setSaving(true); setError('')
     try {
@@ -195,6 +191,7 @@ export default function ClientProfilePage() {
     } catch { setError('Erreur lors de la mise à jour.') } finally { setSaving(false) }
   }
 
+  // Gère logout
   const handleLogout = async () => {
     try {
       const Cookies = (await import('js-cookie')).default

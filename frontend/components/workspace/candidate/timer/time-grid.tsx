@@ -14,6 +14,7 @@ interface TimeGridProps {
   onGridClick: (date: Date, startHour: number) => void;
 }
 
+// Time grid
 export function TimeGrid({
   currentWeek,
   entries,
@@ -30,25 +31,28 @@ export function TimeGrid({
   const containerRef = useRef<HTMLDivElement>(null);
   const [nowDate, setNowDate] = useState(new Date());
 
-  // Mise à jour de l'heure courante pour la ligne rouge
   useEffect(() => {
     const interval = setInterval(() => setNowDate(new Date()), 60000);
     return () => clearInterval(interval);
   }, []);
 
+  // Récupère day index
   const getDayIndex = (dateString: string) => {
     let day = getDay(new Date(dateString)) - 1;
     if (day === -1) day = 6;
     return day;
   };
 
+  // Récupère start hour
   const getStartHour = (dateString: string) => {
     const date = new Date(dateString);
     return date.getHours() + date.getMinutes() / 60;
   };
 
+  // Récupère duration hours
   const getDurationHours = (durationSeconds: number) => durationSeconds / 3600;
 
+  // Vérifie si editable
   const isEditable = (dateString: string) => {
     const entryDate = new Date(dateString);
     entryDate.setHours(0, 0, 0, 0);
@@ -58,10 +62,10 @@ export function TimeGrid({
     return entryDate >= limitDate;
   };
 
+  // Gère grid click
   const handleGridClick = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
     
-    // Si on clique sur un bloc existant, ça ne doit pas déclencher le clic de la grille
     if ((e.target as HTMLElement).closest('.absolute.rounded-lg')) return;
 
     const rect = containerRef.current.getBoundingClientRect();
@@ -81,6 +85,7 @@ export function TimeGrid({
     }
   };
 
+  // Récupère entry chunks
   const getEntryChunks = (entry: Timesheet, isActive: boolean, durationSeconds: number) => {
     const chunks: Array<{
       key: string;
@@ -127,6 +132,7 @@ export function TimeGrid({
     return chunks;
   };
 
+  // Récupère day total duration
   const getDayTotalDuration = (day: Date) => {
     let totalSeconds = 0;
     const dayStart = new Date(day);
@@ -164,6 +170,7 @@ export function TimeGrid({
     return totalSeconds;
   };
 
+  // Formate total time
   const formatTotalTime = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -171,6 +178,7 @@ export function TimeGrid({
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  // Formate total time short
   const formatTotalTimeShort = (seconds: number) => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);

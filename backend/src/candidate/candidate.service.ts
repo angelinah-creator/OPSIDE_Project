@@ -22,8 +22,8 @@ export class CandidateService {
     private uploadService: UploadService,
   ) {}
 
-  // ─── Profile ───
 
+  // Create profile
   async createProfile(userId: string, dto: CreateCandidateProfileDto) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user || user.role !== 'candidat') {
@@ -49,7 +49,6 @@ export class CandidateService {
 
     const { skill_ids, currency, ...profileData } = dto;
     
-    // Automatic currency mapping
     const mappedCurrency = this.mapCountryToCurrency(profileData.country);
 
     const profile = await this.prisma.candidateProfile.create({
@@ -71,6 +70,7 @@ export class CandidateService {
     return { message: 'Profil créé avec succès', profile };
   }
 
+  // Récupère my profile
   async getMyProfile(userId: string) {
     const profile = await this.prisma.candidateProfile.findUnique({
       where: { user_id: userId },
@@ -101,6 +101,7 @@ export class CandidateService {
     return profile;
   }
 
+  // Récupère profile by id
   async getProfileById(profileId: string) {
     const profile = await this.prisma.candidateProfile.findUnique({
       where: { id: profileId },
@@ -131,12 +132,11 @@ export class CandidateService {
     return profile;
   }
 
+  // Find all profiles
   async findAllProfiles() {
-    // Retourne tous les profils complétés de manière anonymisée
     const profiles = await this.prisma.candidateProfile.findMany({
       where: { 
         profile_completed: true,
-        // Suppression du filtre status qui causait une erreur si la valeur était incorrecte
       },
       include: {
         candidate_skills: { include: { skill: true } },
@@ -160,7 +160,6 @@ export class CandidateService {
       orderBy: { updated_at: 'desc' }
     });
 
-    // Anonymisation supplémentaire (sécurité)
     return profiles.map(p => ({
       id: p.id,
       user_id: p.user_id,
@@ -178,6 +177,7 @@ export class CandidateService {
     }));
   }
 
+  // Récupère applied job ids
   async getAppliedJobIds(candidateId: string) {
     const candidatures = await this.prisma.candidature.findMany({
       where: { candidate_id: candidateId },
@@ -186,6 +186,7 @@ export class CandidateService {
     return candidatures.map(c => c.job_offer_id);
   }
 
+  // Update profile
   async updateProfile(userId: string, dto: UpdateCandidateProfileDto) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) {
@@ -223,6 +224,7 @@ export class CandidateService {
     return { message: 'Profil mis à jour avec succès', profile: updatedProfile };
   }
 
+  // Upload photo
   async uploadPhoto(userId: string, file: Express.Multer.File) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) {
@@ -239,6 +241,7 @@ export class CandidateService {
     return { message: 'Photo uploadée avec succès', photo_url: updated.photo_url };
   }
 
+  // Delete photo
   async deletePhoto(userId: string) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) throw new NotFoundException('Profil candidat non trouvé');
@@ -251,8 +254,8 @@ export class CandidateService {
     return { message: 'Photo supprimée avec succès' };
   }
 
-  // ─── Experiences ────
 
+  // Create experience
   async createExperience(userId: string, dto: CreateExperienceDto) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) {
@@ -285,6 +288,7 @@ export class CandidateService {
     return { message: 'Expérience ajoutée avec succès', experience };
   }
 
+  // Récupère experiences
   async getExperiences(userId: string) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) throw new NotFoundException('Profil candidat non trouvé');
@@ -299,6 +303,7 @@ export class CandidateService {
     });
   }
 
+  // Update experience
   async updateExperience(userId: string, experienceId: string, dto: UpdateExperienceDto) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) throw new NotFoundException('Profil candidat non trouvé');
@@ -337,6 +342,7 @@ export class CandidateService {
     return { message: 'Expérience mise à jour', experience: updated };
   }
 
+  // Delete experience
   async deleteExperience(userId: string, experienceId: string) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) throw new NotFoundException('Profil candidat non trouvé');
@@ -350,6 +356,7 @@ export class CandidateService {
     return { message: 'Expérience supprimée avec succès' };
   }
 
+  // Upload experience media
   async uploadExperienceMedia(userId: string, experienceId: string, file: Express.Multer.File) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) throw new NotFoundException('Profil candidat non trouvé');
@@ -373,6 +380,7 @@ export class CandidateService {
     return { message: 'Média ajouté avec succès', media };
   }
 
+  // Delete experience media
   async deleteExperienceMedia(userId: string, experienceId: string, mediaId: string) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) throw new NotFoundException('Profil candidat non trouvé');
@@ -395,8 +403,8 @@ export class CandidateService {
     return { message: 'Média supprimé avec succès' };
   }
 
-  // ─── Educations ────
 
+  // Create education
   async createEducation(userId: string, dto: CreateEducationDto) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) {
@@ -429,6 +437,7 @@ export class CandidateService {
     return { message: 'Formation ajoutée avec succès', education };
   }
 
+  // Récupère educations
   async getEducations(userId: string) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) throw new NotFoundException('Profil candidat non trouvé');
@@ -443,6 +452,7 @@ export class CandidateService {
     });
   }
 
+  // Update education
   async updateEducation(userId: string, educationId: string, dto: UpdateEducationDto) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) throw new NotFoundException('Profil candidat non trouvé');
@@ -481,6 +491,7 @@ export class CandidateService {
     return { message: 'Formation mise à jour', education: updated };
   }
 
+  // Delete education
   async deleteEducation(userId: string, educationId: string) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) throw new NotFoundException('Profil candidat non trouvé');
@@ -494,6 +505,7 @@ export class CandidateService {
     return { message: 'Formation supprimée avec succès' };
   }
 
+  // Upload education media
   async uploadEducationMedia(userId: string, educationId: string, file: Express.Multer.File) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) throw new NotFoundException('Profil candidat non trouvé');
@@ -517,6 +529,7 @@ export class CandidateService {
     return { message: 'Média ajouté avec succès', media };
   }
 
+  // Delete education media
   async deleteEducationMedia(userId: string, educationId: string, mediaId: string) {
     const profile = await this.prisma.candidateProfile.findUnique({ where: { user_id: userId } });
     if (!profile) throw new NotFoundException('Profil candidat non trouvé');
@@ -539,8 +552,8 @@ export class CandidateService {
     return { message: 'Média supprimé avec succès' };
   }
 
+  // Récupère history
   async getHistory(userId: string) {
-    // 1. Fetch current candidatures and custom tests for the candidate
     const [candidatures, tests] = await Promise.all([
       this.prisma.candidature.findMany({
         where: { candidate_id: userId },
@@ -573,7 +586,6 @@ export class CandidateService {
       }),
     ]);
 
-    // 2. Fetch existing histories
     const existingHistories = await this.prisma.history.findMany({
       where: { user_id: userId },
     });
@@ -585,7 +597,6 @@ export class CandidateService {
     const historyItemsToCreate: any[] = [];
     const historyItemsToUpdate: any[] = [];
 
-    // 3. Process candidatures
     for (const cand of candidatures) {
       const companyName = cand.job_offer?.client?.client?.company_name || 'Entreprise';
       const status = cand.status;
@@ -630,7 +641,6 @@ export class CandidateService {
       }
     }
 
-    // 4. Process custom tests
     for (const test of tests) {
       const companyName = test.match?.client?.client?.company_name || test.match?.job_offer?.title || 'Entreprise';
       const status = test.status;
@@ -680,14 +690,12 @@ export class CandidateService {
       }
     }
 
-    // 5. Create new history items if any
     if (historyItemsToCreate.length > 0) {
       await this.prisma.history.createMany({
         data: historyItemsToCreate,
       });
     }
 
-    // 6. Update existing items if status has changed
     for (const item of historyItemsToUpdate) {
       await this.prisma.history.update({
         where: { id: item.id },
@@ -695,7 +703,6 @@ export class CandidateService {
       });
     }
 
-    // 7. Return non-deleted history records sorted by date descending
     return this.prisma.history.findMany({
       where: {
         user_id: userId,
@@ -707,6 +714,7 @@ export class CandidateService {
     });
   }
 
+  // Delete history item
   async deleteHistoryItem(userId: string, itemId: string) {
     const historyItem = await this.prisma.history.findUnique({
       where: { id: itemId },
@@ -728,6 +736,7 @@ export class CandidateService {
     return { message: "Activité supprimée de l'historique avec succès" };
   }
 
+  // Map country to currency
   private mapCountryToCurrency(country: Country): Currency {
     const mapping: Record<Country, Currency> = {
       madagascar: Currency.MGA,

@@ -1,4 +1,3 @@
-// npx tsx .\prisma\seed-skills.ts
 
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
@@ -12,7 +11,6 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 const skillsData = [  
-  // Frontend
   { name: 'React', category: 'frontend' },
   { name: 'Vue.js', category: 'frontend' },
   { name: 'Angular', category: 'frontend' },
@@ -20,7 +18,6 @@ const skillsData = [
   { name: 'TypeScript', category: 'frontend' },
   { name: 'HTML/CSS', category: 'frontend' },
   { name: 'Tailwind', category: 'frontend' },
-  // Backend
   { name: 'Node.js', category: 'backend' },
   { name: 'NestJS', category: 'backend' },
   { name: 'Python', category: 'backend' },
@@ -30,31 +27,28 @@ const skillsData = [
   { name: 'Laravel', category: 'backend' },
   { name: 'Java', category: 'backend' },
   { name: 'Spring Boot', category: 'backend' },
-  // Mobile
   { name: 'React Native', category: 'mobile' },
   { name: 'Flutter', category: 'mobile' },
   { name: 'Swift', category: 'mobile' },
   { name: 'Kotlin', category: 'mobile' },
-  // DevOps
   { name: 'Docker', category: 'devops' },
   { name: 'Kubernetes', category: 'devops' },
   { name: 'AWS', category: 'devops' },
   { name: 'CI/CD', category: 'devops' },
   { name: 'Terraform', category: 'devops' },
-  // Data
   { name: 'PostgreSQL', category: 'data' },
   { name: 'MongoDB', category: 'data' },
   { name: 'Redis', category: 'data' },
   { name: 'Elasticsearch', category: 'data' },
   { name: 'Python Data', category: 'data' },
   { name: 'SQL', category: 'data' },
-  // Design
   { name: 'Figma', category: 'design' },
   { name: 'Photoshop', category: 'design' },
   { name: 'AdobeXD', category: 'design' },
   { name: 'Photopea', category: 'design' },
 ];
 
+// Main
 async function main() {
   console.log('Seeding skills into database...');
   for (const skill of skillsData) {

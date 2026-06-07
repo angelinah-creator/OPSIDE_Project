@@ -1,12 +1,4 @@
-import {
-  IsString,
-  IsOptional,
-  IsDateString,
-  IsNumber,
-  IsEnum,
-  IsBoolean,
-  IsArray,
-} from 'class-validator';
+import { IsString, IsOptional, IsDateString, IsNumber, IsEnum } from 'class-validator';
 import { TimerStatus } from '@prisma/client';
 
 export class CreateTimesheetDto {

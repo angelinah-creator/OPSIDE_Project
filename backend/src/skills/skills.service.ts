@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class SkillsService {
   constructor(private prisma: PrismaService) {}
 
+  // Find all
   async findAll(userId?: string, category?: string) {
     return this.prisma.skill.findMany({
       where: {
@@ -17,6 +18,7 @@ export class SkillsService {
     });
   }
 
+  // Create
   async create(userId: string, data: { name: string; category: string }) {
     return this.prisma.skill.create({
       data: {
@@ -27,6 +29,7 @@ export class SkillsService {
     });
   }
 
+  // Update
   async update(userId: string, id: string, data: { name?: string; category?: string }) {
     const skill = await this.prisma.skill.findUniqueOrThrow({ where: { id } });
     if (skill.owner_id !== userId) {
@@ -38,6 +41,7 @@ export class SkillsService {
     });
   }
 
+  // Remove
   async remove(userId: string, id: string) {
     const skill = await this.prisma.skill.findUniqueOrThrow({ where: { id } });
     if (skill.owner_id !== userId) {
@@ -46,6 +50,7 @@ export class SkillsService {
     return this.prisma.skill.delete({ where: { id } });
   }
 
+  // Find one
   async findOne(id: string) {
     return this.prisma.skill.findUniqueOrThrow({ where: { id } });
   }

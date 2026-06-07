@@ -6,6 +6,7 @@ import { UserStatus } from '@prisma/client';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  // Find all
   async findAll(role?: string) {
     return this.prisma.user.findMany({
       where: role ? { role: role as any } : {},
@@ -24,6 +25,7 @@ export class UsersService {
     });
   }
 
+  // Find one
   async findOne(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
@@ -60,6 +62,7 @@ export class UsersService {
     return user;
   }
 
+  // Update me
   async updateMe(userId: string, data: { first_name?: string; last_name?: string }) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new NotFoundException('Utilisateur non trouvé');
@@ -73,6 +76,7 @@ export class UsersService {
     return { message: 'Profil mis à jour', user: updated };
   }
 
+  // Update status
   async updateStatus(id: string, status: UserStatus) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('Utilisateur non trouvé');
@@ -97,6 +101,7 @@ export class UsersService {
     return { message: `Statut mis à jour: ${status}`, user: updated };
   }
 
+  // Delete user
   async deleteUser(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new NotFoundException('Utilisateur non trouvé');

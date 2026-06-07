@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Logo from '@/components/ui/Logo'
+
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Textarea from '@/components/ui/Textarea'
@@ -12,13 +12,8 @@ import CountrySelect from '@/components/ui/CountrySelect'
 import SkillSelector from '@/components/ui/SkillSelector'
 import { candidateApi } from '@/lib/candidate-service'
 import { clearTokens } from '@/lib/auth-service'
-import {
-  ArrowLeft, LogOut, Pencil, Save, X, Plus, Trash2,
-  Camera, User, ExternalLink, Check, ImagePlus, ChevronDown,
-  ChevronLeft, ChevronRight,
-} from 'lucide-react'
+import { ArrowLeft, LogOut, Pencil, Save, X, Plus, Trash2, Camera, User, ExternalLink, Check, ImagePlus, ChevronLeft, ChevronRight } from 'lucide-react';
 
-// ─── Constants ───────────────────────────────────────────────────
 const SPECIALITIES = [
   { value: 'frontend', label: 'Frontend' }, { value: 'backend', label: 'Backend' },
   { value: 'fullstack', label: 'Fullstack' }, { value: 'mobile', label: 'Mobile' },
@@ -74,6 +69,7 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => ({
   value: String(i + 1),
   label: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][i],
 }))
+// Years
 const years = () => {
   const now = new Date().getFullYear()
   return Array.from({ length: 30 }, (_, i) => ({ value: String(now - i), label: String(now - i) }))
@@ -86,9 +82,9 @@ const SPEC_LABEL: Record<string, string> = {
   devops: 'DevOps', design: 'Design UX/UI', data: 'Data / IA', other: 'Autre',
 }
 
-// ─── Media helpers ────────────────────────────────────────────────
 interface MediaPreview { file: File; previewUrl: string }
 
+// Media gallery
 function MediaGallery({ medias, onDelete, editMode, onOpen }: {
   medias: any[]
   onDelete?: (id: string) => void
@@ -130,6 +126,7 @@ function MediaGallery({ medias, onDelete, editMode, onOpen }: {
   )
 }
 
+// Media preview row
 function MediaPreviewRow({ previews, onRemove }: { previews: MediaPreview[]; onRemove: (i: number) => void }) {
   if (!previews.length) return null
   return (
@@ -152,7 +149,7 @@ function MediaPreviewRow({ previews, onRemove }: { previews: MediaPreview[]; onR
   )
 }
 
-// ─── Auto-resize textarea ─────────────────────────────────────────
+// Auto textarea
 function AutoTextarea({ value, onChange, placeholder, className = '', readOnly = false }: {
   value: string; onChange?: (v: string) => void; placeholder?: string; className?: string; readOnly?: boolean
 }) {
@@ -176,32 +173,28 @@ function AutoTextarea({ value, onChange, placeholder, className = '', readOnly =
   )
 }
 
-// ─── Main Component ───────────────────────────────────────────────
+// Candidat profile page
 export default function CandidatProfilePage() {
   const router = useRouter()
   const photoInputRef = useRef<HTMLInputElement>(null)
 
-  // ── State ──
   const [profile, setProfile] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  // Hero section
   const [editHero, setEditHero] = useState(false)
   const [editBio, setEditBio] = useState(false)
   const [heroForm, setHeroForm] = useState({ first_name: '', last_name: '', bio: '', title: '' })
   const [photoDropdown, setPhotoDropdown] = useState(false)
   const [gallery, setGallery] = useState<{ items: { url: string, type: string }[], index: number } | null>(null)
 
-  // Main info section
   const [editMain, setEditMain] = useState(false)
   const [pf, setPf] = useState<any>({})
   const [skillIds, setSkillIds] = useState<string[]>([])
   const [editSkills, setEditSkills] = useState(false)
 
-  // Experience editing
   const [editingExpId, setEditingExpId] = useState<string | null>(null)
   const [expForm, setExpForm] = useState<any>({})
   const [expNewMedia, setExpNewMedia] = useState<MediaPreview[]>([])
@@ -209,7 +202,6 @@ export default function CandidatProfilePage() {
   const [newExpForm, setNewExpForm] = useState<any>({})
   const [newExpMedia, setNewExpMedia] = useState<MediaPreview[]>([])
 
-  // Education editing
   const [editingEduId, setEditingEduId] = useState<string | null>(null)
   const [eduForm, setEduForm] = useState<any>({})
   const [eduNewMedia, setEduNewMedia] = useState<MediaPreview[]>([])
@@ -217,7 +209,6 @@ export default function CandidatProfilePage() {
   const [newEduForm, setNewEduForm] = useState<any>({})
   const [newEduMedia, setNewEduMedia] = useState<MediaPreview[]>([])
 
-  // ── Load ──
   useEffect(() => {
     candidateApi.getMyProfile().then((p: any) => {
       setProfile(p)
@@ -243,10 +234,12 @@ export default function CandidatProfilePage() {
     }).finally(() => setLoading(false))
   }, [router])
 
+  // Flash
   const flash = (msg: string) => { setSuccess(msg); setTimeout(() => setSuccess(''), 3000) }
+  // Refresh
   const refresh = () => candidateApi.getMyProfile().then((p: any) => setProfile(p)).catch(() => { })
 
-  // ── Photo handlers ──
+  // Gère photo change
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return
     try {
@@ -257,6 +250,7 @@ export default function CandidatProfilePage() {
     e.target.value = ''
   }
 
+  // Gère delete photo
   const handleDeletePhoto = async () => {
     setPhotoDropdown(false)
     try {
@@ -266,7 +260,7 @@ export default function CandidatProfilePage() {
     } catch { setError('Erreur lors de la suppression.') }
   }
 
-  // ── Hero save ──
+  // Save hero
   const saveHero = async () => {
     setSaving(true); setError('')
     try {
@@ -278,6 +272,7 @@ export default function CandidatProfilePage() {
     } catch { setError('Erreur lors de la mise à jour.') } finally { setSaving(false) }
   }
 
+  // Save bio
   const saveBio = async () => {
     setSaving(true); setError('')
     try {
@@ -288,7 +283,7 @@ export default function CandidatProfilePage() {
     } catch { setError('Erreur lors de la mise à jour.') } finally { setSaving(false) }
   }
 
-  // ── Main info save ──
+  // Save main
   const saveMain = async () => {
     setSaving(true); setError('')
     try {
@@ -303,7 +298,7 @@ export default function CandidatProfilePage() {
     } catch { setError('Erreur lors de la mise à jour.') } finally { setSaving(false) }
   }
 
-  // ── Skills save ──
+  // Save skills
   const saveSkills = async () => {
     setSaving(true); setError('')
     try {
@@ -314,7 +309,7 @@ export default function CandidatProfilePage() {
     } catch { setError('Erreur.') } finally { setSaving(false) }
   }
 
-  // ── Experience handlers ──
+  // Start edit exp
   const startEditExp = (exp: any) => {
     setEditingExpId(exp.id)
     setExpNewMedia([])
@@ -329,6 +324,7 @@ export default function CandidatProfilePage() {
     })
   }
 
+  // Save exp
   const saveExp = async (id: string) => {
     setSaving(true); setError('')
     try {
@@ -347,15 +343,18 @@ export default function CandidatProfilePage() {
     } catch { setError('Erreur.') } finally { setSaving(false) }
   }
 
+  // Delete exp
   const deleteExp = async (id: string) => {
     if (!confirm('Supprimer cette expérience ?')) return
     try { await candidateApi.deleteExperience(id); await refresh() } catch { }
   }
 
+  // Delete exp media
   const deleteExpMedia = async (expId: string, mediaId: string) => {
     try { await candidateApi.deleteExperienceMedia(expId, mediaId); await refresh() } catch { }
   }
 
+  // Add exp media files
   const addExpMediaFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     const previews = files.filter(f => f.type.startsWith('image/') || f.type.startsWith('video/')).map(f => ({ file: f, previewUrl: URL.createObjectURL(f) }))
@@ -363,6 +362,7 @@ export default function CandidatProfilePage() {
     e.target.value = ''
   }
 
+  // Add new exp
   const addNewExp = async () => {
     if (!newExpForm.title || !newExpForm.company || !newExpForm.start_year) return
     setSaving(true); setError('')
@@ -386,6 +386,7 @@ export default function CandidatProfilePage() {
     } catch { setError('Erreur.') } finally { setSaving(false) }
   }
 
+  // Add new exp media
   const addNewExpMedia = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     const previews = files.filter(f => f.type.startsWith('image/') || f.type.startsWith('video/')).map(f => ({ file: f, previewUrl: URL.createObjectURL(f) }))
@@ -393,7 +394,7 @@ export default function CandidatProfilePage() {
     e.target.value = ''
   }
 
-  // ── Education handlers ──
+  // Start edit edu
   const startEditEdu = (edu: any) => {
     setEditingEduId(edu.id)
     setEduNewMedia([])
@@ -408,6 +409,7 @@ export default function CandidatProfilePage() {
     })
   }
 
+  // Save edu
   const saveEdu = async (id: string) => {
     setSaving(true); setError('')
     try {
@@ -426,15 +428,18 @@ export default function CandidatProfilePage() {
     } catch { setError('Erreur.') } finally { setSaving(false) }
   }
 
+  // Delete edu
   const deleteEdu = async (id: string) => {
     if (!confirm('Supprimer cette formation ?')) return
     try { await candidateApi.deleteEducation(id); await refresh() } catch { }
   }
 
+  // Delete edu media
   const deleteEduMedia = async (eduId: string, mediaId: string) => {
     try { await candidateApi.deleteEducationMedia(eduId, mediaId); await refresh() } catch { }
   }
 
+  // Add edu media files
   const addEduMediaFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     const previews = files.filter(f => f.type.startsWith('image/') || f.type.startsWith('video/')).map(f => ({ file: f, previewUrl: URL.createObjectURL(f) }))
@@ -442,6 +447,7 @@ export default function CandidatProfilePage() {
     e.target.value = ''
   }
 
+  // Add new edu
   const addNewEdu = async () => {
     if (!newEduForm.school || !newEduForm.degree || !newEduForm.start_year) return
     setSaving(true); setError('')
@@ -465,6 +471,7 @@ export default function CandidatProfilePage() {
     } catch { setError('Erreur.') } finally { setSaving(false) }
   }
 
+  // Add new edu media
   const addNewEduMedia = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     const previews = files.filter(f => f.type.startsWith('image/') || f.type.startsWith('video/')).map(f => ({ file: f, previewUrl: URL.createObjectURL(f) }))
@@ -472,12 +479,12 @@ export default function CandidatProfilePage() {
     e.target.value = ''
   }
 
+  // Gère logout
   const handleLogout = async () => {
     try { const Cookies = (await import('js-cookie')).default; await import('@/lib/auth-service').then(m => m.authApi.logout(Cookies.get('refresh_token') || '')) } catch { }
     clearTokens(); router.push('/')
   }
 
-  // ── Loading / Error ──
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="animate-spin w-8 h-8 border-2 border-accent border-t-transparent rounded-full" />

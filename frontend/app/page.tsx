@@ -2,8 +2,9 @@ import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
 import Button from '@/components/ui/Button';
 import FadeIn from '@/components/ui/FadeIn';
-import { Search, ShieldCheck, CheckCircle, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
+// Landing page
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white text-[#1A1A1A]">

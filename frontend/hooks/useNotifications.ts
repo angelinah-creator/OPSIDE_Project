@@ -7,6 +7,7 @@ import { notificationService } from '@/lib/notification-service';
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
+// Hook pour notifications
 export const useNotifications = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -21,10 +22,8 @@ export const useNotifications = () => {
   }, []);
 
   useEffect(() => {
-    // 1. Fetch initial count
     fetchUnreadCount();
 
-    // 2. Setup WebSocket connection
     const token = getToken();
     if (!token) return;
 
@@ -39,7 +38,6 @@ export const useNotifications = () => {
 
     newSocket.on('newNotification', (notification) => {
       console.log('New notification received:', notification);
-      // On peut ici déclencher un toast si on veut
       fetchUnreadCount();
     });
 

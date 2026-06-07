@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Logo from '@/components/ui/Logo'
+
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { authApi } from '@/lib/auth-service'
 import { setTokens, setUser, getDashboardByRole } from '@/lib/auth-service'
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 
+// Login page
 export default function LoginPage() {
   const router = useRouter()
   const [form, setForm] = useState({ email: '', password: '' })
@@ -17,9 +18,11 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Définit 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(p => ({ ...p, [k]: e.target.value }))
 
+  // Gère submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')

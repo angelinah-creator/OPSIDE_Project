@@ -15,26 +15,31 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
+  // Find all
   @Get()
   findAll(@CurrentUser('id') userId: string) {
     return this.notificationsService.findAll(userId);
   }
 
+  // Récupère unread count
   @Get('unread-count')
   getUnreadCount(@CurrentUser('id') userId: string) {
     return this.notificationsService.getUnreadCount(userId);
   }
 
+  // Mark as read
   @Patch(':id/read')
   markAsRead(@Param('id') id: string, @CurrentUser('id') userId: string) {
     return this.notificationsService.markAsRead(id, userId);
   }
 
+  // Mark all as read
   @Patch('read-all')
   markAllAsRead(@CurrentUser('id') userId: string) {
     return this.notificationsService.markAllAsRead(userId);
   }
 
+  // Remove
   @Delete(':id')
   remove(@Param('id') id: string, @CurrentUser('id') userId: string) {
     return this.notificationsService.remove(id, userId);

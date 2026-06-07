@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react'
 
 export interface CountryOption {
@@ -18,6 +18,7 @@ interface CountrySelectProps {
   error?: string
 }
 
+// Country select
 export default function CountrySelect({ label, options, value, onChange, placeholder = 'Choisir...', error }: CountrySelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -25,6 +26,7 @@ export default function CountrySelect({ label, options, value, onChange, placeho
   const selectedOption = options.find(opt => opt.value === value)
 
   useEffect(() => {
+    // Gère click outside
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false)

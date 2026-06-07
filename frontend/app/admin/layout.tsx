@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import Logo from '@/components/ui/Logo'
+
 import { getUser, clearTokens } from '@/lib/auth-service'
 import { authApi } from '@/lib/auth-service'
 import { Users, LayoutDashboard, LogOut, Menu, X, Video, Handshake } from 'lucide-react'
@@ -16,6 +16,7 @@ const NAV = [
   { href: '/admin/videos', label: 'Aide Entretiens', icon: Video },
 ]
 
+// Admin layout
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -31,6 +32,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }).catch(() => router.push('/auth/login'))
   }, [router])
 
+  // Gère logout
   const handleLogout = async () => {
     try { const Cookies = (await import('js-cookie')).default; await authApi.logout(Cookies.get('refresh_token') || '') } catch { }
     clearTokens(); router.push('/')

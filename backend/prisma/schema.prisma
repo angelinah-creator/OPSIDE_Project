@@ -75,15 +75,6 @@ enum CandidateStatus {
   part_time
 }
 
-// enum SkillCategory {
-//   frontend
-//   backend
-//   mobile
-//   devops
-//   data
-//   design
-// }
-
 enum EmploymentType {
   temps_plein
   temps_partiel

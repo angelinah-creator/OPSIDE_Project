@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { notificationService } from '@/lib/notification-service'
-import { Bell, Check, Trash2, ExternalLink, Mail, Briefcase, UserCheck } from 'lucide-react'
+import { Bell, Trash2, Mail, Briefcase, UserCheck } from 'lucide-react';
 import { toast } from 'sonner'
-import Link from 'next/link'
+
 import clsx from 'clsx'
 import { io } from 'socket.io-client'
 import { getToken } from '@/lib/auth-service'
 
+// Notifications tab
 export default function NotificationsTab() {
   const [notifications, setNotifications] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -38,6 +39,7 @@ export default function NotificationsTab() {
     }
   }, [])
 
+  // Fetch notifications
   const fetchNotifications = async () => {
     try {
       const data = await notificationService.getAll()
@@ -49,6 +51,7 @@ export default function NotificationsTab() {
     }
   }
 
+  // Gère mark read
   const handleMarkRead = async (id: string) => {
     try {
       await notificationService.markAsRead(id)
@@ -58,6 +61,7 @@ export default function NotificationsTab() {
     }
   }
 
+  // Gère mark all read
   const handleMarkAllRead = async () => {
     try {
       await notificationService.markAllAsRead()
@@ -68,6 +72,7 @@ export default function NotificationsTab() {
     }
   }
 
+  // Gère delete
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation()
     try {
@@ -79,6 +84,7 @@ export default function NotificationsTab() {
     }
   }
 
+  // Récupère icon
   const getIcon = (type: string) => {
     switch (type) {
       case 'new_application': return <Briefcase className="w-5 h-5 text-blue-500" />

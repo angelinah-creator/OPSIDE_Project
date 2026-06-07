@@ -3,6 +3,7 @@
 import clsx from 'clsx';
 import { Bell } from 'lucide-react';
 
+// Notifications tab
 export default function NotificationsTab() {
   return (
     <div className="max-w-2xl mx-auto space-y-4">

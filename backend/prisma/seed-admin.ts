@@ -1,4 +1,3 @@
-// npx tsx .\prisma\seed-admin.ts
 
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -12,6 +11,7 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
+// Main
 async function main() {
   const email = 'admin@gmail.com';
   

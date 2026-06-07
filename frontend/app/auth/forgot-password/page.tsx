@@ -2,18 +2,20 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import Logo from '@/components/ui/Logo'
+
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { authApi } from '@/lib/auth-service'
 import { ArrowLeft, CheckCircle2 } from 'lucide-react'
 
+// Forgot password page
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
+  // Gère submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')

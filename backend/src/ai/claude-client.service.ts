@@ -15,6 +15,7 @@ export class ClaudeClientService {
     this.model = this.configService.get<string>('AI_MODEL') || 'claude-sonnet-4-20250514';
   }
 
+  // Generate completion
   async generateCompletion(
     systemPrompt: string,
     userMessage: string,

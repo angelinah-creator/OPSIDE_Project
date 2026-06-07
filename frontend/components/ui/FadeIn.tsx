@@ -9,6 +9,7 @@ interface FadeInProps {
   className?: string;
 }
 
+// Fade in
 export default function FadeIn({
   children,
   delay = 0,
@@ -41,6 +42,7 @@ export default function FadeIn({
     };
   }, []);
 
+  // Récupère direction class
   const getDirectionClass = () => {
     if (direction === "up") return "translate-y-8";
     if (direction === "down") return "-translate-y-8";

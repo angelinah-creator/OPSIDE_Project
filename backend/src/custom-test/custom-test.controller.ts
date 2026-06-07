@@ -21,7 +21,7 @@ import { Role } from '@prisma/client';
 export class CustomTestController {
   constructor(private readonly customTestService: CustomTestService) {}
 
-  /** Client : crée et envoie un test custom */
+  // Create test
   @Post()
   @Roles(Role.client)
   createTest(
@@ -31,6 +31,7 @@ export class CustomTestController {
     return this.customTestService.createTest(clientId, dto);
   }
 
+  // Send calendly
   @Post('match/:matchId/send-calendly')
   @Roles(Role.client)
   sendCalendly(
@@ -41,14 +42,14 @@ export class CustomTestController {
     return this.customTestService.sendCalendlyDirectly(matchId, clientId, calendlyUrl);
   }
 
-  /** Client : ses tests envoyés */
+  // Récupère client tests
   @Get('client')
   @Roles(Role.client)
   getClientTests(@CurrentUser('id') clientId: string) {
     return this.customTestService.getTestsForClient(clientId);
   }
 
-  /** Client : propose un retest */
+  // Request retest
   @Post(':id/retest')
   @Roles(Role.client)
   requestRetest(
@@ -58,7 +59,7 @@ export class CustomTestController {
     return this.customTestService.requestRetest(testId, clientId);
   }
 
-  /** Client ou Candidat : test lié à un match */
+  // Récupère test by match
   @Get('match/:matchId')
   getTestByMatch(
     @Param('matchId') matchId: string,
@@ -67,14 +68,14 @@ export class CustomTestController {
     return this.customTestService.getTestByMatch(matchId, userId);
   }
 
-  /** Candidat : ses tests reçus */
+  // Récupère candidate tests
   @Get('candidate')
   @Roles(Role.candidat)
   getCandidateTests(@CurrentUser('id') candidateId: string) {
     return this.customTestService.getTestsForCandidate(candidateId);
   }
 
-  /** Candidat : voir un test spécifique */
+  // Récupère test
   @Get(':id')
   getTest(
     @Param('id') testId: string,
@@ -83,7 +84,7 @@ export class CustomTestController {
     return this.customTestService.getTestForCandidate(testId, candidateId);
   }
 
-  /** Candidat : démarre le test */
+  // Start test
   @Patch(':id/start')
   @Roles(Role.candidat)
   startTest(
@@ -93,7 +94,7 @@ export class CustomTestController {
     return this.customTestService.startTest(testId, candidateId);
   }
 
-  /** Candidat : soumet les réponses */
+  // Submit test
   @Post(':id/submit')
   @Roles(Role.candidat)
   submitTest(

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { testApi, Question } from '@/lib/test-service';
+import { Question } from '@/lib/test-service';
 import QuestionCard from '@/components/test/QuestionCard';
 import Timer from '@/components/test/Timer';
 import TestStepper from '@/components/test/TestStepper';
@@ -10,6 +10,7 @@ import Button from '@/components/ui/Button';
 import { ChevronRight, Send, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 
+// Take test page
 export default function TakeTestPage() {
   const router = useRouter();
   const params = useParams();
@@ -26,25 +27,28 @@ export default function TakeTestPage() {
   const [cheatWarning, setCheatWarning] = useState<string | null>(null);
 
   useEffect(() => {
+    // Gère copy paste
     const handleCopyPaste = (e: Event) => {
       e.preventDefault();
       e.stopPropagation();
       setCheatWarning("L'utilisation du copier, couper et coller est interdite pendant l'évaluation.");
     };
 
+    // Gère visibility change
     const handleVisibilityChange = () => {
       if (document.hidden) {
         setCheatWarning("Vous avez quitté l'onglet du test. Les changements d'onglet ne sont pas autorisés et sont enregistrés.");
       }
     };
 
+    // Gère mouse leave
     const handleMouseLeave = (e: MouseEvent) => {
-      // Détecter quand la souris quitte la zone de la fenêtre (souvent pour changer d'onglet)
       if (e.clientY <= 0 || e.relatedTarget === null) {
         setCheatWarning("Veuillez rester sur cette page. Il est interdit de quitter la zone de test.");
       }
     };
 
+    // Gère before unload
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
       e.returnValue = "Vous avez un test en cours. Êtes-vous sûr de vouloir quitter ?";
@@ -69,47 +73,29 @@ export default function TakeTestPage() {
   }, []);
 
   useEffect(() => {
-    /* --- MOCK MODE: Bypass API for testing --- */
-    /*
-    testApi
-      .startTestById(testId)
-      .then((res) => {
-        setQuestions(res.questions);
-        setDuration(res.durationMinutes);
-        setAnswers(new Array(res.questions.length).fill(''));
-      })
-      .catch((err) => {
-        setError(err.response?.data?.message || 'Impossible de charger le test.');
-      })
-      .finally(() => setLoading(false));
-    */
 
     const mockQuestions: Question[] = [
-      // 4 QCM
       { id: 1, type: 'mcq', skill: 'React', difficulty: 'medium', question_text: 'Quelle est l\'utilité du hook useEffect ?', options: ['Gérer les cycles de vie', 'Créer des styles', 'Déclarer un état', 'Faire du routage'], points: 10 },
       { id: 2, type: 'mcq', skill: 'TypeScript', difficulty: 'medium', question_text: 'Comment définir une interface pour un objet avec une clé dynamique ?', options: ['{ [key: string]: any }', '{ key: string }', 'any[]', 'Object.keys()'], points: 10 },
       { id: 3, type: 'mcq', skill: 'React', difficulty: 'hard', question_text: 'Dans quel cas useMemo est-il préférable à useCallback ?', options: ['Pour mémoïser une valeur calculée', 'Pour mémoïser une fonction', 'Pour déclencher un effet', 'Pour gérer un cycle de vie'], points: 10 },
       { id: 4, type: 'mcq', skill: 'CSS', difficulty: 'easy', question_text: 'Quelle propriété permet de créer de l\'espace à l\'intérieur d\'un élément ?', options: ['margin', 'padding', 'border', 'gap'], points: 10 },
       
-      // 3 Code
       { id: 5, type: 'code', skill: 'JavaScript', difficulty: 'medium', question_text: 'Écrivez une fonction "reverseString(str)" qui inverse une chaîne de caractères.', code_snippet: 'function reverseString(str) {\n  // Votre code ici\n}', points: 20 },
       { id: 6, type: 'code', skill: 'React', difficulty: 'medium', question_text: 'Créez un composant Counter simple qui incrémente une valeur au clic.', code_snippet: 'export default function Counter() {\n  const [count, setCount] = useState(0);\n  return (\n    // ...\n  );\n}', points: 20 },
       { id: 7, type: 'code', skill: 'JavaScript', difficulty: 'hard', question_text: 'Implémentez une fonction de debounce.', code_snippet: 'function debounce(fn, delay) {\n  // ...\n}', points: 20 },
 
-      // 2 Debug
       { id: 8, type: 'debug', skill: 'React', difficulty: 'medium', question_text: 'Pourquoi ce composant provoque-t-il une boucle infinie ?', code_snippet: 'useEffect(() => {\n  setCount(count + 1);\n}, [count]);', points: 15 },
       { id: 9, type: 'debug', skill: 'JavaScript', difficulty: 'easy', question_text: 'Corrigez l\'erreur dans cette boucle.', code_snippet: 'for (var i = 0; i < 5; i++) {\n  setTimeout(() => console.log(i), 100);\n} // Affiche 5, 5, 5, 5, 5', points: 15 },
 
-      // 1 Open
       { id: 10, type: 'open', skill: 'Architecture', difficulty: 'medium', question_text: 'Expliquez la différence entre le Virtual DOM et le DOM réel.', points: 10 },
     ];
     setQuestions(mockQuestions);
     setDuration(45);
     setAnswers(new Array(mockQuestions.length).fill(''));
     setLoading(false);
-    /* --- END MOCK MODE --- */
   }, [testId]);
 
+  // Gère answer change
   const handleAnswerChange = (value: any) => {
     setAnswers((prev) => {
       const updated = [...prev];
@@ -121,20 +107,13 @@ export default function TakeTestPage() {
   const handleSubmit = useCallback(async () => {
     setSubmitting(true);
     try {
-      /* --- MOCK MODE --- */
-      /*
-      const res = await testApi.submitTest(testId, answers);
-      router.push(`/candidat/test-result/${testId}`);
-      */
       setTimeout(() => {
-        // MOCK: Save score to localStorage for flow guard bypass
         if (typeof window !== 'undefined') {
           localStorage.setItem('opside_mock_score', '85');
         }
         router.push(`/candidat/test/test-result/${testId}`);
         setSubmitting(false);
       }, 1500);
-      /* --- END MOCK MODE --- */
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erreur lors de la soumission.');
       setSubmitting(false);

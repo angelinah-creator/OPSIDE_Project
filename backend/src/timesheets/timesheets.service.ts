@@ -26,6 +26,7 @@ const EDITABLE_DAYS = 7;
 export class TimesheetsService {
   constructor(private prisma: PrismaService) {}
 
+  // Check if editable
   private async checkIfEditable(entryId: string, userId: string): Promise<Timesheet> {
     const entry = await this.prisma.timesheet.findUnique({
       where: { id: entryId, user_id: userId },
@@ -51,6 +52,7 @@ export class TimesheetsService {
     return entry;
   }
 
+  // Start timer
   async startTimer(userId: string, startTimerDto: StartTimerDto): Promise<Timesheet> {
     const activeTimer = await this.prisma.timesheet.findFirst({
       where: {
@@ -63,7 +65,6 @@ export class TimesheetsService {
       throw new ConflictException("Un timer est déjà actif. Arrêtez-le d'abord.");
     }
 
-    // Vérifier que le match appartient bien au candidat
     const match = await this.prisma.match.findUnique({
       where: { id: startTimerDto.match_id, candidate_id: userId },
     });
@@ -85,6 +86,7 @@ export class TimesheetsService {
     });
   }
 
+  // Pause timer
   async pauseTimer(userId: string): Promise<Timesheet> {
     const activeTimer = await this.getActiveTimer(userId);
 
@@ -105,6 +107,7 @@ export class TimesheetsService {
     });
   }
 
+  // Resume timer
   async resumeTimer(userId: string): Promise<Timesheet> {
     const activeTimer = await this.getActiveTimer(userId);
 
@@ -123,6 +126,7 @@ export class TimesheetsService {
     });
   }
 
+  // Stop timer
   async stopTimer(userId: string): Promise<Timesheet> {
     const activeTimer = await this.getActiveTimer(userId);
 
@@ -143,6 +147,7 @@ export class TimesheetsService {
     });
   }
 
+  // Récupère active timer
   async getActiveTimer(userId: string): Promise<Timesheet> {
     const activeTimer = await this.prisma.timesheet.findFirst({
       where: {
@@ -158,6 +163,7 @@ export class TimesheetsService {
     return activeTimer;
   }
 
+  // Create entry
   async createEntry(userId: string, createDto: CreateTimesheetDto): Promise<Timesheet> {
     const now = new Date();
     const limitDate = new Date();
@@ -185,6 +191,7 @@ export class TimesheetsService {
     });
   }
 
+  // Update entry
   async updateEntry(userId: string, id: string, updateDto: UpdateTimesheetDto): Promise<Timesheet> {
     await this.checkIfEditable(id, userId);
     
@@ -198,11 +205,13 @@ export class TimesheetsService {
     });
   }
 
+  // Delete entry
   async deleteEntry(userId: string, id: string): Promise<void> {
     await this.checkIfEditable(id, userId);
     await this.prisma.timesheet.delete({ where: { id } });
   }
 
+  // Récupère entries
   async getEntries(userId: string, matchId?: string, startDate?: Date, endDate?: Date): Promise<Timesheet[]> {
     const where: any = { user_id: userId };
     if (matchId) {
@@ -226,6 +235,7 @@ export class TimesheetsService {
     });
   }
 
+  // Récupère report
   async getReport(reportDto: GetReportDto, requesterId: string, requesterRole: string) {
     let targetUserId = reportDto.user_id;
 
@@ -236,7 +246,6 @@ export class TimesheetsService {
       targetUserId = requesterId;
     }
 
-    // Si le requêteur est client, vérifier s'il y a un match avec le targetUserId
     if (requesterRole === 'client') {
       const match = await this.prisma.match.findFirst({
         where: { client_id: requesterId, candidate_id: targetUserId, status: 'in_workspace' }

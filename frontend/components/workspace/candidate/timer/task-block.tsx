@@ -12,6 +12,7 @@ interface TaskBlockProps {
   isDraggable?: boolean;
 }
 
+// Task block
 export function TaskBlock({
   entry,
   pixelsPerHour,
@@ -38,6 +39,7 @@ export function TaskBlock({
     }
   }, [startHour, durationHours, isDragging, isResizing]);
 
+  // Gère mouse down
   const handleMouseDown = (e: React.MouseEvent, type: 'drag' | 'resize-top' | 'resize-bottom', initialStart: number, initialDuration: number) => {
     e.stopPropagation();
     if (!isEditable || isActive || !isDraggable) return;
@@ -45,6 +47,7 @@ export function TaskBlock({
     const startY = e.clientY;
     let hasMoved = false;
 
+    // Gère mouse move
     const handleMouseMove = (moveEvent: MouseEvent) => {
       const deltaY = moveEvent.clientY - startY;
       if (Math.abs(deltaY) > 5) {
@@ -80,6 +83,7 @@ export function TaskBlock({
       }
     };
 
+    // Gère mouse up
     const handleMouseUp = (upEvent: MouseEvent) => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -100,7 +104,6 @@ export function TaskBlock({
         return currentStart;
       });
 
-      // Délai court pour bloquer le onClick juste après le relâchement
       setTimeout(() => {
         setIsDragging(false);
         setIsResizing(false);
@@ -111,6 +114,7 @@ export function TaskBlock({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
+  // Formate duration
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -119,6 +123,7 @@ export function TaskBlock({
       : `${minutes}m`;
   };
 
+  // Gère block click
   const handleBlockClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isDragging || isResizing) return;

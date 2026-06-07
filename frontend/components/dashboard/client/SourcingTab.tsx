@@ -9,13 +9,14 @@ import { toast } from 'sonner'
 import clsx from 'clsx'
 import Modal from '@/components/ui/Modal'
 
-// Unified Mock score generator (Consistent across tabs)
+// Récupère mock score
 export const getMockScore = (id: string) => {
   if (!id) return 0;
   const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return 65 + (hash % 31); // Score between 65 and 95
 };
 
+// Client sourcing tab
 export default function ClientSourcingTab() {
   const [candidates, setCandidates] = useState<CandidateProfile[]>([])
   const [jobOffers, setJobOffers] = useState<any[]>([])
@@ -28,11 +29,9 @@ export default function ClientSourcingTab() {
   const [selectedCandidate, setSelectedCandidate] = useState<CandidateProfile | null>(null)
   const [targetCandidateId, setTargetCandidateId] = useState<string | null>(null)
 
-  // Filters
   const [techFilter, setTechFilter] = useState('')
   const [minScore, setMinScore] = useState(0)
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 6
 
@@ -40,6 +39,7 @@ export default function ClientSourcingTab() {
     fetchData()
   }, [])
 
+  // Fetch data
   const fetchData = async () => {
     try {
       const [candData, offerData] = await Promise.all([
@@ -56,17 +56,20 @@ export default function ClientSourcingTab() {
     }
   }
 
+  // Open invite modal
   const openInviteModal = (e: React.MouseEvent, candidateId: string) => {
     e.stopPropagation()
     setTargetCandidateId(candidateId)
     setIsInviteModalOpen(true)
   }
 
+  // Open detail modal
   const openDetailModal = (candidate: CandidateProfile) => {
     setSelectedCandidate(candidate)
     setIsDetailModalOpen(true)
   }
 
+  // Gère invite
   const handleInvite = async () => {
     if (!targetCandidateId || !selectedOfferId) {
       toast.error('Veuillez sélectionner une offre')
@@ -104,7 +107,6 @@ export default function ClientSourcingTab() {
     return matchesSearch && matchesTech && matchesScore
   })
 
-  // Pagination Logic
   const totalPages = Math.ceil(filteredCandidates.length / itemsPerPage)
   const paginatedCandidates = filteredCandidates.slice(
     (currentPage - 1) * itemsPerPage,

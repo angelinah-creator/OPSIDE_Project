@@ -7,6 +7,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   placeholder?: string;
 }
 
+// Select
 export default function Select({ label, error, options, placeholder, className = '', ...props }: SelectProps) {
   return (
     <div className="flex flex-col gap-1.5">
