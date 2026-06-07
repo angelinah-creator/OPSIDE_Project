@@ -207,7 +207,7 @@ export default function CandidatWorkspace() {
 
           {/* Tab Content */}
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1 flex flex-col min-h-0">
-            {activeTab === 'workspace_home' && <WorkspaceHome />}
+            {activeTab === 'workspace_home' && <WorkspaceHome matchId={params.matchId as string} />}
             {activeTab === 'workspace_time' && <WorkspaceTimeTracking matchId={params.matchId as string} />}
             {activeTab === 'workspace_factures' && <WorkspaceFactures />}
             {activeTab === 'workspace_contrats' && <WorkspaceContrats />}

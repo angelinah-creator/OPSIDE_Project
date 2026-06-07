@@ -635,7 +635,7 @@ export default function WorkspaceClientTimeTracking() {
                   <Tooltip content={<CustomBarTooltip />} cursor={{ fill: 'rgba(99,102,241,0.06)', radius: 8 }} />
                   <Bar dataKey="hours" radius={[8, 8, 4, 4]} maxBarSize={48}>
                     {dailyData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.isToday ? '#6366f1' : '#e2e8f0'} />
+                      <Cell key={`cell-${index}`} fill={entry.isToday ? '#4f46e5' : (entry.hours > 0 ? '#6366f1' : '#e2e8f0')} />
                     ))}
                   </Bar>
                 </BarChart>

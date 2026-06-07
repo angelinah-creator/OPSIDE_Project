@@ -282,8 +282,42 @@ export class TimesheetsService {
 
     const byDay = new Map<string, number>();
     entries.forEach((entry) => {
-      const day = entry.date.toISOString().split('T')[0];
-      byDay.set(day, (byDay.get(day) || 0) + entry.duration);
+      if (!entry.end_time) {
+        const day = entry.date.toISOString().split('T')[0];
+        byDay.set(day, (byDay.get(day) || 0) + entry.duration);
+        return;
+      }
+
+      const start = new Date(entry.start_time);
+      const end = new Date(entry.end_time);
+      const elapsedSec = (end.getTime() - start.getTime()) / 1000;
+
+      if (elapsedSec <= 0) {
+        const day = entry.date.toISOString().split('T')[0];
+        byDay.set(day, (byDay.get(day) || 0) + entry.duration);
+        return;
+      }
+
+      let current = new Date(start.getTime());
+      while (current < end) {
+        const year = current.getUTCFullYear();
+        const month = current.getUTCMonth();
+        const date = current.getUTCDate();
+        const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+
+        const nextMidnight = new Date(Date.UTC(year, month, date + 1));
+        const segmentEnd = nextMidnight < end ? nextMidnight : end;
+
+        const segmentMs = segmentEnd.getTime() - current.getTime();
+        const segmentSec = segmentMs / 1000;
+
+        const proportion = segmentSec / elapsedSec;
+        const dayDuration = Math.round(proportion * entry.duration);
+
+        byDay.set(dayStr, (byDay.get(dayStr) || 0) + dayDuration);
+
+        current = segmentEnd;
+      }
     });
 
     return {
