@@ -127,6 +127,56 @@ export function TimeGrid({
     return chunks;
   };
 
+  const getDayTotalDuration = (day: Date) => {
+    let totalSeconds = 0;
+    const dayStart = new Date(day);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayStartMs = dayStart.getTime();
+    const dayEndMs = dayStartMs + 24 * 3600 * 1000;
+
+    entries.forEach((entry) => {
+      if (activeTimer?.id === entry.id) return;
+      const entryStart = new Date(entry.start_time).getTime();
+      const durationSeconds = entry.duration;
+      const entryEnd = entryStart + durationSeconds * 1000;
+
+      const overlapStart = Math.max(entryStart, dayStartMs);
+      const overlapEnd = Math.min(entryEnd, dayEndMs);
+
+      if (overlapStart < overlapEnd) {
+        totalSeconds += Math.round((overlapEnd - overlapStart) / 1000);
+      }
+    });
+
+    if (activeTimer) {
+      const entryStart = new Date(activeTimer.start_time).getTime();
+      const durationSeconds = currentTimerDuration ?? activeTimer.duration;
+      const entryEnd = entryStart + durationSeconds * 1000;
+
+      const overlapStart = Math.max(entryStart, dayStartMs);
+      const overlapEnd = Math.min(entryEnd, dayEndMs);
+
+      if (overlapStart < overlapEnd) {
+        totalSeconds += Math.round((overlapEnd - overlapStart) / 1000);
+      }
+    }
+
+    return totalSeconds;
+  };
+
+  const formatTotalTime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const formatTotalTimeShort = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full">
       {/* En-tête des jours */}
@@ -134,6 +184,7 @@ export function TimeGrid({
         <div className="w-[60px] shrink-0 border-r border-slate-100" />
         {DAYS.map((day, i) => {
           const isToday = isSameDay(day, new Date());
+          const totalDuration = getDayTotalDuration(day);
           return (
             <div
               key={i}
@@ -146,6 +197,10 @@ export function TimeGrid({
               </div>
               <div className={`text-xl font-black ${isToday ? 'text-accent' : 'text-slate-900'}`}>
                 {format(day, 'd')}
+              </div>
+              <div className={`text-[9px] sm:text-[11px] md:text-[12px] font-mono font-bold mt-1 ${totalDuration > 0 ? 'text-accent/80' : 'text-slate-400'} truncate px-0.5`}>
+                <span className="hidden sm:inline">{formatTotalTime(totalDuration)}</span>
+                <span className="inline sm:hidden">{formatTotalTimeShort(totalDuration)}</span>
               </div>
             </div>
           );
