@@ -43,7 +43,10 @@ export default function CandidatRegisterPage() {
         first_name: form.first_name,
         last_name: form.last_name,
       })
-      router.push('/auth/verify-email-notice')
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('registered_email', form.email)
+      }
+      router.push(`/auth/verify-email-notice?email=${encodeURIComponent(form.email)}`)
     } catch (err: any) {
       const msg = err.response?.data?.message
       if (err.response?.status === 409) setError('Cet email est déjà utilisé.')

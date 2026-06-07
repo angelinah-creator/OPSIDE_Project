@@ -11,6 +11,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ResendVerificationDto } from './dto/resend-verification.dto';
 import * as bcrypt from 'bcrypt';
 import { Role, UserStatus } from '@prisma/client';
 import { MailService } from '../mail/mail.service';
@@ -183,6 +184,43 @@ export class AuthService {
       ...tokens,
     };
   }
+
+  // Resend verification email
+  async resendVerificationEmail(dto: ResendVerificationDto) {
+    const email = dto.email.toLowerCase();
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new BadRequestException("Aucun compte n'est associé à cette adresse e-mail");
+    }
+
+    if (user.status === UserStatus.active) {
+      throw new BadRequestException('Ce compte est déjà activé');
+    }
+
+    let verificationToken = user.email_verification_token;
+    if (!verificationToken) {
+      verificationToken = crypto.randomBytes(32).toString('hex');
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { email_verification_token: verificationToken },
+      });
+    }
+
+    try {
+      await this.mailService.sendVerificationEmail(user.email, verificationToken);
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      throw new BadRequestException("Erreur lors de l'envoi de l'e-mail de vérification");
+    }
+
+    return {
+      message: 'Un nouvel e-mail de vérification a été envoyé',
+    };
+  }
+
 
   // Me
   async me(userId: string) {
