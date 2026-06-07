@@ -11,6 +11,7 @@ import CountrySelect from '@/components/ui/CountrySelect'
 import SkillSelector from '@/components/ui/SkillSelector'
 import { candidateApi } from '@/lib/candidate-service'
 import { User, Plus, Trash2, X, ImagePlus } from 'lucide-react';
+import { isAuthenticated } from '@/lib/auth-service';
 
 const SPECIALITIES = [
   { value: 'frontend', label: 'Frontend' },
@@ -136,6 +137,7 @@ function AutoTextarea({ value, onChange, placeholder, className = '', label }: {
 export default function CandidatOnboarding() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [checkingAuth, setCheckingAuth] = useState(true)
   const [error, setError] = useState('')
   const photoInputRef = useRef<HTMLInputElement>(null)
 
@@ -150,6 +152,27 @@ export default function CandidatOnboarding() {
 
   const [experiences, setExperiences] = useState<ExpForm[]>([])
   const [educations, setEducations] = useState<EduForm[]>([])
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      router.replace('/auth/login');
+      return;
+    }
+
+    const checkExistingProfile = async () => {
+      try {
+        await candidateApi.getMyProfile();
+        // If it succeeds, the profile exists, so we redirect to the dashboard
+        router.replace('/candidat/dashboard');
+      } catch (err: any) {
+        // If it fails with 404, we can stay here.
+        setCheckingAuth(false);
+      }
+    };
+
+    checkExistingProfile();
+  }, [router]);
+
 
   // Définit p
   const setP = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
@@ -221,33 +244,49 @@ export default function CandidatOnboarding() {
     }
     setLoading(true)
     try {
-      await candidateApi.createProfile({
-        country: profile.country,
-        city: profile.city || undefined,
-        speciality: isSpecialityOther ? 'other' : (profile.speciality as any),
-        custom_speciality: isSpecialityOther ? profile.custom_speciality : undefined,
-        experience_years: Number(profile.experience_years),
-        daily_rate: Number(profile.daily_rate),
-        availability: profile.availability,
-        bio: profile.bio || undefined,
-        title: profile.title || undefined,
-        phone: profile.phone || undefined,
-        linkedin_url: profile.linkedin_url || undefined,
-        portfolio_url: profile.portfolio_url || undefined,
-        skill_ids: profile.skill_ids,
-      })
+      try {
+        await candidateApi.createProfile({
+          country: profile.country,
+          city: profile.city || undefined,
+          speciality: isSpecialityOther ? 'other' : (profile.speciality as any),
+          custom_speciality: isSpecialityOther ? profile.custom_speciality : undefined,
+          experience_years: Number(profile.experience_years),
+          daily_rate: Number(profile.daily_rate),
+          availability: profile.availability,
+          bio: profile.bio || undefined,
+          title: profile.title || undefined,
+          phone: profile.phone || undefined,
+          linkedin_url: profile.linkedin_url || undefined,
+          portfolio_url: profile.portfolio_url || undefined,
+          skill_ids: profile.skill_ids,
+        })
+      } catch (profileErr: any) {
+        // If the profile already exists (409 Conflict), we can safely ignore and proceed
+        if (profileErr.response?.status !== 409) {
+          throw profileErr;
+        }
+      }
 
       if (photoFile) await candidateApi.uploadPhoto(photoFile).catch(() => { })
 
       for (const exp of experiences) {
-        if (!exp.title || !exp.company || !exp.start_year) continue
+        if (!exp.title || !exp.company || !exp.start_month || !exp.start_year) {
+          setError('Veuillez remplir tous les champs obligatoires pour les expériences ajoutées (Intitulé du poste, Entreprise, Date de début).');
+          setLoading(false);
+          return;
+        }
         const res = await candidateApi.createExperience({
-          title: exp.title, employment_type: exp.employment_type, company: exp.company,
-          start_month: Number(exp.start_month), start_year: Number(exp.start_year),
+          title: exp.title,
+          employment_type: exp.employment_type,
+          company: exp.company,
+          start_month: Number(exp.start_month),
+          start_year: Number(exp.start_year),
           end_month: exp.is_current ? undefined : (exp.end_month ? Number(exp.end_month) : undefined),
           end_year: exp.is_current ? undefined : (exp.end_year ? Number(exp.end_year) : undefined),
-          is_current: exp.is_current, location: exp.location || undefined,
-          description: exp.description || undefined, skill_ids: exp.skill_ids,
+          is_current: exp.is_current,
+          location: exp.location || undefined,
+          description: exp.description || undefined,
+          skill_ids: exp.skill_ids.length > 0 ? exp.skill_ids : undefined,
         })
         const expId = res?.experience?.id
         if (expId) {
@@ -258,23 +297,28 @@ export default function CandidatOnboarding() {
       }
 
       for (const edu of educations) {
-        if (!edu.school || (!edu.is_self_taught && (!edu.degree || !edu.start_year))) continue
+        if (!edu.school || !edu.start_month || !edu.start_year || (!edu.is_self_taught && !edu.degree)) {
+          setError('Veuillez remplir tous les champs obligatoires pour les formations ajoutées (École, Diplôme, Date de début).');
+          setLoading(false);
+          return;
+        }
 
-        const finalLevel = edu.level === 'autre' ? edu.custom_level : edu.level
+        const eduLevel = edu.is_self_taught ? 'autre' : (edu.level || undefined);
+        const eduDegree = edu.is_self_taught ? 'Autodidacte' : (edu.degree || undefined);
 
         const res = await candidateApi.createEducation({
           school: edu.school,
-          degree: edu.is_self_taught ? 'Autodidacte' : edu.degree,
-          field: edu.field,
-          level: (edu.is_self_taught || edu.level === 'autre') ? 'autre' : (edu.level as any),
-          custom_level: (!edu.is_self_taught && edu.level === 'autre') ? edu.custom_level : undefined,
+          degree: eduDegree,
+          field: edu.field || undefined,
+          level: eduLevel as any,
+          custom_level: (!edu.is_self_taught && edu.level === 'autre' && edu.custom_level) ? edu.custom_level : undefined,
           start_month: Number(edu.start_month),
           start_year: Number(edu.start_year),
           end_month: edu.is_current ? undefined : (edu.end_month ? Number(edu.end_month) : undefined),
           end_year: edu.is_current ? undefined : (edu.end_year ? Number(edu.end_year) : undefined),
           is_current: edu.is_current,
           description: edu.description || undefined,
-          skill_ids: edu.skill_ids,
+          skill_ids: edu.skill_ids.length > 0 ? edu.skill_ids : undefined,
         })
         const eduId = res?.education?.id
         if (eduId) {
@@ -287,10 +331,25 @@ export default function CandidatOnboarding() {
       router.push('/candidat/test/ready')
     } catch (err: any) {
       const msg = err.response?.data?.message
-      setError(typeof msg === 'string' ? msg : 'Une erreur est survenue. Veuillez réessayer.')
+      if (Array.isArray(msg)) {
+        setError(msg.join(', '))
+      } else {
+        setError(typeof msg === 'string' ? msg : 'Une erreur est survenue. Veuillez réessayer.')
+      }
     } finally {
       setLoading(false)
     }
+  }
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background animate-in fade-in duration-300">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm text-muted">Vérification de votre session...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
