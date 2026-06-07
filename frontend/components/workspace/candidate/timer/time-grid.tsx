@@ -231,7 +231,7 @@ export function TimeGrid({
               {DAYS.map((day, i) => (
                 <div
                   key={i}
-                  className={`flex-1 border-r border-slate-200 border-dashed last:border-r-0 ${isSameDay(day, new Date()) ? 'bg-accent/[0.02]' : ''}`}
+                  className={`flex-1 border-r border-slate-200 border-dashed last:border-r-0 ${isSameDay(day, new Date()) ? 'bg-accent/2' : ''}`}
                 />
               ))}
             </div>
