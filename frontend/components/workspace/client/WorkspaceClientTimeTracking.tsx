@@ -502,7 +502,7 @@ export default function WorkspaceClientTimeTracking() {
                             {photo ? (
                               <img src={photo} alt={name} className="w-8 h-8 rounded-full object-cover shrink-0 ring-2 ring-slate-100" />
                             ) : (
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent/20 to-accent/10 flex items-center justify-center shrink-0 ring-2 ring-slate-100">
+                              <div className="w-8 h-8 rounded-full bg-linear-to-br from-accent/20 to-accent/10 flex items-center justify-center shrink-0 ring-2 ring-slate-100">
                                 <span className="text-accent font-black text-[11px]">
                                   {c.candidate.first_name?.[0]}{c.candidate.last_name?.[0]}
                                 </span>

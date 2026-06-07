@@ -19,11 +19,11 @@ import ClientOffresTab from '@/components/dashboard/client/ClientOffresTab'
 import ClientProfilTab from '@/components/dashboard/client/ClientProfilTab'
 import ClientCandidaturesTab from '@/components/dashboard/client/CandidaturesTab'
 import ClientSourcingTab from '@/components/dashboard/client/SourcingTab'
-// import ClientMatchesTab from '@/components/dashboard/client/MatchesTab'
 import NotificationsTab from '@/components/dashboard/NotificationsTab'
 import { notificationService } from '@/lib/notification-service'
 import { CheckSquare, Home, ArrowRightLeft } from 'lucide-react'
 import Link from 'next/link'
+import { useNotifications } from '@/hooks/useNotifications'
 
 type TabType = 'dashboard' | 'candidatures' | 'sourcing' | 'matches' | 'notifications' | 'offres' | 'profil'
 
@@ -34,7 +34,7 @@ export default function ClientDashboard() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<TabType>('offres')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [unreadNotifications, setUnreadNotifications] = useState(0)
+  const { unreadCount: unreadNotifications } = useNotifications()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,10 +47,6 @@ export default function ClientDashboard() {
         }
         const p = await clientApi.getMyProfile()
         setProfile(p)
-        
-        // Fetch unread count
-        const count = await notificationService.getUnreadCount()
-        setUnreadNotifications(count)
       } catch (err: any) {
         if (err.response?.status === 404) {
           router.push('/client/onboarding')
@@ -62,18 +58,6 @@ export default function ClientDashboard() {
       }
     }
     fetchData()
-
-    // Set up polling for notifications
-    const interval = setInterval(async () => {
-      try {
-        const count = await notificationService.getUnreadCount()
-        setUnreadNotifications(count)
-      } catch (err) {
-        console.error('Error polling notifications:', err)
-      }
-    }, 15000) // Poll every 15 seconds
-
-    return () => clearInterval(interval)
   }, [router])
 
   const handleLogout = async () => {
@@ -121,7 +105,7 @@ export default function ClientDashboard() {
 
       {/* Sidebar */}
       <aside className={clsx(
-        "w-72 bg-white border-r border-slate-200 flex flex-col fixed lg:sticky top-0 h-[100dvh] z-50 transition-transform duration-300 ease-in-out",
+        "w-72 bg-white border-r border-slate-200 flex flex-col fixed lg:sticky top-0 h-dvh z-50 transition-transform duration-300 ease-in-out",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="p-6 lg:p-8 flex items-center justify-between">
@@ -156,7 +140,7 @@ export default function ClientDashboard() {
                 )} />}
                 {item.label}
                 {item.id === 'notifications' && unreadNotifications > 0 && (
-                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[1.25rem] text-center">
+                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-5 text-center">
                     {unreadNotifications}
                   </span>
                 )}
@@ -166,7 +150,7 @@ export default function ClientDashboard() {
              <div className="h-px bg-slate-100 mb-4" />
              <Link
                href="/client/workspace"
-               className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] text-sm text-left"
+               className="w-full flex items-center gap-3 px-4 py-3 bg-linear-to-r from-slate-900 to-slate-800 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] text-sm text-left"
              >
                <Home className="w-5 h-5 text-amber-400" />
                Workspace
@@ -204,7 +188,7 @@ export default function ClientDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 w-full min-w-0 h-[100dvh] overflow-y-auto">
+      <main className="flex-1 w-full min-w-0 h-dvh overflow-y-auto">
         <div className="p-4 md:p-10 w-full">
           <header className="flex items-center gap-4 mb-8 md:mb-10">
             <button

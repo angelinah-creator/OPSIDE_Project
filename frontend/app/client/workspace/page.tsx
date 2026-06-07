@@ -102,7 +102,7 @@ export default function ClientWorkspace() {
 
       {/* Sidebar */}
       <aside className={clsx(
-        "w-72 bg-slate-900 flex flex-col fixed lg:sticky top-0 h-[100dvh] z-50 transition-transform duration-300 ease-in-out",
+        "w-72 bg-slate-900 flex flex-col fixed lg:sticky top-0 h-dvh z-50 transition-transform duration-300 ease-in-out",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="p-6 lg:p-8 flex items-center justify-between">
@@ -180,7 +180,7 @@ export default function ClientWorkspace() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 w-full min-w-0 h-[100dvh] overflow-y-auto">
+      <main className="flex-1 w-full min-w-0 h-dvh overflow-y-auto">
         <div className="p-4 md:p-10 w-full">
           <header className="flex items-center gap-4 mb-8 md:mb-10">
             <button
