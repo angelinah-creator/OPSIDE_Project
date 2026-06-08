@@ -133,7 +133,7 @@ export class MailService {
         ? `Félicitations ! Vous avez obtenu un score de <strong>${score}%</strong> au test technique pour le projet <strong>${projectName || ''}</strong>. Le client va vous contacter très prochainement pour fixer un entretien.`
         : `Vous avez obtenu un score de <strong>${score}%</strong> au test technique (seuil : 75%). Malheureusement, votre candidature pour le projet <strong>${projectName || ''}</strong> n'a pas pu être retenue. Bon courage pour la suite !`
       : passed
-        ? `Le candidat a réussi le test avec un score de <strong>${score}%</strong> pour le projet <strong>${projectName || ''}</strong>. Un lien de prise de rendez-vous a été envoyé au candidat.`
+        ? `Le candidat a réussi le test avec un score de <strong>${score}%</strong> pour le projet <strong>${projectName || ''}</strong>.`
         : `Le candidat n'a pas atteint le seuil de 75% (score : <strong>${score}%</strong>) pour le projet <strong>${projectName || ''}</strong>. Vous pouvez proposer un retest (1 seule fois) depuis votre dashboard.`;
 
     await this.mailerService.sendMail({
