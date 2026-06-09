@@ -22,7 +22,6 @@
    - [Hooks personnalises](#56-hooks-personnalises)
 6. [Flux metier principaux](#6-flux-metier-principaux)
 7. [Guide de demarrage](#7-guide-de-demarrage)
-8. [Scripts disponibles](#8-scripts-disponibles)
 
 ---
 
@@ -1050,30 +1049,3 @@ npx prisma studio
 ```
 
 ---
-
-## 8. Scripts disponibles
-
-### Backend
-
-| Script | Commande | Description |
-|---|---|---|
-| `start:dev` | `nest start --watch` | Serveur en mode developpement (hot reload) |
-| `start` | `nest start` | Demarrage simple |
-| `start:debug` | `nest start --debug --watch` | Mode debug avec hot reload |
-| `start:prod` | `node dist/main` | Demarrage en production |
-| `build` | `nest build` | Compilation TypeScript vers `dist/` |
-| `format` | `prettier --write ...` | Formatage du code |
-| `lint` | `eslint ... --fix` | Linting avec correction automatique |
-| `test` | `jest` | Lancer les tests unitaires |
-| `test:watch` | `jest --watch` | Tests en mode watch |
-| `test:cov` | `jest --coverage` | Tests avec rapport de couverture |
-| `test:e2e` | `jest --config ./test/jest-e2e.json` | Tests end-to-end |
-
-### Frontend
-
-| Script | Commande | Description |
-|---|---|---|
-| `dev` | `next dev` | Serveur de developpement avec hot reload |
-| `build` | `next build` | Build de production optimise |
-| `start` | `next start` | Demarrage du serveur de production |
-| `lint` | `eslint` | Linting du code |
