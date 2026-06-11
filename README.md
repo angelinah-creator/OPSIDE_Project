@@ -1043,9 +1043,7 @@ cd backend
 # Creer une nouvelle migration apres modification du schema
 npx prisma migrate dev --name nom_de_la_migration
 # Appliquer les migrations en production
-npx prisma migrate deploy
-# Ouvrir Prisma Studio (interface visuelle de la BDD)
-npx prisma studio
+npx generate
 ```
 
 ---
